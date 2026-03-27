@@ -1,8 +1,8 @@
-# Kanban CLI Tool - Requirements Document
+# - Requirements Document
 
 ## 1. Project Overview
 
-**Project Name:** kanban  
+**Project Name:** kanab  
 **Type:** Terminal User Interface (TUI) CLI Application  
 **Core Functionality:** A keyboard-driven kanban board manager with vim-style navigation that stores boards globally on the filesystem.  
 **Target Users:** Developers, power users, and productivity enthusiasts who prefer terminal-based workflows.
@@ -217,7 +217,7 @@
 ### Storage Structure
 
 ```
-~/.local/share/kanban/
+~/.local/share/kanab/
 ├── boards/
 │   ├── work.json
 │   └── personal.json
@@ -266,6 +266,6 @@
 
 | Platform | Data Path |
 |----------|-----------|
-| Linux | `$XDG_DATA_HOME/kanban/` (default: `~/.local/share/kanban/`) |
-| macOS | `~/Library/Application Support/kanban/` |
-| Windows | `%APPDATA%/kanban/` |
+| Linux | `$XDG_DATA_HOME/kanab/` (default: `~/.local/share/kanab/`) |
+| macOS | `~/Library/Application Support/kanab/` |
+| Windows | `%APPDATA%/kanab/` |
