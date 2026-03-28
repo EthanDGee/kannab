@@ -8,7 +8,7 @@ use uuid::Uuid;
 pub struct Item {
     id: Uuid,
     pub description: String,
-    complete: bool,
+    pub complete: bool,
 }
 
 impl Item {
@@ -32,10 +32,10 @@ impl Item {
 /// checklist: Option<Vec<Item> = the items of of the optional to-do list
 pub struct Task {
     id: Uuid,
-    title: String,
-    description: String,
-    complete: bool,
-    checklist: Option<Vec<Item>>,
+    pub title: String,
+    pub description: String,
+    pub complete: bool,
+    pub checklist: Option<Vec<Item>>,
 }
 
 impl Task {
@@ -57,8 +57,8 @@ impl Task {
 /// tasks: Vec<Task>,
 pub struct Column {
     id: Uuid,
-    title: String,
-    tasks: Vec<Task>,
+    pub title: String,
+    pub tasks: Vec<Task>,
 }
 
 impl Column {
@@ -79,7 +79,7 @@ impl Column {
 /// pub columns: Vec<Column>,
 pub struct Board {
     id: Uuid,
-    title: String,
+    pub title: String,
     pub columns: Vec<Column>,
 }
 
