@@ -1,3 +1,4 @@
+use crate::model::modal_state::ModalState;
 use crate::view::board::BoardState;
 use crate::view::picker::PickerState;
 use std::collections::HashMap;
@@ -20,10 +21,10 @@ pub enum AppMode {
 pub struct AppState {
     pub mode: AppMode,
     pub board_map: HashMap<String, String>,
-    picker_state: PickerState,
-    board_state: Option<BoardState>,
-    // modal: Option<ModalState>,
-    pending_changes: bool,
+    pub picker_state: PickerState,
+    pub board_state: Option<BoardState>,
+    pub modal_state: Option<ModalState>,
+    pub pending_changes: bool,
 }
 
 impl AppState {
@@ -34,7 +35,7 @@ impl AppState {
             board_map: HashMap::new(),
             picker_state: PickerState::new(),
             board_state: None,
-            // modal: None,
+            modal_state: None,
             pending_changes: false,
         }
     }
