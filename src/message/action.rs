@@ -51,7 +51,7 @@ pub enum Action {
 }
 
 /// All possible text input fields within the app
-enum InputField {
+pub enum InputField {
     BoardName,
     ColumnName,
     TaskTitle,

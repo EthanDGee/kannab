@@ -1,6 +1,6 @@
 mod app;
+mod message;
 mod model;
-mod update;
 mod view;
 use app::App;
 
