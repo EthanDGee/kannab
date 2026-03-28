@@ -9,9 +9,8 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
     match action {
         // Task Handling
         Action::CreateTask => task_actions::create_task(model),
-        Action::EditTask(input_field, update) => {
-            task_actions::edit_task(model, input_field, update)
-        }
+        Action::EditTask(input_field, edit) => task_actions::edit_task(model, input_field, edit),
+        Action::DeleteTask => task_actions::delete_task(model),
         _ => None,
     }
 }
