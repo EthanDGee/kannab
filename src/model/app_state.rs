@@ -42,7 +42,9 @@ impl AppState {
         }
     }
 
-    pub fn update(&mut self, action: Action) {
-        message::update::update(self, action);
+    pub fn update(&mut self, mut action: Action) {
+        while let Some(next_action) = message::update::update(self, action) {
+            action = next_action;
+        }
     }
 }
