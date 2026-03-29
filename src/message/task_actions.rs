@@ -1,5 +1,8 @@
+use core::task;
+
 use crate::message::action::{Action, InputField};
-use crate::model::board::Column;
+use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
+use crate::model::board::{self, Column};
 use crate::model::{
     app_state::AppState,
     board::Task,
@@ -61,7 +64,86 @@ pub fn delete_task(model: &mut AppState) -> Option<Action> {
 }
 
 // MoveTaskUp,
-// MoveTaskDown,
-// MoveTaskToNextColumn,
-// MoveTaskToPrevColumn,
-//
+pub fn move_task_up(model: &mut AppState) -> Option<Action> {
+    let board_state = model.board_state.as_mut()?;
+    let task_index = board_state.task_index;
+    let column = get_current_column_mut(model)?;
+
+    match increment_no_wrap(task_index, column.tasks.len()) {
+        Some(new_index) => {
+            column.tasks.swap(task_index, new_index);
+            None
+        }
+        None => None,
+    }
+}
+
+// MoveTaskDown
+pub fn move_task_down(model: &mut AppState) -> Option<Action> {
+    let board_state = model.board_state.as_mut()?;
+    let task_index = board_state.task_index;
+    let column = get_current_column_mut(model)?;
+
+    match decrement_no_wrap(task_index) {
+        Some(new_index) => {
+            column.tasks.swap(task_index, new_index);
+            None
+        }
+        None => None,
+    }
+}
+
+/// Move currently highlighted task and cursor to the top of the right column
+pub fn move_task_to_next_column(model: &mut AppState) -> Option<Action> {
+    let board_state = model.board_state.as_mut()?;
+    let column_index = board_state.column_index;
+    let task_index = board_state.task_index;
+    let num_columns = board_state.board.columns.len();
+
+    let task = {
+        let column = board_state.board.columns.get_mut(column_index)?;
+        column.tasks.remove(task_index)
+    };
+
+    match increment_no_wrap(column_index, num_columns) {
+        Some(new_column_index) => {
+            board_state
+                .board
+                .columns
+                .get_mut(new_column_index)?
+                .tasks
+                .insert(0, task);
+            board_state.column_index = new_column_index;
+            board_state.task_index = 0;
+            None
+        }
+        None => None,
+    }
+}
+
+/// Move currently highlighted task and cursor to the top of the left column
+pub fn move_task_to_prev_column(model: &mut AppState) -> Option<Action> {
+    let board_state = model.board_state.as_mut()?;
+    let column_index = board_state.column_index;
+    let task_index = board_state.task_index;
+
+    let task = {
+        let column = board_state.board.columns.get_mut(column_index)?;
+        column.tasks.remove(task_index)
+    };
+
+    match decrement_no_wrap(column_index) {
+        Some(new_column_index) => {
+            board_state
+                .board
+                .columns
+                .get_mut(new_column_index)?
+                .tasks
+                .insert(0, task);
+            board_state.column_index = new_column_index;
+            board_state.task_index = 0;
+            None
+        }
+        None => None,
+    }
+}
