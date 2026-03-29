@@ -1,10 +1,10 @@
+#[derive(Clone, Default)]
 pub struct PickerState {
     pub index: usize,
 }
 
-// Information for the picker screen
 impl PickerState {
     pub fn new() -> Self {
-        PickerState { index: 0 }
+        Self::default()
     }
 }

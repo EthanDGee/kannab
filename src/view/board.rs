@@ -4,7 +4,6 @@ use crate::model::board::Board;
 ///
 /// In addition to the selecting of tasks all scroll data for every column is stored independently to
 /// make sure the state of scrolling is stored when switching between columns.
-#[derive(Clone)]
 pub struct BoardState {
     pub column_index: usize,
     pub task_index: usize,
