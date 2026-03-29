@@ -1,5 +1,5 @@
 pub struct PickerState {
-    index: usize,
+    pub index: usize,
 }
 
 // Information for the picker screen

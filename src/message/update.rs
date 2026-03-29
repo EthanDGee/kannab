@@ -1,7 +1,5 @@
-use core::task;
-
 use crate::{
-    message::{action::Action, column_actions, io_actions, task_actions},
+    message::{action::Action, column_actions, io_actions, navigation_actions, task_actions},
     model::app_state::AppState,
 };
 
@@ -9,6 +7,14 @@ use crate::{
 /// such as ExitModal or MarkDirty
 pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
     match action {
+        // Navigation
+        Action::MoveUp => navigation_actions::move_up(model),
+        Action::MoveDown => navigation_actions::move_down(model),
+        Action::MoveLeft => navigation_actions::move_left(model),
+        Action::MoveRight => navigation_actions::move_right(model),
+
+        // Board Picker Actions
+
         // Column Handling
         Action::CreateColumn => column_actions::create_column(model),
         Action::RenameColumn(new_name) => column_actions::rename_column(model, new_name),

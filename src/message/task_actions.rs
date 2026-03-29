@@ -138,7 +138,7 @@ pub fn move_task_to_prev_column(model: &mut AppState) -> Option<Action> {
 
 /// Toggles the completion of the currently selected task
 pub fn toggle_completion(model: &mut AppState) -> Option<Action> {
-    let board_state = model.board_state.as_mut()?;
+    let _board_state = model.board_state.as_mut()?;
     let task = get_current_task_mut(model)?;
 
     // flips completion

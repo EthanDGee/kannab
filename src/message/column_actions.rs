@@ -38,7 +38,7 @@ pub fn rename_column(model: &mut AppState, new_name: String) -> Option<Action> {
 /// Delete Columns the currently selected column
 pub fn delete_column(model: &mut AppState) -> Option<Action> {
     let column_index = model.board_state.as_ref()?.column_index;
-    let mut columns_ref = model.board_state.as_mut()?.board.get_columns();
+    let columns_ref = model.board_state.as_mut()?.board.get_columns();
     let columns = columns_ref;
     columns.remove(column_index);
     mark_dirty(model)

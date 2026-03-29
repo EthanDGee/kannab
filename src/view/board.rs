@@ -18,7 +18,7 @@ impl BoardState {
         BoardState {
             column_index: 0,
             task_index: 0,
-            column_scrolls: vec![num_columns; 0],
+            column_scrolls: vec![0; num_columns],
             board,
         }
     }
