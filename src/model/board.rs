@@ -5,6 +5,7 @@ use uuid::Uuid;
 /// id: Uuid
 /// pub description: String
 /// complete: bool
+#[derive(Clone)]
 pub struct Item {
     id: Uuid,
     pub description: String,
@@ -30,6 +31,7 @@ impl Item {
 /// description: String,
 /// complete: bool,
 /// checklist: Option<Vec<Item> = the items of of the optional to-do list
+#[derive(Clone)]
 pub struct Task {
     id: Uuid,
     pub title: String,
@@ -55,6 +57,7 @@ impl Task {
 /// id: Uuid,
 /// title: String,
 /// tasks: Vec<Task>,
+#[derive(Clone)]
 pub struct Column {
     id: Uuid,
     pub title: String,
@@ -77,6 +80,7 @@ impl Column {
 /// id: Uuid,
 /// title: String,
 /// pub columns: Vec<Column>,
+#[derive(Clone)]
 pub struct Board {
     id: Uuid,
     pub title: String,
@@ -90,5 +94,9 @@ impl Board {
             title: String::new(),
             columns: Vec::new(),
         }
+    }
+
+    pub fn get_columns(&mut self) -> &mut Vec<Column> {
+        &mut self.columns
     }
 }

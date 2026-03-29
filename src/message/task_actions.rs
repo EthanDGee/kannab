@@ -1,25 +1,14 @@
-use core::task;
-
 use crate::message::action::{Action, InputField};
+use crate::message::column_actions::get_current_column_mut;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
-use crate::model::board::{self, Column};
 use crate::model::{
     app_state::AppState,
     board::Task,
     modal_state::{ModalState, ModalType},
 };
 
-/// Utility function to get currently highlighted column based on AppState.BoardState's index
-fn get_current_column_mut(model: &mut AppState) -> Option<&mut Column> {
-    // Extract the column index immutably first to avoid overlapping borrows
-    let column_index = model.board_state.as_ref()?.column_index;
-    // Now borrow mutably
-    let board_state = model.board_state.as_mut()?;
-    board_state.board.columns.get_mut(column_index)
-}
-
 /// Utility function to get currently highlighted task based on AppState.BoardState's index
-fn get_current_task_mut(model: &mut AppState) -> Option<&mut Task> {
+pub fn get_current_task_mut(model: &mut AppState) -> Option<&mut Task> {
     let (column_index, task_index) = {
         let board_state = model.board_state.as_ref()?;
         (board_state.column_index, board_state.task_index)
@@ -33,10 +22,9 @@ fn get_current_task_mut(model: &mut AppState) -> Option<&mut Task> {
 /// Enters the Task Creation model state which handles task creation
 pub fn create_task(model: &mut AppState) -> Option<Action> {
     if model.board_state.is_some() {
-        let new_state = ModalState::new(ModalType::CreateBoard);
+        let new_state = ModalState::new(ModalType::CreateTask);
         model.modal_state = Some(new_state);
     }
-
     None
 }
 /// Replaces the input field of the currently selected task with the new edit
