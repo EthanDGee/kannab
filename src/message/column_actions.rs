@@ -16,14 +16,17 @@ pub fn get_current_column_mut(model: &mut AppState) -> Option<&mut Column> {
     board_state.board.columns.get_mut(column_index)
 }
 
-/// Places a new column after the current index of the selected column or if empty places it in
-/// index 0
-pub fn create_column(model: &mut AppState) -> Option<Action> {
-    if model.board_state.is_some() {
-        let new_state = ModalState::new(ModalType::CreateColumn);
-        model.modal_state = Some(new_state);
+/// Creates a new column with the specified title and adds it to the board.
+pub fn create_column(model: &mut AppState, title: String) -> Option<Action> {
+    if let Some(board_state) = &mut model.board_state {
+        let mut column = Column::new();
+        column.title = title;
+        board_state.board.columns.push(column);
+        board_state.column_scrolls.push(0);
+        mark_dirty(model)
+    } else {
+        None
     }
-    mark_dirty(model)
 }
 
 /// Renames the title of the currently selected column

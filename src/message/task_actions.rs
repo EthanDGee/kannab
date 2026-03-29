@@ -20,13 +20,24 @@ pub fn get_current_task_mut(model: &mut AppState) -> Option<&mut Task> {
     column.tasks.get_mut(task_index)
 }
 
-/// Enters the Task Creation model state which handles task creation
-pub fn create_task(model: &mut AppState) -> Option<Action> {
-    if model.board_state.is_some() {
-        let new_state = ModalState::new(ModalType::CreateTask);
-        model.modal_state = Some(new_state);
+/// Creates a new task with the specified title and description and adds it to the current column.
+pub fn create_task(model: &mut AppState, title: String, description: String) -> Option<Action> {
+    if let Some(board_state) = &mut model.board_state {
+        let mut task = Task::new();
+        task.title = title;
+        task.description = description;
+
+        let column_index = board_state.column_index;
+        if let Some(column) = board_state.board.columns.get_mut(column_index) {
+            column.tasks.push(task);
+            board_state.task_index = column.tasks.len() - 1;
+            mark_dirty(model)
+        } else {
+            None
+        }
+    } else {
+        None
     }
-    None
 }
 /// Replaces the input field of the currently selected task with the new edit
 pub fn edit_task(model: &mut AppState, input_field: InputField, edit: String) -> Option<Action> {

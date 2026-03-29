@@ -1,3 +1,5 @@
+use crate::model::modal_state::ModalType;
+
 /// Handle message actions as part of Elm Architecture
 pub enum Action {
     // Navigation
@@ -23,14 +25,14 @@ pub enum Action {
     PrevTask,
 
     // Column Actions
-    CreateColumn,
+    CreateColumn(String),
     RenameColumn(String),
     DeleteColumn,
     MoveColumnLeft,
     MoveColumnRight,
 
     // Task Actions
-    CreateTask,
+    CreateTask(String, String),
     EditTask(InputField, String),
     DeleteTask,
     ToggleCompletion,
@@ -40,8 +42,9 @@ pub enum Action {
     MoveTaskToPrevColumn,
 
     // Modal Actions
-    // OpenModal(ModalType),
+    OpenModal(ModalType),
     CloseModal,
+    UpdateField(InputField, String),
     Confirm,
     Cancel,
 

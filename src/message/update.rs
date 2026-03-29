@@ -1,5 +1,5 @@
 use crate::{
-    message::{action::Action, column_actions, io_actions, navigation_actions, task_actions},
+    message::{action::Action, column_actions, io_actions, modal_actions, navigation_actions, task_actions},
     model::app_state::AppState,
 };
 
@@ -16,14 +16,14 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         // Board Picker Actions
 
         // Column Handling
-        Action::CreateColumn => column_actions::create_column(model),
+        Action::CreateColumn(title) => column_actions::create_column(model, title),
         Action::RenameColumn(new_name) => column_actions::rename_column(model, new_name),
         Action::DeleteColumn => column_actions::delete_column(model),
         Action::MoveColumnLeft => column_actions::move_column_left(model),
         Action::MoveColumnRight => column_actions::move_column_right(model),
 
         // Task Handling
-        Action::CreateTask => task_actions::create_task(model),
+        Action::CreateTask(title, description) => task_actions::create_task(model, title, description),
         Action::EditTask(input_field, edit) => task_actions::edit_task(model, input_field, edit),
         Action::DeleteTask => task_actions::delete_task(model),
         Action::MoveTaskUp => task_actions::move_task_up(model),
@@ -31,6 +31,13 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::MoveTaskToNextColumn => task_actions::move_task_to_next_column(model),
         Action::MoveTaskToPrevColumn => task_actions::move_task_to_prev_column(model),
         Action::ToggleCompletion => task_actions::toggle_completion(model),
+
+        // Modal Actions
+        Action::OpenModal(modal_type) => modal_actions::open_modal(model, modal_type),
+        Action::CloseModal => modal_actions::close_modal(model),
+        Action::UpdateField(field, value) => modal_actions::update_field(model, field, value),
+        Action::Confirm => modal_actions::confirm(model),
+        Action::Cancel => modal_actions::cancel(model),
 
         // I/O Operations
         Action::MarkDirty => io_actions::mark_dirty(model),

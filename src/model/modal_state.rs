@@ -18,7 +18,6 @@ pub enum ModalType {
     Search,
 }
 
-/// The target of a confirmation modal
 #[derive(Clone, PartialEq)]
 pub enum ConfirmTarget {
     Board,
@@ -26,7 +25,6 @@ pub enum ConfirmTarget {
     Task,
 }
 
-/// Data stored within a modal, typically input values
 #[derive(Clone, Default, PartialEq)]
 pub struct ModalData {
     pub board_name: String,
@@ -36,7 +34,6 @@ pub struct ModalData {
     pub item_title: String,
 }
 
-/// Complete state of an active modal
 #[derive(Clone, PartialEq)]
 pub struct ModalState {
     pub modal_type: ModalType,
@@ -45,7 +42,6 @@ pub struct ModalState {
 }
 
 impl ModalState {
-    /// Create a new ModalState for the given type with default data and cursor position
     pub fn new(modal_type: ModalType) -> Self {
         ModalState {
             modal_type,
