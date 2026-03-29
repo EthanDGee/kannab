@@ -1,3 +1,5 @@
+use crate::message;
+use crate::message::action::Action;
 use crate::model::modal_state::ModalState;
 use crate::view::board::BoardState;
 use crate::view::picker::PickerState;
@@ -38,5 +40,9 @@ impl AppState {
             modal_state: None,
             pending_changes: false,
         }
+    }
+
+    pub fn update(&mut self, action: Action) {
+        message::update::update(self, action);
     }
 }

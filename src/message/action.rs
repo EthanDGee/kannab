@@ -42,8 +42,11 @@ pub enum Action {
     // Modal Actions
     // OpenModal(ModalType),
     CloseModal,
-    ConfirmAction,
-    CancelAction,
+    Confirm,
+    Cancel,
+
+    // IO operations
+    MarkDirty,
 
     // System
     Render,

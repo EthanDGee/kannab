@@ -1,7 +1,7 @@
 use core::task;
 
 use crate::{
-    message::{action::Action, column_actions, task_actions},
+    message::{action::Action, column_actions, io_actions, task_actions},
     model::app_state::AppState,
 };
 
@@ -25,6 +25,9 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::MoveTaskToNextColumn => task_actions::move_task_to_next_column(model),
         Action::MoveTaskToPrevColumn => task_actions::move_task_to_prev_column(model),
         Action::ToggleCompletion => task_actions::toggle_completion(model),
+
+        // I/O Operations
+        Action::MarkDirty => io_actions::mark_dirty(model),
 
         _ => None,
     }

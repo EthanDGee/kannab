@@ -1,5 +1,6 @@
 use crate::message::action::{Action, InputField};
 use crate::message::column_actions::get_current_column_mut;
+use crate::message::io_actions::mark_dirty;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
 use crate::model::{
     app_state::AppState,
@@ -38,8 +39,7 @@ pub fn edit_task(model: &mut AppState, input_field: InputField, edit: String) ->
         InputField::TaskDescription => task.description = edit,
         _ => {}
     }
-    // TODO: MarkDirty after update
-    None
+    mark_dirty(model)
 }
 
 /// Deletes the currently highlighted task
@@ -48,7 +48,7 @@ pub fn delete_task(model: &mut AppState) -> Option<Action> {
     let task_index = board_state.task_index;
     let column = get_current_column_mut(model)?;
     column.tasks.remove(task_index);
-    None
+    mark_dirty(model)
 }
 
 /// Move currently selected task up in the current column
@@ -60,7 +60,7 @@ pub fn move_task_up(model: &mut AppState) -> Option<Action> {
     match increment_no_wrap(task_index, column.tasks.len()) {
         Some(new_index) => {
             column.tasks.swap(task_index, new_index);
-            None
+            mark_dirty(model)
         }
         None => None,
     }
@@ -75,7 +75,7 @@ pub fn move_task_down(model: &mut AppState) -> Option<Action> {
     match decrement_no_wrap(task_index) {
         Some(new_index) => {
             column.tasks.swap(task_index, new_index);
-            None
+            mark_dirty(model)
         }
         None => None,
     }
@@ -103,7 +103,7 @@ pub fn move_task_to_next_column(model: &mut AppState) -> Option<Action> {
                 .insert(0, task);
             board_state.column_index = new_column_index;
             board_state.task_index = 0;
-            None
+            mark_dirty(model)
         }
         None => None,
     }
@@ -130,7 +130,7 @@ pub fn move_task_to_prev_column(model: &mut AppState) -> Option<Action> {
                 .insert(0, task);
             board_state.column_index = new_column_index;
             board_state.task_index = 0;
-            None
+            mark_dirty(model)
         }
         None => None,
     }
@@ -143,5 +143,5 @@ pub fn toggle_completion(model: &mut AppState) -> Option<Action> {
 
     // flips completion
     task.complete = !task.complete;
-    None
+    mark_dirty(model)
 }
