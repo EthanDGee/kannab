@@ -63,7 +63,7 @@ pub fn delete_task(model: &mut AppState) -> Option<Action> {
     None
 }
 
-// MoveTaskUp,
+/// Move currently selected task up in the current column
 pub fn move_task_up(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
     let task_index = board_state.task_index;
@@ -78,7 +78,7 @@ pub fn move_task_up(model: &mut AppState) -> Option<Action> {
     }
 }
 
-// MoveTaskDown
+/// Move currently selected task down in the current column
 pub fn move_task_down(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
     let task_index = board_state.task_index;
@@ -146,4 +146,14 @@ pub fn move_task_to_prev_column(model: &mut AppState) -> Option<Action> {
         }
         None => None,
     }
+}
+
+/// Toggles the completion of the currently selected task
+pub fn toggle_completion(model: &mut AppState) -> Option<Action> {
+    let board_state = model.board_state.as_mut()?;
+    let task = get_current_task_mut(model)?;
+
+    // flips completion
+    task.complete = !task.complete;
+    None
 }

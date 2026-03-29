@@ -17,6 +17,7 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::MoveTaskDown => task_actions::move_task_down(model),
         Action::MoveTaskToNextColumn => task_actions::move_task_to_next_column(model),
         Action::MoveTaskToPrevColumn => task_actions::move_task_to_prev_column(model),
+        Action::ToggleCompletion => task_actions::toggle_completion(model),
         _ => None,
     }
 }
