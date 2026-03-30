@@ -22,3 +22,45 @@ impl BoardState {
         }
     }
 }
+
+use crate::app::App;
+use ratatui::{
+    Frame,
+    layout::{Constraint, Direction, Layout, Rect},
+    style::Style,
+    widgets::Paragraph,
+};
+
+pub fn render(app: &App, frame: &mut Frame, area: Rect) {
+    let board_state = app.model.board_state.as_ref().unwrap();
+    let board = &board_state.board;
+
+    let colors = &app.model.color_scheme;
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(1), // Header
+            Constraint::Min(0),    // Kanban Manager
+            Constraint::Length(1), // Footer
+        ])
+        .split(area);
+
+    // Header
+    let header_title = format!("kanab - {}", board.title);
+    let title = Paragraph::new(header_title)
+        .style(Style::default().fg(colors.body_text).bg(colors.background));
+    frame.render_widget(title, chunks[0]);
+
+    // Horizontal layout for columns
+
+    // Calculate column widths based on terminal width
+    let column_count = board.columns.len().max(1);
+    let column_width = (area.width as usize / column_count).max(20);
+
+    let column_areas = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints(std::iter::repeat(Constraint::Length(column_width as u16)).take(column_count))
+        .split(area);
+
+    // TODO: render columns
+}
