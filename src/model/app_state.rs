@@ -1,8 +1,7 @@
-use crate::message;
-use crate::message::action::Action;
 use crate::model::modal_state::ModalState;
 use crate::view::board::BoardState;
-use crate::view::picker::PickerState;
+use crate::view::picker_view::PickerState;
+use crate::view::theme::ColorScheme;
 use std::collections::HashMap;
 
 /// enum containing the various screens
@@ -26,6 +25,7 @@ pub struct AppState {
     pub picker_state: PickerState,
     pub board_state: Option<BoardState>,
     pub modal_state: Option<ModalState>,
+    pub color_scheme: ColorScheme,
     pub pending_changes: bool,
 }
 
@@ -38,6 +38,7 @@ impl AppState {
             picker_state: PickerState::new(),
             board_state: None,
             modal_state: None,
+            color_scheme: ColorScheme::default(),
             pending_changes: false,
         }
     }
