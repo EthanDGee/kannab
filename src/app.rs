@@ -1,3 +1,8 @@
+use color_eyre::eyre::Result;
+
+use crate::io::tui::Tui;
+use crate::message;
+use crate::message::action::Action;
 use crate::model::app_state::AppState;
 use std::time::Duration;
 
@@ -19,20 +24,34 @@ impl App {
         }
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> Result<()> {
         // initialize
+        let mut terminal = Tui::new()?;
 
         // run
         loop {
+            terminal.render(self.model);
+
+            self.update(Action::Render);
+
             if self.should_quit {
                 break;
             }
 
             // render
         }
+
+        if self.model.pending_changes {
+            self.update(Action::Save);
+        }
+        terminal.exit();
+
+        Ok(())
     }
 
-    fn update(&mut self) {
-        todo!("Implement event handling")
+    pub fn update(&mut self, mut action: Action) {
+        while let Some(next_action) = message::update::update(&mut self.model, action) {
+            action = next_action;
+        }
     }
 }

@@ -50,6 +50,7 @@ pub enum Action {
 
     // IO operations
     MarkDirty,
+    Save,
 
     // System
     Render,

@@ -41,10 +41,4 @@ impl AppState {
             pending_changes: false,
         }
     }
-
-    pub fn update(&mut self, mut action: Action) {
-        while let Some(next_action) = message::update::update(self, action) {
-            action = next_action;
-        }
-    }
 }
