@@ -18,11 +18,11 @@ impl Tui {
         Ok(Tui { terminal })
     }
 
-    pub fn enter(&mut self) -> Result<()> {
+    pub fn enter(mut self) -> Result<Self> {
         enable_raw_mode()?;
         execute!(stdout(), EnterAlternateScreen, cursor::Hide)?;
         self.terminal.hide_cursor()?;
-        Ok(())
+        Ok(self)
     }
 
     pub fn exit(&mut self) -> Result<()> {

@@ -1,4 +1,5 @@
 use color_eyre::eyre::Result;
+use crossterm::event::{self, Event, KeyCode};
 
 use crate::io::tui::Tui;
 use crate::message;
@@ -17,8 +18,17 @@ pub struct App {
 
 impl App {
     pub fn new() -> Self {
+        let mut model = AppState::new();
+        // Add dummy data for visualization
+        model
+            .board_map
+            .insert("Project Alpha".to_string(), "alpha.json".to_string());
+        model
+            .board_map
+            .insert("Personal Tasks".to_string(), "personal.json".to_string());
+
         App {
-            model: AppState::new(),
+            model,
             tick_rate: TICK_RATE,
             should_quit: false,
         }
@@ -26,25 +36,40 @@ impl App {
 
     pub fn run(&mut self) -> Result<()> {
         // initialize
-        let mut terminal = Tui::new()?;
+        let mut tui = Tui::new()?.enter()?;
 
         // run
-        loop {
-            terminal.render(self.model);
+        while !self.should_quit {
+            tui.terminal.draw(|f| crate::view::app::render(self, f))?;
 
-            self.update(Action::Render);
-
-            if self.should_quit {
-                break;
+            // Simple event handling to allow quitting and prevent high CPU usage
+            if event::poll(Duration::from_millis(100))? {
+                if let Event::Key(key) = event::read()? {
+                    match key.code {
+                        KeyCode::Char('q') | KeyCode::Esc => self.should_quit = true,
+                        // Basic navigation just to see it works
+                        KeyCode::Down | KeyCode::Char('j') => {
+                            self.model.picker_state.index = (self.model.picker_state.index + 1)
+                                % self.model.board_map.len().max(1);
+                        }
+                        KeyCode::Up | KeyCode::Char('k') => {
+                            if self.model.picker_state.index > 0 {
+                                self.model.picker_state.index -= 1;
+                            } else {
+                                self.model.picker_state.index =
+                                    self.model.board_map.len().saturating_sub(1);
+                            }
+                        }
+                        _ => {}
+                    }
+                }
             }
-
-            // render
         }
 
         if self.model.pending_changes {
             self.update(Action::Save);
         }
-        terminal.exit();
+        tui.exit()?;
 
         Ok(())
     }
