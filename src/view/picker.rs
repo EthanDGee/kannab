@@ -55,7 +55,7 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
     let list = List::new(items).block(
         Block::default()
             .title("Boards")
-            .border_style(Style::default().fg(colors.outer_boarder))
+            .border_style(Style::default().fg(colors.outer_border))
             .style(Style::default().fg(colors.body_text).bg(colors.background)),
     );
     frame.render_widget(list, chunks[1]);
