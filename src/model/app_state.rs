@@ -1,6 +1,6 @@
 use crate::model::modal_state::ModalState;
 use crate::view::board::BoardState;
-use crate::view::picker_view::PickerState;
+use crate::view::picker::PickerState;
 use crate::view::theme::ColorScheme;
 use std::collections::HashMap;
 
