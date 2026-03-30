@@ -16,6 +16,7 @@ pub enum ModalType {
     EditTask,
     ConfirmDelete(ConfirmTarget),
     Search,
+    Help,
 }
 
 #[derive(Clone, PartialEq)]

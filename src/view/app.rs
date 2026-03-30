@@ -1,9 +1,14 @@
-use crate::model::app_state::AppState;
-use ratatui::{Frame, widgets::Paragraph};
+use crate::model::{
+    app_state::{AppMode, AppState},
+    modal_state::{self, ModalType},
+};
+use ratatui::Frame;
 
-pub fn view(App: &AppState, frame: &mut Frame) {
+pub fn view(app: &AppState, frame: &mut Frame) {
     let area = frame.area();
 
-    let testing = Paragraph::new("HELLO WORLD");
-    frame.render_widget(testing, area);
+    match app.mode {
+        AppMode::Picker => {}
+        AppMode::Board => {}
+    }
 }
