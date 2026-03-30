@@ -1,4 +1,4 @@
-use crate::model::board::Board;
+use crate::model::board_state::Board;
 
 /// Handles associated view data for the Kanban data
 ///

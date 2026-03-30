@@ -3,7 +3,7 @@ use crate::message::io_actions::mark_dirty;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
 use crate::model::{
     app_state::AppState,
-    board::Column,
+    board_state::Column,
     modal_state::{ModalState, ModalType},
 };
 

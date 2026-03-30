@@ -4,7 +4,7 @@ use crate::message::io_actions::mark_dirty;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
 use crate::model::{
     app_state::AppState,
-    board::Task,
+    board_state::Task,
     modal_state::{ModalState, ModalType},
 };
 
