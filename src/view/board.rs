@@ -1,4 +1,5 @@
 use crate::model::board_state::Board;
+use crate::view::column;
 
 /// Handles associated view data for the Kanban data
 ///
@@ -62,5 +63,8 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
         .constraints(std::iter::repeat(Constraint::Length(column_width as u16)).take(column_count))
         .split(area);
 
-    // TODO: render columns
+    for (i, (column, column_area)) in board.columns.iter().zip(column_areas.iter()).enumerate() {
+        let selected = i == board_state.column_index;
+        column::render(app, frame, column, *column_area, selected, i);
+    }
 }
