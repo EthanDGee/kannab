@@ -14,13 +14,13 @@ pub enum ModalType {
     RenameColumn,
     CreateTask,
     EditTask,
-    ConfirmDelete(ConfirmTarget),
+    ConfirmDelete(ConfirmDelete),
     Search,
     Help,
 }
 
 #[derive(Clone, PartialEq)]
-pub enum ConfirmTarget {
+pub enum ConfirmDelete {
     Board,
     Column,
     Task,

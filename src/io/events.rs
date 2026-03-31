@@ -1,6 +1,8 @@
-use crossterm::event::{KeyEvent, MouseButton, MouseEvent};
-
-use crate::{app::App, message::action::Action, model::app_state::AppMode};
+use crate::message::action::Action;
+use crate::model::app_state::AppMode;
+use crate::model::modal_state::{ConfirmDelete, ModalState};
+use crate::{app::App, model::modal_state::ModalType};
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent};
 
 pub enum Event {
     Key(KeyEvent),
@@ -16,12 +18,76 @@ pub fn handle_event(app: &App, event: Event) -> Option<Action> {
     }
 }
 
-pub fn handle_key_event(app: &App, key: KeyEvent) -> Option<Action> {
+fn handle_key_event(app: &App, key: KeyEvent) -> Option<Action> {
     let mode = &app.model.mode;
 
     match mode {
-        AppMode::Picker => {}
-        AppMode::Board => {}
+        AppMode::Picker => None,
+        AppMode::Board => handle_board_keys(app, key),
     }
-    None
+}
+
+fn handle_board_keys(app: &App, key: KeyEvent) -> Option<Action> {
+    let ctrl = key.modifiers.contains(KeyModifiers::CONTROL);
+    let shift = key.modifiers.contains(KeyModifiers::SHIFT);
+
+    if ctrl {
+        match key.code {
+            // Column Reordering
+            KeyCode::Left | KeyCode::Char('h') => Some(Action::MoveColumnLeft),
+            KeyCode::Right | KeyCode::Char('l') => Some(Action::MoveColumnRight),
+
+            // Column Creation
+            KeyCode::Char('n') => Some(Action::OpenModal(ModalType::CreateColumn)),
+
+            // Column Renaming
+            KeyCode::Char('r') => Some(Action::OpenModal(ModalType::RenameColumn)),
+
+            // Delete Column
+            KeyCode::Char('d') => Some(Action::OpenModal(ModalType::ConfirmDelete(
+                ConfirmDelete::Column,
+            ))),
+
+            _ => None,
+        }
+    } else if shift {
+        match key.code {
+            // Task reordering
+            KeyCode::Up | KeyCode::Char('k') => Some(Action::MoveTaskUp),
+            KeyCode::Down | KeyCode::Char('j') => Some(Action::MoveTaskDown),
+            KeyCode::Left | KeyCode::Char('h') => Some(Action::MoveTaskToPrevColumn),
+            KeyCode::Right | KeyCode::Char('l') => Some(Action::MoveTaskToNextColumn),
+            _ => None,
+        }
+    } else {
+        match key.code {
+            // Navigation
+            KeyCode::Left | KeyCode::Char('h') => Some(Action::MoveLeft),
+            KeyCode::Right | KeyCode::Char('l') => Some(Action::MoveRight),
+            KeyCode::Up | KeyCode::Char('k') => Some(Action::MoveUp),
+            KeyCode::Down | KeyCode::Char('j') => Some(Action::MoveDown),
+
+            // Create Task
+            KeyCode::Char('n') => Some(Action::OpenModal(ModalType::CreateTask)),
+
+            // Edit Task
+            KeyCode::Char('e') => Some(Action::OpenModal(ModalType::EditTask)),
+
+            // Delete Task
+            KeyCode::Char('d') => Some(Action::OpenModal(ModalType::ConfirmDelete(
+                ConfirmDelete::Task,
+            ))),
+
+            // Toggle Completion
+            KeyCode::Tab => Some(Action::ToggleCompletion),
+
+            // Help
+            KeyCode::Char('?') => Some(Action::OpenModal(ModalType::Help)),
+
+            // Exit Board mode
+            KeyCode::Char('q') | KeyCode::Esc => Some(Action::QuitToPicker),
+
+            _ => None,
+        }
+    }
 }

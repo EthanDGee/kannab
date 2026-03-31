@@ -17,6 +17,7 @@ pub enum Action {
     DeleteBoard,
     MoveBoardUp,
     MoveBoardDown,
+    QuitToPicker,
 
     // Board View Actions
     NextColumn,

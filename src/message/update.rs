@@ -1,5 +1,7 @@
 use crate::{
-    message::{action::Action, column_actions, io_actions, modal_actions, navigation_actions, task_actions},
+    message::{
+        action::Action, column_actions, io_actions, modal_actions, navigation_actions, task_actions,
+    },
     model::app_state::AppState,
 };
 
@@ -23,7 +25,9 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::MoveColumnRight => column_actions::move_column_right(model),
 
         // Task Handling
-        Action::CreateTask(title, description) => task_actions::create_task(model, title, description),
+        Action::CreateTask(title, description) => {
+            task_actions::create_task(model, title, description)
+        }
         Action::EditTask(input_field, edit) => task_actions::edit_task(model, input_field, edit),
         Action::DeleteTask => task_actions::delete_task(model),
         Action::MoveTaskUp => task_actions::move_task_up(model),
@@ -41,7 +45,6 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
 
         // I/O Operations
         Action::MarkDirty => io_actions::mark_dirty(model),
-
         _ => None,
     }
 }
