@@ -1,4 +1,4 @@
-use crate::message::action::Action;
+use crate::message::action::{Action, InputField};
 use crate::model::app_state::AppMode;
 use crate::model::modal_state::{ConfirmDelete, ModalState};
 use crate::{app::App, model::modal_state::ModalType};
@@ -19,11 +19,41 @@ pub fn handle_event(app: &App, event: Event) -> Option<Action> {
 }
 
 fn handle_key_event(app: &App, key: KeyEvent) -> Option<Action> {
+    if let Some(modal) = &app.model.modal_state {
+        return handle_modal_key(modal, key);
+    }
+
     let mode = &app.model.mode;
 
     match mode {
-        AppMode::Picker => None,
+        AppMode::Picker => handle_picker_keys(app, key),
         AppMode::Board => handle_board_keys(app, key),
+    }
+}
+
+fn handle_picker_keys(_app: &App, key: KeyEvent) -> Option<Action> {
+    match key.code {
+        // Navigation
+        KeyCode::Up | KeyCode::Char('k') => Some(Action::MoveUp),
+        KeyCode::Down | KeyCode::Char('j') => Some(Action::MoveDown),
+
+        // Actions
+        KeyCode::Char('c') => Some(Action::OpenModal(ModalType::CreateBoard)),
+        KeyCode::Char('r') | KeyCode::Char('e') => Some(Action::OpenModal(ModalType::EditBoard)),
+        KeyCode::Char('d') => Some(Action::OpenModal(ModalType::ConfirmDelete(
+            ConfirmDelete::Board,
+        ))),
+
+        // Open selected board
+        KeyCode::Enter => Some(Action::OpenBoard),
+
+        // Help
+        KeyCode::Char('?') => Some(Action::OpenModal(ModalType::Help)),
+
+        // Quit
+        KeyCode::Char('q') | KeyCode::Esc => Some(Action::Quit),
+
+        _ => None,
     }
 }
 
