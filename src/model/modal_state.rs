@@ -15,7 +15,6 @@ pub enum ModalType {
     CreateTask,
     EditTask,
     ConfirmDelete(ConfirmDelete),
-    Search,
     Help,
 }
 

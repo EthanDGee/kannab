@@ -31,6 +31,35 @@ fn handle_key_event(app: &App, key: KeyEvent) -> Option<Action> {
     }
 }
 
+fn handle_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
+    if key.code == KeyCode::Esc {
+        return Some(Action::CloseModal);
+    }
+
+    match modal.modal_type {
+        ModalType::CreateBoard => handle_create_board_key(modal, key),
+        _ => None,
+    }
+}
+
+fn handle_create_board_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
+    let mut current_name = modal.data.board_name.clone();
+
+    match key.code {
+        KeyCode::Enter => Some(Action::Confirm),
+        KeyCode::Char(c) => {
+            current_name.push(c);
+            Some(Action::UpdateField(InputField::BoardName, current_name))
+        }
+        KeyCode::Backspace => {
+            // remove the last character of the board_name
+            current_name.pop();
+            Some(Action::UpdateField(InputField::BoardName, current_name))
+        }
+        _ => None,
+    }
+}
+
 fn handle_picker_keys(_app: &App, key: KeyEvent) -> Option<Action> {
     match key.code {
         // Navigation
