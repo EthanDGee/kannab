@@ -1,18 +1,18 @@
-use color_eyre::eyre::Result;
-use crossterm::event::{self, Event, KeyCode};
-
 use crate::io::tui::Tui;
 use crate::message;
 use crate::message::action::Action;
 use crate::model::app_state::AppState;
+use color_eyre::eyre::Result;
+use crossterm::event::{self};
 use std::time::Duration;
 
-const TICK_RATE: Duration = Duration::new(5, 0);
+const EVENT_TICK_RATE: Duration = Duration::new(0, 15);
+const SAVE_TICK_RATE: Duration = Duration::new(5, 0);
 
 /// Main application state container
 pub struct App {
     pub model: AppState,
-    pub tick_rate: Duration, // Tick rate for auto-save
+    pub tick_rate: Duration, // Tick rate for event handling
     pub should_quit: bool,
 }
 
@@ -29,7 +29,7 @@ impl App {
 
         App {
             model,
-            tick_rate: TICK_RATE,
+            tick_rate: EVENT_TICK_RATE,
             should_quit: false,
         }
     }
@@ -39,35 +39,23 @@ impl App {
         let mut tui = Tui::new()?.enter()?;
 
         // run
-        while !self.should_quit {
+        loop {
             tui.terminal.draw(|f| crate::view::app::render(self, f))?;
-
-            // Simple event handling to allow quitting and prevent high CPU usage
-            if event::poll(Duration::from_millis(100))? {
-                if let Event::Key(key) = event::read()? {
-                    match key.code {
-                        KeyCode::Char('q') | KeyCode::Esc => self.should_quit = true,
-                        // Basic navigation just to see it works
-                        KeyCode::Down | KeyCode::Char('j') => {
-                            self.model.picker_state.index = (self.model.picker_state.index + 1)
-                                % self.model.board_map.len().max(1);
-                        }
-                        KeyCode::Up | KeyCode::Char('k') => {
-                            if self.model.picker_state.index > 0 {
-                                self.model.picker_state.index -= 1;
-                            } else {
-                                self.model.picker_state.index =
-                                    self.model.board_map.len().saturating_sub(1);
-                            }
-                        }
-                        _ => {}
+            if event::poll(self.tick_rate)?
+                && let event::Event::Key(key) = event::read()?
+            {
+                let event = crate::io::events::Event::Key(key);
+                if let Some(action) = crate::io::events::handle_event(self, event) {
+                    match action {
+                        Action::Quit => self.should_quit = true,
+                        _ => self.update(action),
                     }
                 }
             }
-        }
 
-        if self.model.pending_changes {
-            self.update(Action::Save);
+            if self.should_quit {
+                break;
+            }
         }
         tui.exit()?;
 
