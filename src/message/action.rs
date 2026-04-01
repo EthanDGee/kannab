@@ -12,7 +12,7 @@ pub enum Action {
 
     // Board Picker Actions
     OpenBoard,
-    CreateBoard,
+    CreateBoard(String),
     RenameBoard(String),
     DeleteBoard,
     MoveBoardUp,

@@ -36,7 +36,7 @@ pub fn confirm(model: &mut AppState) -> Option<Action> {
     let action = match &modal.modal_type {
         ModalType::CreateBoard => {
             let name = modal.data.board_name.clone();
-            Some(Action::RenameBoard(name)) // Placeholder or specific Action::CreateBoard(name)
+            Some(Action::CreateBoard(name))
         }
         ModalType::CreateColumn => {
             let name = modal.data.column_name.clone();

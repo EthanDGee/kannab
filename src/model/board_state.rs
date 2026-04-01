@@ -101,6 +101,10 @@ impl Board {
         }
     }
 
+    pub fn get_id(&self) -> Uuid {
+        self.id
+    }
+
     pub fn get_columns(&mut self) -> &mut Vec<Column> {
         &mut self.columns
     }

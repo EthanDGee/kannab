@@ -4,7 +4,6 @@ use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
 use crate::model::{
     app_state::AppState,
     board_state::Column,
-    modal_state::{ModalState, ModalType},
 };
 
 /// Utility function to get currently highlighted column based on AppState.BoardState's index

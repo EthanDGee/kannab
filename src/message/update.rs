@@ -1,6 +1,7 @@
 use crate::{
     message::{
-        action::Action, column_actions, io_actions, modal_actions, navigation_actions, task_actions,
+        action::Action, board_actions, column_actions, io_actions, modal_actions,
+        navigation_actions, task_actions,
     },
     model::app_state::AppState,
 };
@@ -16,6 +17,7 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::MoveRight => navigation_actions::move_right(model),
 
         // Board Picker Actions
+        Action::CreateBoard(title) => board_actions::create_board(model, title),
 
         // Column Handling
         Action::CreateColumn(title) => column_actions::create_column(model, title),
