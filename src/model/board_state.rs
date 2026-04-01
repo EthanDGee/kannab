@@ -1,11 +1,8 @@
-use std::fs;
-
-use crate::APP_NAME;
+use crate::{APP_NAME, io::file_handling::to_snake_case};
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
+use std::fs;
 use uuid::Uuid;
-
-const BOARD_SAVE_DIRECTORY: &str = "Boards";
 
 /// Handles the member of a todo list for a given task
 ///
@@ -81,6 +78,20 @@ impl Column {
     }
 }
 
+/// Stores the title of a board and it's associated file name
+pub struct BoardName {
+    pub title: String,
+    pub snake_case: String,
+}
+
+impl BoardName {
+    pub fn new(title: String) -> Self {
+        let snake_case = to_snake_case(title.clone());
+
+        BoardName { title, snake_case }
+    }
+}
+
 /// The model containing the data of the Kanban board containing columns of tasks as well as it's
 /// own name.
 ///
@@ -89,60 +100,22 @@ impl Column {
 /// pub columns: Vec<Column>,
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Board {
-    id: Uuid,
     pub title: String,
+    pub file_name: String,
     pub columns: Vec<Column>,
 }
 
 impl Board {
     pub fn new(title: String) -> Self {
+        let file_name = to_snake_case(title.clone());
         Board {
-            id: Uuid::new_v4(),
             title,
+            file_name,
             columns: Vec::new(),
         }
-    }
-
-    pub fn get_id(&self) -> Uuid {
-        self.id
     }
 
     pub fn get_columns(&mut self) -> &mut Vec<Column> {
         &mut self.columns
     }
-
-    pub fn load_board(id: Uuid) -> Option<Self> {
-        let proj_dirs = ProjectDirs::from("com", APP_NAME, APP_NAME)?;
-        let save_path = proj_dirs.data_local_dir().join(BOARD_SAVE_DIRECTORY);
-        let board_file_path = save_path.join(format!("{}.json", id));
-
-        let json = std::fs::read_to_string(board_file_path).ok()?;
-        serde_json::from_str(&json).ok()
-    }
-
-    pub fn save_board(&self) -> Option<bool> {
-        let proj_dirs = ProjectDirs::from("com", APP_NAME, APP_NAME)?;
-
-        let save_path = proj_dirs.data_local_dir().join(BOARD_SAVE_DIRECTORY);
-        std::fs::create_dir_all(&save_path).ok()?;
-
-        let board_file_path = save_path.join(format!("{}.json", self.id));
-
-        let json = serde_json::to_string_pretty(self).ok()?;
-        std::fs::write(board_file_path, json).ok()?;
-
-        Some(true)
-    }
-}
-
-/// Deleted a given board from the save directory
-pub fn delete_board(id: Uuid) -> bool {
-    let proj_dirs = match ProjectDirs::from("com", APP_NAME, APP_NAME) {
-        Some(project_path) => project_path,
-        None => return false,
-    };
-
-    let save_path = proj_dirs.data_local_dir().join(BOARD_SAVE_DIRECTORY);
-    let board_file_path = save_path.join(format!("{}.json", id));
-    fs::remove_file(board_file_path).is_ok()
 }

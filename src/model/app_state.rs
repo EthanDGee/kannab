@@ -1,3 +1,4 @@
+pub use crate::model::board_state::BoardName;
 use crate::model::modal_state::ModalState;
 use crate::view::board::BoardState;
 use crate::view::picker::PickerState;
@@ -9,30 +10,6 @@ pub enum AppMode {
     Board,
 }
 
-/// Stores the title of a board and it's associated file name
-pub struct BoardName {
-    pub title: String,
-    pub snake_case: String,
-}
-
-
-impl BoardName {
-    pub fn new(title: String) -> Self {
-        let camel_case = Self::to_snake_case(&title);
-
-        BoardName {
-            title,
-            snake_case: camel_case,
-        }
-    }
-
-    pub fn to_snake_case(s: &str) -> String {
-        s.split_whitespace()
-            .map(|word| word.to_lowercase())
-            .collect::<Vec<_>>()
-            .join("_")
-    }
-}
 /// Handles all state logic
 ///
 /// mode: AppMode,
