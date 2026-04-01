@@ -26,8 +26,8 @@ fn handle_key_event(app: &App, key: KeyEvent) -> Option<Action> {
     let mode = &app.model.mode;
 
     match mode {
-        AppMode::Picker => handle_picker_keys(app, key),
-        AppMode::Board => handle_board_keys(app, key),
+        AppMode::Picker => handle_picker_keys(key),
+        AppMode::Board => handle_board_keys(key),
     }
 }
 
@@ -60,33 +60,47 @@ fn handle_create_board_key(modal: &ModalState, key: KeyEvent) -> Option<Action> 
     }
 }
 
-fn handle_picker_keys(_app: &App, key: KeyEvent) -> Option<Action> {
-    match key.code {
-        // Navigation
-        KeyCode::Up | KeyCode::Char('k') => Some(Action::MoveUp),
-        KeyCode::Down | KeyCode::Char('j') => Some(Action::MoveDown),
+fn handle_picker_keys(key: KeyEvent) -> Option<Action> {
+    let shift = key.modifiers.contains(KeyModifiers::SHIFT);
+    if shift {
+        match key.code {
+            // Board Rearrangement
+            KeyCode::Up | KeyCode::Char('K') => Some(Action::MoveBoardUp),
+            KeyCode::Down | KeyCode::Char('J') | KeyCode::Tab => Some(Action::MoveBoardDown),
+            _ => None,
+        }
+    } else {
+        match key.code {
+            // Navigation
+            KeyCode::Up | KeyCode::Char('k') => Some(Action::MoveUp),
+            KeyCode::Down | KeyCode::Char('j') | KeyCode::Tab => Some(Action::MoveDown),
 
-        // Actions
-        KeyCode::Char('c') => Some(Action::OpenModal(ModalType::CreateBoard)),
-        KeyCode::Char('r') | KeyCode::Char('e') => Some(Action::OpenModal(ModalType::EditBoard)),
-        KeyCode::Char('d') => Some(Action::OpenModal(ModalType::ConfirmDelete(
-            ConfirmDelete::Board,
-        ))),
+            // Actions
+            KeyCode::Char('c') | KeyCode::Char('n') => {
+                Some(Action::OpenModal(ModalType::CreateBoard))
+            }
+            KeyCode::Char('r') | KeyCode::Char('e') => {
+                Some(Action::OpenModal(ModalType::EditBoard))
+            }
+            KeyCode::Char('d') => Some(Action::OpenModal(ModalType::ConfirmDelete(
+                ConfirmDelete::Board,
+            ))),
 
-        // Open selected board
-        KeyCode::Enter => Some(Action::OpenBoard),
+            // Open selected board
+            KeyCode::Enter => Some(Action::OpenBoard),
 
-        // Help
-        KeyCode::Char('?') => Some(Action::OpenModal(ModalType::Help)),
+            // Help
+            KeyCode::Char('?') => Some(Action::OpenModal(ModalType::Help)),
 
-        // Quit
-        KeyCode::Char('q') | KeyCode::Esc => Some(Action::Quit),
+            // Quit
+            KeyCode::Char('q') | KeyCode::Esc => Some(Action::Quit),
 
-        _ => None,
+            _ => None,
+        }
     }
 }
 
-fn handle_board_keys(app: &App, key: KeyEvent) -> Option<Action> {
+fn handle_board_keys(key: KeyEvent) -> Option<Action> {
     let ctrl = key.modifiers.contains(KeyModifiers::CONTROL);
     let shift = key.modifiers.contains(KeyModifiers::SHIFT);
 

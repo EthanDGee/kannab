@@ -1,12 +1,11 @@
-use crate::{
-    io::file_handling,
-    message::action::Action,
-    model::{
-        app_state::{AppMode, AppState},
-        board_state::{Board, BoardName},
-    },
-    view::board::BoardState,
-};
+use crate::io::file_handling;
+use crate::message::action::Action;
+use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
+use crate::model::app_state::{AppMode, AppState};
+use crate::model::board_state::{Board, BoardName};
+use crate::view::board::BoardState;
+
+// Board Handling
 
 /// Creates a new board, adds it to the global map of boards, then sets the view to be the new board
 pub fn create_board(model: &mut AppState, title: String) -> Option<Action> {
@@ -78,6 +77,29 @@ pub fn rename_board(model: &mut AppState, new_title: String) -> Option<Action> {
     }
 
     Some(Action::MarkDirty)
+}
+
+// Board List Handling
+
+pub fn move_board_up(model: &mut AppState) -> Option<Action> {
+    let current_index = model.picker_state.index;
+    let new_index = decrement_no_wrap(current_index)?;
+    model.board_list.swap(current_index, new_index);
+    model.picker_state.index = new_index;
+
+    save_board_list(model);
+    None
+}
+
+pub fn move_board_down(model: &mut AppState) -> Option<Action> {
+    let current_index = model.picker_state.index;
+    let max = model.board_list.len();
+    let new_index = increment_no_wrap(current_index, max)?;
+    model.board_list.swap(current_index, new_index);
+    model.picker_state.index = new_index;
+
+    save_board_list(model);
+    None
 }
 
 /// Saves the current board state to the file system
