@@ -36,12 +36,12 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
     // Board list (custom scrollable list widget)
     let items: Vec<ListItem> = app
         .model
-        .board_map
+        .board_list
         .iter()
         .enumerate()
         .map(|(i, board)| {
             let selected = i == app.model.picker_state.index;
-            ListItem::new(board.0.clone()).style(if selected {
+            ListItem::new(board.title.clone()).style(if selected {
                 // Board Name
                 Style::default()
                     .fg(colors.highlight_text)
@@ -61,7 +61,7 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
     frame.render_widget(list, chunks[1]);
 
     // Status bar
-    let status = format!("[NORMAL] [?] Help  ({} boards)", app.model.board_map.len());
+    let status = format!("[NORMAL] [?] Help  ({} boards)", app.model.board_list.len());
     frame.render_widget(
         Paragraph::new(status).style(Style::default().fg(colors.body_text).bg(colors.background)),
         chunks[2],

@@ -1,4 +1,4 @@
-use crate::model::modal_state::{ConfirmDelete, ModalState};
+use crate::model::modal_state::ModalState;
 use crate::{app::App, model::modal_state::ModalType};
 use ratatui::{
     Frame,

@@ -1,7 +1,7 @@
 use crate::io::tui::Tui;
 use crate::message;
 use crate::message::action::Action;
-use crate::model::app_state::AppState;
+use crate::model::app_state::{AppState, BoardName};
 use color_eyre::eyre::Result;
 use crossterm::event::{self};
 use std::time::Duration;
@@ -21,11 +21,11 @@ impl App {
         let mut model = AppState::new();
         // Add dummy data for visualization
         model
-            .board_map
-            .insert("Project Alpha".to_string(), "alpha.json".to_string());
+            .board_list
+            .push(BoardName::new("Project Alpha".to_string()));
         model
-            .board_map
-            .insert("Personal Tasks".to_string(), "personal.json".to_string());
+            .board_list
+            .push(BoardName::new("Personal Tasks".to_string()));
 
         App {
             model,

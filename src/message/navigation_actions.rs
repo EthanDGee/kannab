@@ -49,7 +49,7 @@ pub fn decrement_no_wrap(index: usize) -> Option<usize> {
 pub fn move_up(model: &mut AppState) -> Option<Action> {
     match model.mode {
         AppMode::Picker => {
-            let len = model.board_map.len();
+            let len = model.board_list.len();
             model.picker_state.index = decrement_wrap(model.picker_state.index, len);
         }
         AppMode::Board => {
@@ -69,7 +69,7 @@ pub fn move_up(model: &mut AppState) -> Option<Action> {
 pub fn move_down(model: &mut AppState) -> Option<Action> {
     match model.mode {
         AppMode::Picker => {
-            let len = model.board_map.len();
+            let len = model.board_list.len();
             model.picker_state.index = increment_wrap(model.picker_state.index, len);
         }
         AppMode::Board => {
