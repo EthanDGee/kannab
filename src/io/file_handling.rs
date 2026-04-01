@@ -23,7 +23,7 @@ fn board_list_path() -> Option<PathBuf> {
     let proj_dirs = ProjectDirs::from("com", APP_NAME, APP_NAME)?;
     let save_path = proj_dirs.data_local_dir();
     std::fs::create_dir_all(save_path).ok()?;
-    Some(save_path.join(format!("{}{}", BOARD_LIST_FILENAME, BOARD_LIST_FILENAME)))
+    Some(save_path.join(format!("{}{}", BOARD_LIST_FILENAME, DATA_FILE_TYPE)))
 }
 
 /// Saves the list of boards to the file system

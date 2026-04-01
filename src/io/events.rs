@@ -126,10 +126,10 @@ fn handle_board_keys(key: KeyEvent) -> Option<Action> {
     } else if shift {
         match key.code {
             // Task reordering
-            KeyCode::Up | KeyCode::Char('k') => Some(Action::MoveTaskUp),
-            KeyCode::Down | KeyCode::Char('j') => Some(Action::MoveTaskDown),
-            KeyCode::Left | KeyCode::Char('h') => Some(Action::MoveTaskToPrevColumn),
-            KeyCode::Right | KeyCode::Char('l') => Some(Action::MoveTaskToNextColumn),
+            KeyCode::Up | KeyCode::Char('K') => Some(Action::MoveTaskUp),
+            KeyCode::Down | KeyCode::Char('J') => Some(Action::MoveTaskDown),
+            KeyCode::Left | KeyCode::Char('H') => Some(Action::MoveTaskToPrevColumn),
+            KeyCode::Right | KeyCode::Char('L') => Some(Action::MoveTaskToNextColumn),
             _ => None,
         }
     } else {

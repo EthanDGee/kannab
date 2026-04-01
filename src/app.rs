@@ -6,7 +6,7 @@ use color_eyre::eyre::Result;
 use crossterm::event::{self};
 use std::time::Duration;
 
-const EVENT_TICK_RATE: Duration = Duration::new(0, 15);
+const EVENT_TICK_RATE: Duration = Duration::new(0, 10);
 const SAVE_TICK_RATE: Duration = Duration::new(5, 0);
 
 /// Main application state container
