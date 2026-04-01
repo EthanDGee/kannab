@@ -1,5 +1,5 @@
-use crate::model::board_state::Board;
 use crate::view::column;
+use crate::{APP_NAME, model::board_state::Board};
 
 /// Handles associated view data for the Kanban data
 ///
@@ -47,7 +47,7 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
         .split(area);
 
     // Header
-    let header_title = format!("kanab - {}", board.title);
+    let header_title = format!("{} - {}", APP_NAME, board.title);
     let title = Paragraph::new(header_title)
         .style(Style::default().fg(colors.body_text).bg(colors.background));
     frame.render_widget(title, chunks[0]);

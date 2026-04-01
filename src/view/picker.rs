@@ -1,4 +1,4 @@
-use crate::app::App;
+use crate::{APP_NAME, app::App};
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Rect},
@@ -29,7 +29,7 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
         .split(area);
 
     // Header
-    let title = Paragraph::new("kanab - Select Board")
+    let title = Paragraph::new(format!("{} - Select Board", APP_NAME))
         .style(Style::default().fg(colors.body_text).bg(colors.background));
     frame.render_widget(title, chunks[0]);
 

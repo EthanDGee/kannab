@@ -6,7 +6,6 @@ use crossterm::{
 use ratatui::{Terminal, prelude::CrosstermBackend};
 use std::io::{Stdout, stdout};
 
-use crate::{model::app_state::AppState, view};
 
 pub struct Tui {
     pub terminal: Terminal<CrosstermBackend<Stdout>>,
@@ -14,7 +13,7 @@ pub struct Tui {
 
 impl Tui {
     pub fn new() -> Result<Self> {
-        let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
+        let terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
         Ok(Tui { terminal })
     }
 
