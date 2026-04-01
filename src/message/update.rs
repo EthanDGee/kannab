@@ -17,7 +17,11 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::MoveRight => navigation_actions::move_right(model),
 
         // Board Picker Actions
+        Action::OpenBoard => board_actions::open_board(model),
         Action::CreateBoard(title) => board_actions::create_board(model, title),
+        Action::RenameBoard(new_title) => board_actions::rename_board(model, new_title),
+        Action::DeleteBoard => board_actions::delete_board(model),
+        Action::Save => board_actions::save_board(model),
 
         // Column Handling
         Action::CreateColumn(title) => column_actions::create_column(model, title),

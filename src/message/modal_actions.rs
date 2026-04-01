@@ -47,6 +47,11 @@ pub fn confirm(model: &mut AppState) -> Option<Action> {
             let description = modal.data.task_description.clone();
             Some(Action::CreateTask(title, description))
         }
+        ModalType::ConfirmDelete(target) => match target {
+            crate::model::modal_state::ConfirmDelete::Board => Some(Action::DeleteBoard),
+            crate::model::modal_state::ConfirmDelete::Column => Some(Action::DeleteColumn),
+            crate::model::modal_state::ConfirmDelete::Task => Some(Action::DeleteTask),
+        },
         _ => None,
     };
 
