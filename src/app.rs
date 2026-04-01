@@ -1,7 +1,7 @@
 use crate::io::tui::Tui;
 use crate::message;
 use crate::message::action::Action;
-use crate::model::app_state::{AppState, BoardName};
+use crate::model::app_state::AppState;
 use color_eyre::eyre::Result;
 use crossterm::event::{self};
 use std::time::Duration;
@@ -19,13 +19,10 @@ pub struct App {
 impl App {
     pub fn new() -> Self {
         let mut model = AppState::new();
-        // Add dummy data for visualization
-        model
-            .board_list
-            .push(BoardName::new("Project Alpha".to_string()));
-        model
-            .board_list
-            .push(BoardName::new("Personal Tasks".to_string()));
+        // Load boards from disk
+        if let Some(boards) = crate::io::file_handling::load_board_list() {
+            model.board_list = boards;
+        }
 
         App {
             model,

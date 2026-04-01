@@ -19,11 +19,13 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         // Board Picker Actions
         Action::OpenBoard => board_actions::open_board(model),
         Action::CreateBoard(title) => board_actions::create_board(model, title),
-        Action::RenameBoard(new_title) => board_actions::rename_board(model, new_title),
+        Action::RenameBoard(title) => board_actions::rename_board(model, title),
         Action::DeleteBoard => board_actions::delete_board(model),
         Action::Save => board_actions::save_board(model),
+        Action::SaveBoardList => board_actions::save_board_list(model),
 
         // Column Handling
+
         Action::CreateColumn(title) => column_actions::create_column(model, title),
         Action::RenameColumn(new_name) => column_actions::rename_column(model, new_name),
         Action::DeleteColumn => column_actions::delete_column(model),

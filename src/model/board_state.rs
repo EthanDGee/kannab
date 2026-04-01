@@ -79,6 +79,7 @@ impl Column {
 }
 
 /// Stores the title of a board and it's associated file name
+#[derive(Clone, Serialize, Deserialize)]
 pub struct BoardName {
     pub title: String,
     pub snake_case: String,

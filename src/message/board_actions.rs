@@ -14,7 +14,7 @@ pub fn create_board(model: &mut AppState, title: String) -> Option<Action> {
 
     model.board_list.insert(0, BoardName::new(title.clone()));
     let board_state = BoardState::new(board);
-    file_handling::save_board(&board_state.board);
+    file_handling::save_board_list(&model.board_list);
     model.board_state = Some(board_state);
     model.mode = AppMode::Board;
     Some(Action::MarkDirty)
@@ -40,6 +40,7 @@ pub fn delete_board(model: &mut AppState) -> Option<Action> {
 
     let board_name = model.board_list.remove(index);
     file_handling::delete_board(&board_name.title);
+    file_handling::save_board_list(&model.board_list);
 
     // update picker index as needed to ensure that is at valid position
     if model.picker_state.index >= model.board_list.len() && !model.board_list.is_empty() {
@@ -67,12 +68,13 @@ pub fn rename_board(model: &mut AppState, new_title: String) -> Option<Action> {
 
     // 2. Update board_list entry
     *board_name_entry = BoardName::new(new_title.clone());
+    file_handling::save_board_list(&model.board_list);
 
     // 3. Update active board state if it's the same board
-    if let Some(board_state) = &mut model.board_state {
-        if board_state.board.title == old_title {
-            board_state.board.title = new_title;
-        }
+    if let Some(board_state) = &mut model.board_state
+        && board_state.board.title == old_title
+    {
+        board_state.board.title = new_title;
     }
 
     Some(Action::MarkDirty)
@@ -83,5 +85,11 @@ pub fn save_board(model: &mut AppState) -> Option<Action> {
     if let Some(board_state) = &model.board_state {
         file_handling::save_board(&board_state.board);
     }
+    None
+}
+
+/// Saves the current list of boards to the file system
+pub fn save_board_list(model: &mut AppState) -> Option<Action> {
+    file_handling::save_board_list(&model.board_list);
     None
 }
