@@ -1,15 +1,17 @@
-use crate::{
-    message::{
-        action::Action, board_actions, column_actions, io_actions, modal_actions,
-        navigation_actions, task_actions,
-    },
-    model::app_state::AppState,
+use crate::message::board_actions;
+use crate::message::{
+    action::Action, column_actions, io_actions, modal_actions, navigation_actions, task_actions,
 };
+use crate::model::app_state::AppState;
 
 /// Given an action updates the AppState returning an Optional next Action if required
 /// such as ExitModal or MarkDirty
 pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
     match action {
+        // General Actions
+        Action::Quit => todo!("Implement quitting action"),
+        Action::Render => todo!("Handle render update action"),
+
         // Navigation
         Action::MoveUp => navigation_actions::move_up(model),
         Action::MoveDown => navigation_actions::move_down(model),
@@ -17,17 +19,21 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::MoveRight => navigation_actions::move_right(model),
 
         // Board Picker Actions
+        Action::MoveBoardUp => board_actions::move_board_up(model),
+        Action::MoveBoardDown => board_actions::move_board_down(model),
+        Action::QuitToPicker => todo!("Implement QuitToPicker"),
+
+        // Board Actions
         Action::OpenBoard => board_actions::open_board(model),
         Action::CreateBoard(title) => board_actions::create_board(model, title),
         Action::RenameBoard(title) => board_actions::rename_board(model, title),
         Action::DeleteBoard => board_actions::delete_board(model),
-        Action::Save => board_actions::save_board(model),
-        Action::SaveBoardList => board_actions::save_board_list(model),
 
         // Column Handling
-
         Action::CreateColumn(title) => column_actions::create_column(model, title),
         Action::RenameColumn(new_name) => column_actions::rename_column(model, new_name),
+        Action::NextColumn => todo!("Implement column movement"),
+        Action::PrevColumn => todo!("Implement column movement"),
         Action::DeleteColumn => column_actions::delete_column(model),
         Action::MoveColumnLeft => column_actions::move_column_left(model),
         Action::MoveColumnRight => column_actions::move_column_right(model),
@@ -38,6 +44,8 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         }
         Action::EditTask(input_field, edit) => task_actions::edit_task(model, input_field, edit),
         Action::DeleteTask => task_actions::delete_task(model),
+        Action::NextTask => todo!("Implement task navigation_actions"),
+        Action::PrevTask => todo!("Implement task navigation_actions"),
         Action::MoveTaskUp => task_actions::move_task_up(model),
         Action::MoveTaskDown => task_actions::move_task_down(model),
         Action::MoveTaskToNextColumn => task_actions::move_task_to_next_column(model),
@@ -52,7 +60,8 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::Cancel => modal_actions::cancel(model),
 
         // I/O Operations
+        Action::Save => board_actions::save_board(model),
+        Action::SaveBoardList => board_actions::save_board_list(model),
         Action::MarkDirty => io_actions::mark_dirty(model),
-        _ => None,
     }
 }
