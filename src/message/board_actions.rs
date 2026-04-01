@@ -3,7 +3,7 @@ use crate::message::action::Action;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
 use crate::model::app_state::{AppMode, AppState};
 use crate::model::board_state::{Board, BoardName};
-use crate::view::board::BoardState;
+use crate::view::board_view::BoardState;
 
 // Board Handling
 

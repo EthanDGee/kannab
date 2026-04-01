@@ -37,7 +37,8 @@ impl App {
 
         // run
         loop {
-            tui.terminal.draw(|f| crate::view::app::render(self, f))?;
+            tui.terminal
+                .draw(|f| crate::view::app_view::render(self, f))?;
             if event::poll(self.tick_rate)?
                 && let event::Event::Key(key) = event::read()?
             {

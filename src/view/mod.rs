@@ -1,8 +1,8 @@
-pub mod app;
-pub mod board;
-pub mod column;
+pub mod app_view;
+pub mod board_view;
+pub mod column_view;
 pub mod help;
-pub mod modal;
-pub mod picker;
-pub mod task;
+pub mod modal_view;
+pub mod picker_view;
+pub mod task_view;
 pub mod theme;

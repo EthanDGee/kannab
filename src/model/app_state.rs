@@ -1,7 +1,7 @@
 pub use crate::model::board_state::BoardName;
 use crate::model::modal_state::ModalState;
-use crate::view::board::BoardState;
-use crate::view::picker::PickerState;
+use crate::view::board_view::BoardState;
+use crate::view::picker_view::PickerState;
 use crate::view::theme::ColorScheme;
 
 /// enum containing the various screens

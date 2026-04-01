@@ -1,6 +1,6 @@
 use crate::app::App;
 use crate::model::board_state::Column;
-use crate::view::task;
+use crate::view::task_view;
 use ratatui::{
     Frame,
     layout::Rect,
@@ -50,7 +50,7 @@ pub fn render(
         .enumerate()
         .map(|(i, task)| {
             let is_selected = selected && i == board_state.task_index;
-            task::render_item(task, colors, is_selected, inner_width)
+            task_view::render_item(task, colors, is_selected, inner_width)
         })
         .collect();
 

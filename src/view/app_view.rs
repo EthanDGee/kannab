@@ -8,16 +8,16 @@ pub fn render(app: &App, frame: &mut Frame) {
 
     match app.model.mode {
         AppMode::Picker => {
-            crate::view::picker::render(app, frame, area);
+            crate::view::picker_view::render(app, frame, area);
         }
         AppMode::Board => {
-            crate::view::board::render(app, frame, area);
+            crate::view::board_view::render(app, frame, area);
         }
     }
 
     // Overlays rendered on top
     if let Some(ref modal) = app.model.modal_state {
-        crate::view::modal::render(app, frame, modal, area);
+        crate::view::modal_view::render(app, frame, modal, area);
     }
 
     // help rendering logic can be added here if needed,

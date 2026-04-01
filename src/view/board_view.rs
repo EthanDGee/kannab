@@ -1,4 +1,4 @@
-use crate::view::column;
+use crate::view::column_view;
 use crate::{APP_NAME, model::board_state::Board};
 
 /// Handles associated view data for the Kanban data
@@ -65,6 +65,6 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
 
     for (i, (column, column_area)) in board.columns.iter().zip(column_areas.iter()).enumerate() {
         let selected = i == board_state.column_index;
-        column::render(app, frame, column, *column_area, selected, i);
+        column_view::render(app, frame, column, *column_area, selected, i);
     }
 }
