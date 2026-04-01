@@ -1,3 +1,5 @@
+use std::fs;
+
 use crate::APP_NAME;
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
@@ -131,4 +133,16 @@ impl Board {
 
         Some(true)
     }
+}
+
+/// Deleted a given board from the save directory
+pub fn delete_board(id: Uuid) -> bool {
+    let proj_dirs = match ProjectDirs::from("com", APP_NAME, APP_NAME) {
+        Some(project_path) => project_path,
+        None => return false,
+    };
+
+    let save_path = proj_dirs.data_local_dir().join(BOARD_SAVE_DIRECTORY);
+    let board_file_path = save_path.join(format!("{}.json", id));
+    fs::remove_file(board_file_path).is_ok()
 }
