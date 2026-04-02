@@ -1,6 +1,6 @@
-use crate::message::board_actions;
 use crate::message::{
-    action::Action, column_actions, io_actions, modal_actions, navigation_actions, task_actions,
+    action::Action, board_actions, column_actions, io_actions, modal_actions, navigation_actions,
+    picker_actions, task_actions,
 };
 use crate::model::app_state::AppState;
 
@@ -21,7 +21,7 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         // Board Picker Actions
         Action::MoveBoardUp => board_actions::move_board_up(model),
         Action::MoveBoardDown => board_actions::move_board_down(model),
-        Action::QuitToPicker => todo!("Implement QuitToPicker"),
+        Action::QuitToPicker => picker_actions::quit_to_picker(model),
 
         // Board Actions
         Action::OpenBoard => board_actions::open_board(model),

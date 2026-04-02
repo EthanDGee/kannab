@@ -2,11 +2,8 @@ use crate::message::action::{Action, InputField};
 use crate::message::column_actions::get_current_column_mut;
 use crate::message::io_actions::mark_dirty;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
-use crate::model::{
-    app_state::AppState,
-    board_state::Task,
-    modal_state::{ModalState, ModalType},
-};
+use crate::model::app_state::AppState;
+use crate::model::board_state::Task;
 
 /// Utility function to get currently highlighted task based on AppState.BoardState's index
 pub fn get_current_task_mut(model: &mut AppState) -> Option<&mut Task> {
