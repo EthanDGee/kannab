@@ -4,7 +4,7 @@ use crate::message::action::Action;
 use crate::model::app_state::AppState;
 use color_eyre::eyre::Result;
 use crossterm::event::{self};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 const EVENT_TICK_RATE: Duration = Duration::new(0, 10);
 const SAVE_TICK_RATE: Duration = Duration::new(5, 0);
@@ -12,8 +12,8 @@ const SAVE_TICK_RATE: Duration = Duration::new(5, 0);
 /// Main application state container
 pub struct App {
     pub model: AppState,
-    pub tick_rate: Duration, // Tick rate for event handling
-    pub should_quit: bool,
+    pub last_save_time: Instant,
+    pub pending_action: Option<Action>,
 }
 
 impl App {
@@ -26,8 +26,8 @@ impl App {
 
         App {
             model,
-            tick_rate: EVENT_TICK_RATE,
-            should_quit: false,
+            last_save_time: Instant::now(),
+            pending_action: None,
         }
     }
 
@@ -39,19 +39,22 @@ impl App {
         loop {
             tui.terminal
                 .draw(|f| crate::view::app_view::render(self, f))?;
-            if event::poll(self.tick_rate)?
-                && let event::Event::Key(key) = event::read()?
-            {
+
+            if let event::Event::Key(key) = event::read()? {
                 let event = crate::io::events::Event::Key(key);
-                if let Some(action) = crate::io::events::handle_event(self, event) {
-                    match action {
-                        Action::Quit => self.should_quit = true,
-                        _ => self.update(action),
-                    }
-                }
+                self.pending_action = crate::io::events::handle_event(self, event);
             }
 
-            if self.should_quit {
+            while let Some(action) = self.pending_action.take() {
+                self.pending_action = message::update::update(&mut self.model, action);
+            }
+
+            if self.last_save_time.elapsed() >= SAVE_TICK_RATE {
+                self.last_save_time = Instant::now();
+                self.update(Action::Tick);
+            }
+
+            if self.model.should_quit {
                 break;
             }
         }

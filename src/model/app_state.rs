@@ -27,6 +27,7 @@ pub struct AppState {
     pub modal_state: Option<ModalState>,
     pub color_scheme: ColorScheme,
     pub pending_changes: bool,
+    pub should_quit: bool,
 }
 
 impl AppState {
@@ -40,6 +41,7 @@ impl AppState {
             modal_state: None,
             color_scheme: ColorScheme::default(),
             pending_changes: false,
+            should_quit: false,
         }
     }
 }

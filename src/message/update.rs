@@ -9,8 +9,7 @@ use crate::model::app_state::AppState;
 pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
     match action {
         // General Actions
-        Action::Quit => todo!("Implement quitting action"),
-        Action::Render => todo!("Handle render update action"),
+        Action::Quit => io_actions::quit(model),
 
         // Navigation
         Action::MoveUp => navigation_actions::move_up(model),
@@ -60,8 +59,8 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::Cancel => modal_actions::cancel(model),
 
         // I/O Operations
-        Action::Save => board_actions::save_board(model),
-        Action::SaveBoardList => board_actions::save_board_list(model),
+        Action::Save => io_actions::save(model),
         Action::MarkDirty => io_actions::mark_dirty(model),
+        Action::Tick => io_actions::handle_tick(model),
     }
 }
