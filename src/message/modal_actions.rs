@@ -18,9 +18,37 @@ pub fn close_modal(model: &mut AppState) -> Option<Action> {
     None
 }
 
+/// Toggles focus between title and description fields in a task-related modal.
+pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
+    if let Some(modal) = &mut model.modal_state {
+        modal.focus = match modal.focus {
+            InputField::TaskTitle => InputField::TaskDescription,
+            _ => InputField::TaskTitle,
+        };
+
+        // Reset cursor position to end of the new field's content
+        let content = match modal.focus {
+            InputField::TaskTitle => &modal.data.task_title,
+            InputField::TaskDescription => &modal.data.task_description,
+            _ => "",
+        };
+
+        modal.cursor_position.char_index = content.chars().count();
+        modal.cursor_position.line_index = 0; // Simple for now
+    }
+    None
+}
+
 /// Updates the transient value of a specific input field within the active modal.
 pub fn update_field(model: &mut AppState, field: InputField, value: String) -> Option<Action> {
+    let mut new_cursor_pos = None;
     if let Some(modal) = &mut model.modal_state {
+        // Calculate cursor position based on the end of the text
+        let lines: Vec<&str> = value.split('\n').collect();
+        let line_index = lines.len().saturating_sub(1);
+        let char_index = lines.last().map_or(0, |l| l.chars().count());
+        new_cursor_pos = Some((char_index, line_index));
+
         match field {
             InputField::BoardName => modal.data.board_name = value,
             InputField::ColumnName => modal.data.column_name = value,
@@ -29,7 +57,8 @@ pub fn update_field(model: &mut AppState, field: InputField, value: String) -> O
             InputField::TaskItem => {} // Handle if checklists are implemented
         }
     }
-    None
+
+    new_cursor_pos.map(|(x, y)| Action::MoveCursor(x, y))
 }
 
 /// Updates the cursor's character and line position in the active modal.

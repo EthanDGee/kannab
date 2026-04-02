@@ -37,53 +37,87 @@ fn handle_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
     }
 
     match modal.modal_type {
-        ModalType::CreateBoard => handle_create_board_key(modal, key),
-        ModalType::CreateColumn => handle_create_column_key(modal, key),
-        ModalType::ConfirmDelete(_) => handle_confirm_delete_key(key),
-        _ => None,
+        ModalType::CreateBoard | ModalType::EditBoard => {
+            single_line_modal(key, InputField::BoardName, modal.data.board_name.clone())
+        }
+        ModalType::CreateColumn | ModalType::RenameColumn => {
+            single_line_modal(key, InputField::ColumnName, modal.data.column_name.clone())
+        }
+        ModalType::CreateTask | ModalType::EditTask => handle_task_creation(modal, key),
+        ModalType::ConfirmDelete(_) => confirmation(key),
+        ModalType::Help => None,
     }
 }
 
-fn handle_confirm_delete_key(key: KeyEvent) -> Option<Action> {
+/// Helper for handling task-related text input (title and description).
+fn handle_task_creation(modal: &ModalState, key: KeyEvent) -> Option<Action> {
+    // Handle hot keys
+    if key.modifiers.contains(KeyModifiers::CONTROL) {
+        match key.code {
+            // Save and Exit: Ctrl+S or Ctrl+Enter
+            KeyCode::Char('s') | KeyCode::Enter => return Some(Action::Confirm),
+            _ => return None,
+        }
+    }
+
     match key.code {
-        KeyCode::Enter => Some(Action::Confirm),
-        _ => None,
+        KeyCode::Tab => Some(Action::SwitchInputField),
+        // Submit the task / Newline support
+        KeyCode::Enter => {
+            if modal.focus == InputField::TaskTitle {
+                Some(Action::Confirm)
+            } else {
+                // Insert newline in description
+                let mut current_text = modal.data.task_description.clone();
+                current_text.push('\n');
+                Some(Action::UpdateField(
+                    InputField::TaskDescription,
+                    current_text,
+                ))
+            }
+        }
+        _ => {
+            let (field, current_text) = match modal.focus {
+                InputField::TaskTitle => (InputField::TaskTitle, modal.data.task_title.clone()),
+                InputField::TaskDescription => (
+                    InputField::TaskDescription,
+                    modal.data.task_description.clone(),
+                ),
+                _ => (InputField::TaskTitle, modal.data.task_title.clone()),
+            };
+            update_text_field(key, field, current_text)
+        }
     }
 }
 
-fn handle_create_board_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
-    let mut current_name = modal.data.board_name.clone();
+/// Helper for handling single line text edit modals
+fn single_line_modal(key: KeyEvent, field: InputField, current_text: String) -> Option<Action> {
+    if key.code == KeyCode::Enter {
+        return Some(Action::Confirm);
+    }
+    update_text_field(key, field, current_text)
+}
 
+/// Helper for handling text input fields within modals.
+fn update_text_field(key: KeyEvent, field: InputField, mut current_text: String) -> Option<Action> {
     match key.code {
-        KeyCode::Enter => Some(Action::Confirm),
         KeyCode::Char(c) => {
-            current_name.push(c);
-            Some(Action::UpdateField(InputField::BoardName, current_name))
+            current_text.push(c);
+            Some(Action::UpdateField(field, current_text))
         }
         KeyCode::Backspace => {
-            // remove the last character of the board_name
-            current_name.pop();
-            Some(Action::UpdateField(InputField::BoardName, current_name))
+            current_text.pop();
+            Some(Action::UpdateField(field, current_text))
         }
         _ => None,
     }
 }
 
-fn handle_create_column_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
-    let mut current_name = modal.data.column_name.clone();
-
-    match key.code {
-        KeyCode::Enter => Some(Action::Confirm),
-        KeyCode::Char(c) => {
-            current_name.push(c);
-            Some(Action::UpdateField(InputField::ColumnName, current_name))
-        }
-        KeyCode::Backspace => {
-            current_name.pop();
-            Some(Action::UpdateField(InputField::ColumnName, current_name))
-        }
-        _ => None,
+fn confirmation(key: KeyEvent) -> Option<Action> {
+    if key.code == KeyCode::Enter {
+        return Some(Action::Confirm);
     }
+    None
 }
 
 fn handle_picker_keys(key: KeyEvent) -> Option<Action> {

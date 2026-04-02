@@ -1,7 +1,6 @@
-use std::f32::DIGITS;
-
-use crate::io::file_handling::delete_board;
+use crate::message::action::InputField;
 use crate::model::modal_state::{ConfirmDelete, ModalState};
+use crate::widgets::text_input::TextInput;
 use crate::{app::App, model::modal_state::ModalType};
 use ratatui::{
     Frame,
@@ -20,21 +19,89 @@ pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
         ModalType::RenameColumn => {
             todo!("Finish implementing the  Modal ")
         }
-        ModalType::CreateTask => {
-            todo!("Finish implementing the  Modal ")
-        }
+        ModalType::CreateTask => create_task_view(app, frame, modal, area),
         ModalType::EditTask => {
             todo!("Finish implementing the  Modal ")
         }
-        ModalType::ConfirmDelete(ConfirmDelete) => confirm_delete(app, frame, modal, area),
+        ModalType::ConfirmDelete(_) => confirm_delete(app, frame, modal, area),
         ModalType::Help => {
             todo!("Finish implementing the  Modal ")
         }
     }
 }
 
+fn create_task_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
+    let colors = app.model.color_scheme;
+    let area = centered_rect(70, 40, area);
+
+    frame.render_widget(Clear, area);
+
+    let block = Block::default()
+        .title(" Create New Task ")
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(colors.highlight))
+        .style(Style::default().bg(colors.background).fg(colors.body_text));
+
+    let inner_area = block.inner(area);
+    frame.render_widget(block, area);
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(1), // Title Label
+            Constraint::Length(3), // Title Input
+            Constraint::Length(1), // Description Label
+            Constraint::Min(5),    // Description Input
+            Constraint::Length(1), // Instructions
+        ])
+        .split(inner_area);
+
+    // Title Field
+    let title_label = Paragraph::new("Task Title:")
+        .style(Style::default().add_modifier(Modifier::BOLD));
+    frame.render_widget(title_label, chunks[0]);
+
+    let title_active = modal.focus == InputField::TaskTitle;
+    let title_input = TextInput::new(colors, &modal.data.task_title, modal.cursor_position)
+        .active(title_active)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(if title_active {
+                    colors.highlight
+                } else {
+                    colors.inner_border
+                })),
+        );
+    frame.render_widget(title_input, chunks[1]);
+
+    // Description Field
+    let desc_label = Paragraph::new("Description:")
+        .style(Style::default().add_modifier(Modifier::BOLD));
+    frame.render_widget(desc_label, chunks[2]);
+
+    let desc_active = modal.focus == InputField::TaskDescription;
+    let desc_input = TextInput::new(colors, &modal.data.task_description, modal.cursor_position)
+        .active(desc_active)
+        .multiline()
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(if desc_active {
+                    colors.highlight
+                } else {
+                    colors.inner_border
+                })),
+        );
+    frame.render_widget(desc_input, chunks[3]);
+
+    let instructions = Paragraph::new("Tab: Switch fields | Enter: Create | Esc: Cancel")
+        .style(Style::default().fg(colors.inner_border));
+    frame.render_widget(instructions, chunks[4]);
+}
+
 fn create_board_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
-    let colors = &app.model.color_scheme;
+    let colors = app.model.color_scheme;
     let area = centered_rect(60, 15, area);
 
     frame.render_widget(Clear, area); //this clears out the background
@@ -60,11 +127,13 @@ fn create_board_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rec
     let label = Paragraph::new("Board Name:").style(Style::default().add_modifier(Modifier::BOLD));
     frame.render_widget(label, chunks[0]);
 
-    let input = Paragraph::new(modal.data.board_name.as_str()).block(
-        Block::default()
-            .borders(Borders::ALL)
-            .border_style(Style::default().fg(colors.inner_border)),
-    );
+    let input = TextInput::new(colors, &modal.data.board_name, modal.cursor_position)
+        .active(true)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(colors.inner_border)),
+        );
     frame.render_widget(input, chunks[1]);
 
     let instructions = Paragraph::new("Press Enter to create, Esc to cancel")
@@ -73,7 +142,7 @@ fn create_board_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rec
 }
 
 fn create_column_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
-    let colors = &app.model.color_scheme;
+    let colors = app.model.color_scheme;
     let area = centered_rect(60, 15, area);
 
     frame.render_widget(Clear, area);
@@ -96,14 +165,17 @@ fn create_column_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Re
         ])
         .split(inner_area);
 
-    let label = Paragraph::new("Column Title:").style(Style::default().add_modifier(Modifier::BOLD));
+    let label =
+        Paragraph::new("Column Title:").style(Style::default().add_modifier(Modifier::BOLD));
     frame.render_widget(label, chunks[0]);
 
-    let input = Paragraph::new(modal.data.column_name.as_str()).block(
-        Block::default()
-            .borders(Borders::ALL)
-            .border_style(Style::default().fg(colors.inner_border)),
-    );
+    let input = TextInput::new(colors, &modal.data.column_name, modal.cursor_position)
+        .active(true)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(colors.inner_border)),
+        );
     frame.render_widget(input, chunks[1]);
 
     let instructions = Paragraph::new("Press Enter to create, Esc to cancel")
@@ -179,7 +251,7 @@ fn confirm_delete(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) 
         .constraints([
             Constraint::Length(1), // label
             Constraint::Min(1),    // confirmation question
-            Constraint::Length(1), // instructions
+            Constraint::Max(1),    // instructions
         ])
         .split(inner_area);
 

@@ -1,5 +1,7 @@
 //! State definitions for modal overlays.
 
+use crate::message::action::InputField;
+
 /// Cursor position within a modal's text input fields.
 #[derive(Clone, Copy, Default, PartialEq)]
 pub struct CursorPosition {
@@ -65,15 +67,25 @@ pub struct ModalState {
     pub data: ModalData,
     /// The current cursor position in the active field.
     pub cursor_position: CursorPosition,
+    /// The currently focused input field.
+    pub focus: InputField,
 }
 
 impl ModalState {
     /// Creates a new `ModalState` of the given type with default data and cursor position.
     pub fn new(modal_type: ModalType) -> Self {
+        let focus = match modal_type {
+            ModalType::CreateBoard | ModalType::EditBoard => InputField::BoardName,
+            ModalType::CreateColumn | ModalType::RenameColumn => InputField::ColumnName,
+            ModalType::CreateTask | ModalType::EditTask => InputField::TaskTitle,
+            _ => InputField::BoardName,
+        };
+
         ModalState {
             modal_type,
             data: ModalData::default(),
             cursor_position: CursorPosition::default(),
+            focus,
         }
     }
 }

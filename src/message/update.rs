@@ -59,6 +59,7 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         // Modal Actions
         Action::OpenModal(modal_type) => modal_actions::open_modal(model, modal_type),
         Action::CloseModal => modal_actions::close_modal(model),
+        Action::SwitchInputField => modal_actions::switch_input_field(model),
         Action::UpdateField(field, value) => modal_actions::update_field(model, field, value),
         Action::MoveCursor(x, y) => modal_actions::move_cursor(model, x, y),
         Action::Confirm => modal_actions::confirm(model),

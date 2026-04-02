@@ -76,6 +76,8 @@ pub enum Action {
     OpenModal(ModalType),
     /// Close any currently open modal and discard its modal state.
     CloseModal,
+    /// Switch to the next available input field in the modal.
+    SwitchInputField,
     /// Update the text value of a field in an active modal.
     UpdateField(InputField, String),
     /// Update the cursor position within a modal field.
@@ -99,6 +101,7 @@ pub enum Action {
 }
 
 /// Identifiers for all text input fields across various modals and views.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputField {
     /// Field for entering a board title.
     BoardName,

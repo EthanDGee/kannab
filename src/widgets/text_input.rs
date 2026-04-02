@@ -20,6 +20,8 @@ pub struct TextInput<'a> {
     active: bool,
     /// Whether to wrap long lines
     wrap: bool,
+    /// Whether the input supports multiple lines
+    is_multiline: bool,
     /// Color Palette
     theme: ColorScheme,
     /// ratatui styling
@@ -28,6 +30,7 @@ pub struct TextInput<'a> {
 
 impl<'a> TextInput<'a> {
     /// Creates a new `TextInput` widget with the given theme, value, and cursor position.
+    /// Defaults to single-line mode.
     pub fn new(theme: ColorScheme, value: &'a str, cursor_pos: CursorPosition) -> Self {
         let style = Style::default().fg(theme.body_text);
         Self {
@@ -35,7 +38,8 @@ impl<'a> TextInput<'a> {
             value,
             cursor_pos,
             active: false,
-            wrap: true,
+            wrap: false,
+            is_multiline: false,
             theme,
             style,
         }
@@ -67,8 +71,20 @@ impl<'a> TextInput<'a> {
         self
     }
 
-    /// Splits the input value into lines and renders them as `ratatui::text::Line`.
-    fn split_lines(&self) -> Vec<Line<'a>> {
+    /// Enables multi-line support for this input.
+    pub fn multiline(mut self) -> Self {
+        self.is_multiline = true;
+        self.wrap = true;
+        self
+    }
+
+    /// Renders the widget in single-line mode.
+    fn render_single_line(&self) -> Vec<Line<'a>> {
+        vec![self.render_line(0, self.value)]
+    }
+
+    /// Renders the widget in multi-line mode.
+    fn render_multi_line(&self) -> Vec<Line<'a>> {
         self.value
             .split('\n')
             .enumerate()
@@ -78,7 +94,12 @@ impl<'a> TextInput<'a> {
 
     /// Renders a single line of text, adding cursor styling if it's the current line.
     fn render_line(&self, line_index: usize, line_content: &'a str) -> Line<'a> {
-        if self.active && line_index == self.cursor_pos.line_index {
+        // In single-line mode, we always render the cursor if active.
+        // In multi-line mode, we only render it if the line_index matches.
+        let should_render_cursor =
+            self.active && (!self.is_multiline || line_index == self.cursor_pos.line_index);
+
+        if should_render_cursor {
             self.render_active_line(line_content)
         } else {
             Line::from(Span::styled(line_content, self.style))
@@ -122,7 +143,12 @@ impl<'a> Widget for TextInput<'a> {
             return;
         }
 
-        let lines = self.split_lines();
+        let lines = if self.is_multiline {
+            self.render_multi_line()
+        } else {
+            self.render_single_line()
+        };
+
         let mut paragraph = Paragraph::new(lines).style(self.style);
         if self.wrap {
             paragraph = paragraph.wrap(ratatui::widgets::Wrap { trim: false });
