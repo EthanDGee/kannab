@@ -7,9 +7,7 @@ use crate::model::app_state::{AppMode, AppState};
 
 /// Increments the index with wrapping based on the length of the collection.
 pub fn increment_wrap(index: usize, len: usize) -> usize {
-    if len <= 1 {
-        0
-    } else if index >= len - 1 {
+    if len <= 1 || index >= len - 1 {
         0
     } else {
         index + 1

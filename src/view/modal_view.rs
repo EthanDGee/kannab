@@ -16,9 +16,7 @@ pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
         ModalType::EditBoard => {
             todo!("Finish implementing the  Modal ")
         }
-        ModalType::CreateColumn => {
-            todo!("Finish implementing the  Modal ")
-        }
+        ModalType::CreateColumn => create_column_view(app, frame, modal, area),
         ModalType::RenameColumn => {
             todo!("Finish implementing the  Modal ")
         }
@@ -63,6 +61,45 @@ fn create_board_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rec
     frame.render_widget(label, chunks[0]);
 
     let input = Paragraph::new(modal.data.board_name.as_str()).block(
+        Block::default()
+            .borders(Borders::ALL)
+            .border_style(Style::default().fg(colors.inner_border)),
+    );
+    frame.render_widget(input, chunks[1]);
+
+    let instructions = Paragraph::new("Press Enter to create, Esc to cancel")
+        .style(Style::default().fg(colors.inner_border));
+    frame.render_widget(instructions, chunks[2]);
+}
+
+fn create_column_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
+    let colors = &app.model.color_scheme;
+    let area = centered_rect(60, 15, area);
+
+    frame.render_widget(Clear, area);
+
+    let block = Block::default()
+        .title(" Create New Column ")
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(colors.highlight))
+        .style(Style::default().bg(colors.background).fg(colors.body_text));
+
+    let inner_area = block.inner(area);
+    frame.render_widget(block, area);
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(1), // Title Label
+            Constraint::Length(3), // Input Field
+            Constraint::Length(1), // Instructions
+        ])
+        .split(inner_area);
+
+    let label = Paragraph::new("Column Title:").style(Style::default().add_modifier(Modifier::BOLD));
+    frame.render_widget(label, chunks[0]);
+
+    let input = Paragraph::new(modal.data.column_name.as_str()).block(
         Block::default()
             .borders(Borders::ALL)
             .border_style(Style::default().fg(colors.inner_border)),

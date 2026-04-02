@@ -38,6 +38,7 @@ fn handle_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
 
     match modal.modal_type {
         ModalType::CreateBoard => handle_create_board_key(modal, key),
+        ModalType::CreateColumn => handle_create_column_key(modal, key),
         ModalType::ConfirmDelete(_) => handle_confirm_delete_key(key),
         _ => None,
     }
@@ -63,6 +64,23 @@ fn handle_create_board_key(modal: &ModalState, key: KeyEvent) -> Option<Action> 
             // remove the last character of the board_name
             current_name.pop();
             Some(Action::UpdateField(InputField::BoardName, current_name))
+        }
+        _ => None,
+    }
+}
+
+fn handle_create_column_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
+    let mut current_name = modal.data.column_name.clone();
+
+    match key.code {
+        KeyCode::Enter => Some(Action::Confirm),
+        KeyCode::Char(c) => {
+            current_name.push(c);
+            Some(Action::UpdateField(InputField::ColumnName, current_name))
+        }
+        KeyCode::Backspace => {
+            current_name.pop();
+            Some(Action::UpdateField(InputField::ColumnName, current_name))
         }
         _ => None,
     }
