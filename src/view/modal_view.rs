@@ -11,13 +11,17 @@ use ratatui::{
 
 pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
     match modal.modal_type {
-        ModalType::CreateBoard => create_board_view(app, frame, modal, area),
-        ModalType::EditBoard => {
-            todo!("Finish implementing the  Modal ")
+        ModalType::CreateBoard => {
+            board_modal_view(app, frame, modal, area, " Create New Board ", "Press Enter to create, Esc to cancel")
         }
-        ModalType::CreateColumn => create_column_view(app, frame, modal, area),
+        ModalType::EditBoard => {
+            board_modal_view(app, frame, modal, area, " Rename Board ", "Press Enter to rename, Esc to cancel")
+        }
+        ModalType::CreateColumn => {
+            column_modal_view(app, frame, modal, area, " Create New Column ", "Press Enter to create, Esc to cancel")
+        }
         ModalType::RenameColumn => {
-            todo!("Finish implementing the  Modal ")
+            column_modal_view(app, frame, modal, area, " Rename Column ", "Press Enter to rename, Esc to cancel")
         }
         ModalType::CreateTask => create_task_view(app, frame, modal, area),
         ModalType::EditTask => {
@@ -100,14 +104,14 @@ fn create_task_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect
     frame.render_widget(instructions, chunks[4]);
 }
 
-fn create_board_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
+fn board_modal_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect, title: &str, instruction_text: &str) {
     let colors = app.model.color_scheme;
     let area = centered_rect(60, 15, area);
 
     frame.render_widget(Clear, area); //this clears out the background
 
     let block = Block::default()
-        .title(" Create New Board ")
+        .title(title)
         .borders(Borders::ALL)
         .border_style(Style::default().fg(colors.highlight))
         .style(Style::default().bg(colors.background).fg(colors.body_text));
@@ -136,19 +140,19 @@ fn create_board_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rec
         );
     frame.render_widget(input, chunks[1]);
 
-    let instructions = Paragraph::new("Press Enter to create, Esc to cancel")
+    let instructions = Paragraph::new(instruction_text)
         .style(Style::default().fg(colors.inner_border));
     frame.render_widget(instructions, chunks[2]);
 }
 
-fn create_column_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
+fn column_modal_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect, title: &str, instruction_text: &str) {
     let colors = app.model.color_scheme;
     let area = centered_rect(60, 15, area);
 
     frame.render_widget(Clear, area);
 
     let block = Block::default()
-        .title(" Create New Column ")
+        .title(title)
         .borders(Borders::ALL)
         .border_style(Style::default().fg(colors.highlight))
         .style(Style::default().bg(colors.background).fg(colors.body_text));
@@ -178,7 +182,7 @@ fn create_column_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Re
         );
     frame.render_widget(input, chunks[1]);
 
-    let instructions = Paragraph::new("Press Enter to create, Esc to cancel")
+    let instructions = Paragraph::new(instruction_text)
         .style(Style::default().fg(colors.inner_border));
     frame.render_widget(instructions, chunks[2]);
 }

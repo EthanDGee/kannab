@@ -190,6 +190,14 @@ fn handle_board_keys(key: KeyEvent) -> Option<Action> {
             KeyCode::Down | KeyCode::Char('J') => Some(Action::MoveTaskDown),
             KeyCode::Left | KeyCode::Char('H') => Some(Action::MoveTaskToPrevColumn),
             KeyCode::Right | KeyCode::Char('L') => Some(Action::MoveTaskToNextColumn),
+
+            // Column Actions
+            KeyCode::Char('C') => Some(Action::OpenModal(ModalType::CreateColumn)),
+            KeyCode::Char('E') => Some(Action::OpenModal(ModalType::RenameColumn)),
+            KeyCode::Char('D') => Some(Action::OpenModal(ModalType::ConfirmDelete(
+                ConfirmDelete::Column,
+            ))),
+
             _ => None,
         }
     } else {
@@ -200,8 +208,13 @@ fn handle_board_keys(key: KeyEvent) -> Option<Action> {
             KeyCode::Up | KeyCode::Char('k') => Some(Action::MoveUp),
             KeyCode::Down | KeyCode::Char('j') => Some(Action::MoveDown),
 
+            // Column Renaming (also allow 'r' if not used for anything else)
+            KeyCode::Char('r') => Some(Action::OpenModal(ModalType::RenameColumn)),
+
             // Create Task
-            KeyCode::Char('n') => Some(Action::OpenModal(ModalType::CreateTask)),
+            KeyCode::Char('n') | KeyCode::Char('c') => {
+                Some(Action::OpenModal(ModalType::CreateTask))
+            }
 
             // Edit Task
             KeyCode::Char('e') => Some(Action::OpenModal(ModalType::EditTask)),

@@ -8,7 +8,29 @@ use crate::model::{
 
 /// Initializes and opens a modal of the specified type.
 pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action> {
-    model.modal_state = Some(ModalState::new(modal_type));
+    let mut modal_state = ModalState::new(modal_type.clone());
+
+    match &modal_type {
+        ModalType::RenameColumn => {
+            if let Some(board_state) = &model.board_state
+                && let Some(column) = board_state.board.columns.get(board_state.column_index)
+            {
+                modal_state.data.column_name = column.title.clone();
+                modal_state.cursor_position.char_index =
+                    modal_state.data.column_name.chars().count();
+            }
+        }
+        ModalType::EditBoard => {
+            if let Some(board) = model.board_list.get(model.picker_state.index) {
+                modal_state.data.board_name = board.title.clone();
+                modal_state.cursor_position.char_index =
+                    modal_state.data.board_name.chars().count();
+            }
+        }
+        _ => {}
+    }
+
+    model.modal_state = Some(modal_state);
     None
 }
 
@@ -83,6 +105,10 @@ pub fn confirm(model: &mut AppState) -> Option<Action> {
         ModalType::CreateColumn => {
             let name = modal.data.column_name.clone();
             Some(Action::CreateColumn(name))
+        }
+        ModalType::RenameColumn => {
+            let name = modal.data.column_name.clone();
+            Some(Action::RenameColumn(name))
         }
         ModalType::CreateTask => {
             let title = modal.data.task_title.clone();
