@@ -1,7 +1,5 @@
-use crate::{APP_NAME, io::file_handling::to_snake_case};
-use directories::ProjectDirs;
+use crate::io::file_handling::to_snake_case;
 use serde::{Deserialize, Serialize};
-use std::fs;
 use uuid::Uuid;
 
 /// Handles the member of a todo list for a given task

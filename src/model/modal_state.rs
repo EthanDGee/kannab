@@ -18,7 +18,7 @@ pub enum ModalType {
     Help,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum ConfirmDelete {
     Board,
     Column,

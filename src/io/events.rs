@@ -38,6 +38,14 @@ fn handle_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
 
     match modal.modal_type {
         ModalType::CreateBoard => handle_create_board_key(modal, key),
+        ModalType::ConfirmDelete(_) => handle_confirm_delete_key(key),
+        _ => None,
+    }
+}
+
+fn handle_confirm_delete_key(key: KeyEvent) -> Option<Action> {
+    match key.code {
+        KeyCode::Enter => Some(Action::Confirm),
         _ => None,
     }
 }
