@@ -1,12 +1,11 @@
+//! Handlers for column-level actions within a board.
+
 use crate::message::action::Action;
 use crate::message::io_actions::mark_dirty;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
-use crate::model::{
-    app_state::AppState,
-    board_state::Column,
-};
+use crate::model::{app_state::AppState, board_state::Column};
 
-/// Utility function to get currently highlighted column based on AppState.BoardState's index
+/// Returns a mutable reference to the currently selected column, if a board is active.
 pub fn get_current_column_mut(model: &mut AppState) -> Option<&mut Column> {
     // Extract the column index immutably first to avoid overlapping borrows
     let column_index = model.board_state.as_ref()?.column_index;
@@ -15,7 +14,9 @@ pub fn get_current_column_mut(model: &mut AppState) -> Option<&mut Column> {
     board_state.board.columns.get_mut(column_index)
 }
 
-/// Creates a new column with the specified title and adds it to the board.
+// TODO: create_column should insert column after the current column index
+
+/// Appends a new column with the specified title to the current board.
 pub fn create_column(model: &mut AppState, title: String) -> Option<Action> {
     if let Some(board_state) = &mut model.board_state {
         let mut column = Column::new();
@@ -28,16 +29,15 @@ pub fn create_column(model: &mut AppState, title: String) -> Option<Action> {
     }
 }
 
-/// Renames the title of the currently selected column
+/// Updates the title of the currently selected column.
 pub fn rename_column(model: &mut AppState, new_name: String) -> Option<Action> {
     model.board_state.as_ref()?;
-
     let column = get_current_column_mut(model)?;
     column.title = new_name;
     mark_dirty(model)
 }
 
-/// Delete Columns the currently selected column
+/// Removes the currently selected column from the board.
 pub fn delete_column(model: &mut AppState) -> Option<Action> {
     let column_index = model.board_state.as_ref()?.column_index;
     let columns_ref = model.board_state.as_mut()?.board.get_columns();
@@ -46,7 +46,7 @@ pub fn delete_column(model: &mut AppState) -> Option<Action> {
     mark_dirty(model)
 }
 
-/// Moves the column and the cursor to the left.
+/// Swaps the current column with the one to its left (lower index).
 pub fn move_column_left(model: &mut AppState) -> Option<Action> {
     let column_index = model.board_state.as_ref()?.column_index;
     let columns_ref = model.board_state.as_mut()?.board.get_columns();
@@ -61,7 +61,7 @@ pub fn move_column_left(model: &mut AppState) -> Option<Action> {
     }
 }
 
-/// Moves the column and the cursor to the right.
+/// Swaps the current column with the one to its right (higher index).
 pub fn move_column_right(model: &mut AppState) -> Option<Action> {
     model.board_state.as_ref()?;
     let column_index = model.board_state.as_ref()?.column_index;

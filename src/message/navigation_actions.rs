@@ -1,3 +1,5 @@
+//! Utilities and handlers for navigating through menus and board items.
+
 use crate::message::action::Action;
 use crate::model::app_state::{AppMode, AppState};
 
@@ -5,7 +7,7 @@ use crate::model::app_state::{AppMode, AppState};
 // Navigation Utilities
 // ---------------------
 
-/// Increments the index with wrapping based on the length of the collection.
+/// Increments an index with wrapping: returns 0 if at the last element.
 pub fn increment_wrap(index: usize, len: usize) -> usize {
     if len <= 1 || index >= len - 1 {
         0
@@ -14,7 +16,7 @@ pub fn increment_wrap(index: usize, len: usize) -> usize {
     }
 }
 
-/// Increments the index without wrapping, returning None if at the end.
+/// Increments an index without wrapping: returns `None` if at the last element.
 pub fn increment_no_wrap(index: usize, len: usize) -> Option<usize> {
     if len == 0 || index >= len - 1 {
         None
@@ -23,7 +25,7 @@ pub fn increment_no_wrap(index: usize, len: usize) -> Option<usize> {
     }
 }
 
-/// Decrements the index with wrapping based on the length of the collection.
+/// Decrements an index with wrapping: returns `len - 1` if at the first element.
 pub fn decrement_wrap(index: usize, len: usize) -> usize {
     if len <= 1 {
         0
@@ -34,16 +36,23 @@ pub fn decrement_wrap(index: usize, len: usize) -> usize {
     }
 }
 
-/// Decrements the index without wrapping, returning None if at the start.
+/// Decrements an index without wrapping: returns `None` if at the first element.
 pub fn decrement_no_wrap(index: usize) -> Option<usize> {
-    if index == 0 { None } else { Some(index - 1) }
+    if index == 0 {
+        None
+    } else {
+        Some(index - 1)
+    }
 }
 
 // ---------------------------
 // Global Navigation Bindings
 // ---------------------------
 
-/// Handles the MoveUp action, navigating to the previous item.
+/// Moves the active selection up.
+///
+/// In Picker mode, selects the previous board.
+/// In Board mode, selects the previous task in the current column.
 pub fn move_up(model: &mut AppState) -> Option<Action> {
     match model.mode {
         AppMode::Picker => {
@@ -63,7 +72,10 @@ pub fn move_up(model: &mut AppState) -> Option<Action> {
     None
 }
 
-/// Handles the MoveDown action, navigating to the next item.
+/// Moves the active selection down.
+///
+/// In Picker mode, selects the next board.
+/// In Board mode, selects the next task in the current column.
 pub fn move_down(model: &mut AppState) -> Option<Action> {
     match model.mode {
         AppMode::Picker => {
@@ -83,7 +95,9 @@ pub fn move_down(model: &mut AppState) -> Option<Action> {
     None
 }
 
-/// Handles the MoveLeft action
+/// Moves the active selection left.
+///
+/// In Board mode, selects the column to the left.
 pub fn move_left(model: &mut AppState) -> Option<Action> {
     match model.mode {
         AppMode::Picker => {}
@@ -120,7 +134,9 @@ pub fn move_left(model: &mut AppState) -> Option<Action> {
     None
 }
 
-/// Handles the MoveRight action
+/// Moves the active selection right.
+///
+/// In Board mode, selects the column to the right.
 pub fn move_right(model: &mut AppState) -> Option<Action> {
     match model.mode {
         AppMode::Picker => {}

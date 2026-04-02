@@ -1,3 +1,5 @@
+//! Handlers for task-level actions.
+
 use crate::message::action::{Action, InputField};
 use crate::message::column_actions::get_current_column_mut;
 use crate::message::io_actions::mark_dirty;
@@ -5,7 +7,7 @@ use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
 use crate::model::app_state::AppState;
 use crate::model::board_state::Task;
 
-/// Utility function to get currently highlighted task based on AppState.BoardState's index
+/// Returns a mutable reference to the currently selected task, if a board and column are active.
 pub fn get_current_task_mut(model: &mut AppState) -> Option<&mut Task> {
     let (column_index, task_index) = {
         let board_state = model.board_state.as_ref()?;
@@ -17,7 +19,8 @@ pub fn get_current_task_mut(model: &mut AppState) -> Option<&mut Task> {
     column.tasks.get_mut(task_index)
 }
 
-/// Creates a new task with the specified title and description and adds it to the current column.
+/// Creates a new task with the specified title and description in the active column, if a board and
+/// column are active.
 pub fn create_task(model: &mut AppState, title: String, description: String) -> Option<Action> {
     if let Some(board_state) = &mut model.board_state {
         let mut task = Task::new();
@@ -36,7 +39,8 @@ pub fn create_task(model: &mut AppState, title: String, description: String) -> 
         None
     }
 }
-/// Replaces the input field of the currently selected task with the new edit
+
+/// Updates a specific field (title or description) of the currently selected task.
 pub fn edit_task(model: &mut AppState, input_field: InputField, edit: String) -> Option<Action> {
     model.board_state.as_ref()?;
 
@@ -50,7 +54,7 @@ pub fn edit_task(model: &mut AppState, input_field: InputField, edit: String) ->
     mark_dirty(model)
 }
 
-/// Deletes the currently highlighted task
+/// Deletes the currently selected task from its column.
 pub fn delete_task(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
     let task_index = board_state.task_index;
@@ -59,7 +63,7 @@ pub fn delete_task(model: &mut AppState) -> Option<Action> {
     mark_dirty(model)
 }
 
-/// Move currently selected task up in the current column
+/// Swaps the current task with the one at the next index.
 pub fn move_task_up(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
     let task_index = board_state.task_index;
@@ -74,7 +78,7 @@ pub fn move_task_up(model: &mut AppState) -> Option<Action> {
     }
 }
 
-/// Move currently selected task down in the current column
+/// Swaps the current task with the one at the previous index.
 pub fn move_task_down(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
     let task_index = board_state.task_index;
@@ -89,7 +93,7 @@ pub fn move_task_down(model: &mut AppState) -> Option<Action> {
     }
 }
 
-/// Move currently highlighted task and cursor to the top of the right column
+/// Moves the currently selected task to the beginning of the next column.
 pub fn move_task_to_next_column(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
     let column_index = board_state.column_index;
@@ -117,7 +121,7 @@ pub fn move_task_to_next_column(model: &mut AppState) -> Option<Action> {
     }
 }
 
-/// Move currently highlighted task and cursor to the top of the left column
+/// Moves the currently selected task to the beginning of the previous column.
 pub fn move_task_to_prev_column(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
     let column_index = board_state.column_index;
@@ -144,7 +148,7 @@ pub fn move_task_to_prev_column(model: &mut AppState) -> Option<Action> {
     }
 }
 
-/// Toggles the completion of the currently selected task
+/// Flips the `complete` status of the currently selected task.
 pub fn toggle_completion(model: &mut AppState) -> Option<Action> {
     let _board_state = model.board_state.as_mut()?;
     let task = get_current_task_mut(model)?;

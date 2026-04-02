@@ -1,7 +1,10 @@
+//! Handlers for actions specifically within the board picker.
+
 use crate::io::file_handling;
 use crate::message::action::Action;
 use crate::model::app_state::{AppMode, AppState};
 
+/// Exits the active board and returns to the picker view, saving any unsaved board changes.
 pub fn quit_to_picker(model: &mut AppState) -> Option<Action> {
     if let Some(board_state) = &model.board_state
         && model.pending_changes

@@ -1,3 +1,5 @@
+//! Handlers for board-level actions.
+
 use crate::io::file_handling;
 use crate::message::action::Action;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
@@ -5,9 +7,7 @@ use crate::model::app_state::{AppMode, AppState};
 use crate::model::board_state::{Board, BoardName};
 use crate::view::board_view::BoardState;
 
-// Board Handling
-
-/// Creates a new board, adds it to the global map of boards, then sets the view to be the new board
+/// Creates a new board with the specified title and sets it as active.
 pub fn create_board(model: &mut AppState, title: String) -> Option<Action> {
     let board = Board::new(title.clone());
 
@@ -18,7 +18,7 @@ pub fn create_board(model: &mut AppState, title: String) -> Option<Action> {
     Some(Action::MarkDirty)
 }
 
-/// Opens the currently selected board from the picker
+/// Loads and opens the board selected in the board picker.
 pub fn open_board(model: &mut AppState) -> Option<Action> {
     let index = model.picker_state.index;
     let board_name = model.board_list.get(index)?;
@@ -29,7 +29,7 @@ pub fn open_board(model: &mut AppState) -> Option<Action> {
     None
 }
 
-/// Deletes the currently selected board
+/// Deletes the currently selected board from the picker and deletes its file.
 pub fn delete_board(model: &mut AppState) -> Option<Action> {
     let index = model.picker_state.index;
     if index >= model.board_list.len() {
@@ -49,7 +49,7 @@ pub fn delete_board(model: &mut AppState) -> Option<Action> {
     Some(Action::MarkDirty)
 }
 
-/// Renames the currently selected board in the picker
+/// Renames a board in the picker and updates its filename on disk.
 pub fn rename_board(model: &mut AppState, new_title: String) -> Option<Action> {
     let index = model.picker_state.index;
     let board_name_entry = model.board_list.get_mut(index)?;
@@ -75,8 +75,7 @@ pub fn rename_board(model: &mut AppState, new_title: String) -> Option<Action> {
     Some(Action::MarkDirty)
 }
 
-// Board List Handling
-
+/// Reorders the board list by swapping the selected board with the one above it.
 pub fn move_board_up(model: &mut AppState) -> Option<Action> {
     let current_index = model.picker_state.index;
     let new_index = decrement_no_wrap(current_index)?;
@@ -86,6 +85,7 @@ pub fn move_board_up(model: &mut AppState) -> Option<Action> {
     Some(Action::MarkDirty)
 }
 
+/// Reorders the board list by swapping the selected board with the one below it.
 pub fn move_board_down(model: &mut AppState) -> Option<Action> {
     let current_index = model.picker_state.index;
     let max = model.board_list.len();

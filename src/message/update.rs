@@ -1,11 +1,16 @@
+//! The central update function that routes actions to their specific handlers.
+
 use crate::message::{
     action::Action, board_actions, column_actions, io_actions, modal_actions, navigation_actions,
     picker_actions, task_actions,
 };
 use crate::model::app_state::AppState;
 
-/// Given an action updates the AppState returning an Optional next Action if required
-/// such as ExitModal or MarkDirty
+/// Updates the application state based on the given action.
+///
+/// This function acts as a dispatcher, delegating complex logic to specialized modules
+/// based on the type of action received. It may return a new action to be processed
+/// in the next iteration of the update loop.
 pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
     match action {
         // General Actions
@@ -55,6 +60,7 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::OpenModal(modal_type) => modal_actions::open_modal(model, modal_type),
         Action::CloseModal => modal_actions::close_modal(model),
         Action::UpdateField(field, value) => modal_actions::update_field(model, field, value),
+        Action::MoveCursor(x, y) => modal_actions::move_cursor(model, x, y),
         Action::Confirm => modal_actions::confirm(model),
         Action::Cancel => modal_actions::cancel(model),
 
