@@ -8,6 +8,8 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState},
 };
 
+pub const COLUMN_WIDTH: u16 = 50;
+
 pub fn render(
     app: &App,
     frame: &mut Frame,
