@@ -1,5 +1,6 @@
 use ratatui::style::Color;
 
+#[derive(Clone, Copy)]
 pub struct ColorScheme {
     pub background: Color,
     pub outer_border: Color,
