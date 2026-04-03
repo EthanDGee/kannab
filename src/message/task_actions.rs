@@ -58,8 +58,29 @@ pub fn edit_task(model: &mut AppState, input_field: InputField, edit: String) ->
 pub fn delete_task(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
     let task_index = board_state.task_index;
-    let column = get_current_column_mut(model)?;
+    let column_index = board_state.column_index;
+    let column = board_state.board.columns.get_mut(column_index)?;
+    let task_count = column.tasks.len();
+
+    if task_index > task_count {
+        return None;
+    }
+
     column.tasks.remove(task_index);
+    let has_tasks = !column.tasks.is_empty();
+
+    // Adjust task_index if it's now out of bounds
+    if task_index >= task_count && has_tasks {
+        board_state.task_index = task_count - 1;
+    } else if !has_tasks {
+        board_state.task_index = 0;
+    }
+
+    // Update the scroll persistent state for this column
+    if column_index < board_state.column_scrolls.len() {
+        board_state.column_scrolls[column_index] = board_state.task_index;
+    }
+
     mark_dirty(model)
 }
 
