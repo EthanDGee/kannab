@@ -1,5 +1,6 @@
 //! High-level application state and mode definitions.
 
+use crate::io::file_handling::initialize_theme;
 pub use crate::model::board_state::BoardName;
 use crate::model::modal_state::ModalState;
 use crate::view::board_view::BoardState;
@@ -43,7 +44,7 @@ impl AppState {
             picker_state: PickerState::new(),
             board_state: None,
             modal_state: None,
-            color_scheme: ColorScheme::default(),
+            color_scheme: initialize_theme(),
             pending_changes: false,
             should_quit: false,
         }

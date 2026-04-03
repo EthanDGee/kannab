@@ -1,12 +1,13 @@
-use crate::{
-    APP_NAME,
-    model::board_state::{Board, BoardName},
-};
+use crate::APP_NAME;
+use crate::model::board_state::{Board, BoardName};
+use crate::view::theme::ColorScheme;
 use directories::ProjectDirs;
 use std::{fs, path::PathBuf};
 
 const DATA_FILE_TYPE: &str = ".json";
+const CONFIG_FILE_TYPE: &str = ".toml";
 const BOARD_LIST_FILENAME: &str = "boards";
+const THEME_FILENAME: &str = "theme";
 
 /// Converts a string to snake_case
 pub fn to_snake_case(s: String) -> String {
@@ -80,4 +81,49 @@ pub fn delete_board(title: &str) -> bool {
     } else {
         false
     }
+}
+
+// THEME HANDLING
+
+/// Returns the path to the theme file
+fn theme_path() -> Option<PathBuf> {
+    let proj_dirs = ProjectDirs::from("com", APP_NAME, APP_NAME)?;
+    let save_path = proj_dirs.config_local_dir();
+    std::fs::create_dir_all(save_path).ok()?;
+    Some(save_path.join(format!("{}{}", THEME_FILENAME, CONFIG_FILE_TYPE)))
+}
+
+/// Checks if the theme file exists on the file system
+fn theme_exists() -> bool {
+    theme_path().map_or(false, |path| path.exists())
+}
+
+/// Saves the color scheme to the file system
+fn save_theme(color_scheme: &ColorScheme) -> Option<bool> {
+    let path = theme_path()?;
+    let json = toml::to_string_pretty(color_scheme).ok()?;
+    std::fs::write(path, json).ok()?;
+    Some(true)
+}
+
+/// Loads the color scheme from the file system
+fn load_theme() -> Option<ColorScheme> {
+    let path = theme_path()?;
+    let json = std::fs::read_to_string(path).ok()?;
+    toml::from_str(&json).ok()
+}
+
+/// Attempts to load config theme if fails to load to toml loading it fails back to the default. If
+/// no config exists save the default theme to the project directory
+pub fn initialize_theme() -> ColorScheme {
+    if theme_exists() {
+        match load_theme() {
+            Some(theme) => return theme,
+            None => return ColorScheme::default(),
+        }
+    }
+
+    let theme = ColorScheme::default();
+    save_theme(&theme);
+    theme
 }

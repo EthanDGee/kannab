@@ -1,6 +1,7 @@
 use ratatui::style::Color;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct ColorScheme {
     pub background: Color,
     pub outer_border: Color,
