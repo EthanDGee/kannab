@@ -23,9 +23,11 @@ pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
         ModalType::RenameColumn => {
             column_modal_view(app, frame, modal, area, " Rename Column ", "Press Enter to rename, Esc to cancel")
         }
-        ModalType::CreateTask => create_task_view(app, frame, modal, area),
+        ModalType::CreateTask => {
+            task_modal_view(app, frame, modal, area, " Create New Task ", "Tab: Switch fields | Enter: Create | Esc: Cancel")
+        }
         ModalType::EditTask => {
-            todo!("Finish implementing the  Modal ")
+            task_modal_view(app, frame, modal, area, " Edit Task ", "Tab: Switch fields | Enter: Save | Esc: Cancel")
         }
         ModalType::ConfirmDelete(_) => confirm_delete(app, frame, modal, area),
         ModalType::Help => {
@@ -34,14 +36,14 @@ pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
     }
 }
 
-fn create_task_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
+fn task_modal_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect, title: &str, instruction_text: &str) {
     let colors = app.model.color_scheme;
     let area = centered_rect(70, 40, area);
 
     frame.render_widget(Clear, area);
 
     let block = Block::default()
-        .title(" Create New Task ")
+        .title(title)
         .borders(Borders::ALL)
         .border_style(Style::default().fg(colors.highlight))
         .style(Style::default().bg(colors.background).fg(colors.body_text));
@@ -99,7 +101,7 @@ fn create_task_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect
         );
     frame.render_widget(desc_input, chunks[3]);
 
-    let instructions = Paragraph::new("Tab: Switch fields | Enter: Create | Esc: Cancel")
+    let instructions = Paragraph::new(instruction_text)
         .style(Style::default().fg(colors.inner_border));
     frame.render_widget(instructions, chunks[4]);
 }

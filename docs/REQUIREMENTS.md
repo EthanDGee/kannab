@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-**Project Name:** kanab  
+**Project Name:** kannab  
 **Type:** Terminal User Interface (TUI) CLI Application  
 **Core Functionality:** A keyboard-driven kanban board manager with vim-style navigation that stores boards globally on the filesystem.  
 **Target Users:** Developers, power users, and productivity enthusiasts who prefer terminal-based workflows.
@@ -217,7 +217,7 @@
 ### Storage Structure
 
 ```
-~/.local/share/kanab/
+~/.local/share/kannab/
 ├── boards/
 │   ├── work.json
 │   └── personal.json
@@ -266,6 +266,6 @@
 
 | Platform | Data Path |
 |----------|-----------|
-| Linux | `$XDG_DATA_HOME/kanab/` (default: `~/.local/share/kanab/`) |
-| macOS | `~/Library/Application Support/kanab/` |
-| Windows | `%APPDATA%/kanab/` |
+| Linux | `$XDG_DATA_HOME/kannab/` (default: `~/.local/share/kannab/`) |
+| macOS | `~/Library/Application Support/kannab/` |
+| Windows | `%APPDATA%/kannab/` |

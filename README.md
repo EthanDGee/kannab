@@ -1,8 +1,8 @@
-# kanab
+# kannab
 
 A keyboard-driven Kanban board manager for the terminal, built with Rust and Ratatui.
 
-`kanab` is designed for developers and power users who want a fast, vim-inspired workflow for managing tasks without leaving the command line. It features a responsive TUI, global persistent storage, and intuitive keybindings for seamless board management.
+`kannab` is designed for developers and power users who want a fast, vim-inspired workflow for managing tasks without leaving the command line. It features a responsive TUI, global persistent storage, and intuitive keybindings for seamless board management.
 
 ## Features
 
@@ -16,12 +16,12 @@ A keyboard-driven Kanban board manager for the terminal, built with Rust and Rat
 
 ### Installation
 
-Since `kanab` is built with Rust, you can install it using `cargo`:
+Since `kannab` is built with Rust, you can install it using `cargo`:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/kanab.git
-cd kanab
+git clone https://github.com/yourusername/kannab.git
+cd kannab
 
 # Build and install
 cargo install --path .
@@ -32,7 +32,7 @@ cargo install --path .
 Simply run the command to launch the board picker:
 
 ```bash
-kanab
+kannab
 ```
 
 ## Keybindings
@@ -72,11 +72,11 @@ kanab
 
 ## Storage
 
-`kanab` stores your data in platform-specific directories:
+`kannab` stores your data in platform-specific directories:
 
-- **Linux**: `~/.local/share/kanab/`
-- **macOS**: `~/Library/Application Support/kanab/`
-- **Windows**: `%APPDATA%/kanab/`
+- **Linux**: `~/.local/share/kannab/`
+- **macOS**: `~/Library/Application Support/kannab/`
+- **Windows**: `%APPDATA%/kannab/`
 
 ## Development
 
@@ -93,4 +93,4 @@ cargo test
 
 ## License
 
-This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

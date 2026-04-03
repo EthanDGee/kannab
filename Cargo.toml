@@ -1,9 +1,9 @@
 [package]
-name = "kanab"
+name = "kannab"
 description = "A kanban CLI tool."
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
-license = "Apache-2.0"
+license = "MIT"
 
 [dependencies]
 uuid = { version = "1.23.0", features = ["v4", "serde"] }

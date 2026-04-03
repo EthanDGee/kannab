@@ -1,6 +1,7 @@
 //! Handlers for modal-related actions and user input.
 
 use crate::message::action::{Action, InputField};
+use crate::message::task_actions;
 use crate::model::{
     app_state::AppState,
     modal_state::{ModalState, ModalType},
@@ -25,6 +26,14 @@ pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action>
                 modal_state.data.board_name = board.title.clone();
                 modal_state.cursor_position.char_index =
                     modal_state.data.board_name.chars().count();
+            }
+        }
+        ModalType::EditTask => {
+            if let Some(task) = task_actions::get_current_task_mut(model) {
+                modal_state.data.task_title = task.title.clone();
+                modal_state.data.task_description = task.description.clone();
+                modal_state.cursor_position.char_index =
+                    modal_state.data.task_title.chars().count();
             }
         }
         _ => {}
@@ -114,6 +123,13 @@ pub fn confirm(model: &mut AppState) -> Option<Action> {
             let title = modal.data.task_title.clone();
             let description = modal.data.task_description.clone();
             Some(Action::CreateTask(title, description))
+        }
+        ModalType::EditTask => {
+            let title = modal.data.task_title.clone();
+            let description = modal.data.task_description.clone();
+            task_actions::edit_task(model, InputField::TaskTitle, title);
+            task_actions::edit_task(model, InputField::TaskDescription, description);
+            None
         }
         ModalType::ConfirmDelete(target) => match target {
             crate::model::modal_state::ConfirmDelete::Board => Some(Action::DeleteBoard),

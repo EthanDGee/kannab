@@ -1,6 +1,6 @@
-//! The main entry point for the kanab application.
+//! The main entry point for the kannab application.
 //!
-//! kanab is a terminal-based Kanban board manager designed for efficiency and ease of use.
+//! kannab is a terminal-based Kanban board manager designed for efficiency and ease of use.
 
 mod app;
 mod io;
@@ -11,7 +11,7 @@ mod widgets;
 use app::App;
 
 /// The name of the application.
-pub const APP_NAME: &str = "kanab";
+pub const APP_NAME: &str = "kannab";
 
 fn main() -> color_eyre::Result<()> {
     color_eyre::install()?;
