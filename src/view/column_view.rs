@@ -8,7 +8,7 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState},
 };
 
-pub const COLUMN_WIDTH: u16 = 50;
+pub const COLUMN_WIDTH: u16 = 40;
 
 pub fn render(
     app: &App,
@@ -62,14 +62,9 @@ pub fn render(
     if selected {
         list_state.select(Some(board_state.task_index));
     } else {
-        // If not selected, we might want to show where the scroll was,
-        // but for now let's just show the top.
-        // If we want persistent scroll we'd use column_scrolls.
-        if column_index < board_state.column_scrolls.len() {
-            list_state.select(None);
-            // Ratatui doesn't easily let us set offset without select.
-            // Actually it does if we use a more complex state or manual rendering.
-        }
+        // Use the persistent scroll position for non-selected columns
+        let scroll_index = board_state.column_scrolls.get(column_index).cloned();
+        list_state.select(scroll_index);
     }
 
     frame.render_stateful_widget(list, inner, &mut list_state);
