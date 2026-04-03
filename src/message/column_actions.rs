@@ -73,13 +73,15 @@ pub fn delete_column(model: &mut AppState) -> Option<Action> {
 }
 /// Swaps the current column with the one to its left (lower index).
 pub fn move_column_left(model: &mut AppState) -> Option<Action> {
-    let column_index = model.board_state.as_ref()?.column_index;
-    let columns_ref = model.board_state.as_mut()?.board.get_columns();
+    let board_state = model.board_state.as_mut()?;
+    let column_index = board_state.column_index;
+    let columns_ref = board_state.board.get_columns();
     let columns = columns_ref;
 
-    match increment_no_wrap(column_index, columns.len()) {
+    match decrement_no_wrap(column_index) {
         Some(new_index) => {
             columns.swap(column_index, new_index);
+            board_state.column_index = new_index;
             mark_dirty(model)
         }
         None => None,
@@ -88,14 +90,14 @@ pub fn move_column_left(model: &mut AppState) -> Option<Action> {
 
 /// Swaps the current column with the one to its right (higher index).
 pub fn move_column_right(model: &mut AppState) -> Option<Action> {
-    model.board_state.as_ref()?;
-    let column_index = model.board_state.as_ref()?.column_index;
-    let columns_ref = model.board_state.as_mut()?.board.get_columns();
-    let columns = columns_ref;
+    let board_state = model.board_state.as_mut()?;
+    let column_index = board_state.column_index;
+    let columns = board_state.board.get_columns();
 
-    match decrement_no_wrap(column_index) {
+    match increment_no_wrap(column_index, columns.len()) {
         Some(new_index) => {
             columns.swap(column_index, new_index);
+            board_state.column_index = new_index;
             mark_dirty(model)
         }
         None => None,
