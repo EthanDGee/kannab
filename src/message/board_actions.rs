@@ -55,22 +55,31 @@ pub fn rename_board(model: &mut AppState, new_title: String) -> Option<Action> {
     let board_name_entry = model.board_list.get_mut(index)?;
     let old_title = board_name_entry.title.clone();
 
-    // 1. Handle file renaming on disk
-    if let Some(mut board) = file_handling::load_board(&old_title) {
-        file_handling::delete_board(&old_title);
-        board.title = new_title.clone();
-        board.file_name = file_handling::to_snake_case(new_title.clone());
-    }
-
-    // 2. Update board_list entry
+    // 1. Update board_list entry
     *board_name_entry = BoardName::new(new_title.clone());
 
-    // 3. Update active board state if it's the same board
-    if let Some(board_state) = &mut model.board_state
+    // 2. Handle file renaming and state update
+    let is_active = if let Some(board_state) = &mut model.board_state
         && board_state.board.title == old_title
     {
-        board_state.board.title = new_title;
+        board_state.board.title = new_title.clone();
+        board_state.board.file_name = file_handling::to_snake_case(new_title.clone());
+        file_handling::save_board(&board_state.board);
+        true
+    } else {
+        false
+    };
+
+    if let Some(mut board) = file_handling::load_board(&old_title)
+        && is_active
+    {
+        board.title = new_title.clone();
+        board.file_name = file_handling::to_snake_case(new_title);
+        file_handling::save_board(&board);
     }
+
+    // 3. Delete the old file
+    file_handling::delete_board(&old_title);
 
     Some(Action::MarkDirty)
 }

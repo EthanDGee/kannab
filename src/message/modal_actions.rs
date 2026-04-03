@@ -126,6 +126,10 @@ pub fn confirm(model: &mut AppState) -> Option<Action> {
             let name = modal.data.column_title.clone();
             Some(Action::RenameColumn(name))
         }
+        ModalType::EditBoard => {
+            let name = modal.data.board_title.clone();
+            Some(Action::RenameBoard(name))
+        }
         ModalType::CreateTask => {
             let title = modal.data.task_title.clone();
             let description = modal.data.task_description.clone();
