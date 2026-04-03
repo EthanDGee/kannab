@@ -36,8 +36,6 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         // Column Handling
         Action::CreateColumn(title) => column_actions::create_column(model, title),
         Action::RenameColumn(new_name) => column_actions::rename_column(model, new_name),
-        Action::NextColumn => todo!("Implement column movement"),
-        Action::PrevColumn => todo!("Implement column movement"),
         Action::DeleteColumn => column_actions::delete_column(model),
         Action::MoveColumnLeft => column_actions::move_column_left(model),
         Action::MoveColumnRight => column_actions::move_column_right(model),
@@ -48,8 +46,6 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         }
         Action::EditTask(input_field, edit) => task_actions::edit_task(model, input_field, edit),
         Action::DeleteTask => task_actions::delete_task(model),
-        Action::NextTask => todo!("Implement task navigation_actions"),
-        Action::PrevTask => todo!("Implement task navigation_actions"),
         Action::MoveTaskUp => task_actions::move_task_up(model),
         Action::MoveTaskDown => task_actions::move_task_down(model),
         Action::MoveTaskToNextColumn => task_actions::move_task_to_next_column(model),

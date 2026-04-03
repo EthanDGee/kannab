@@ -31,16 +31,6 @@ pub enum Action {
     /// Close the active board and return to the picker.
     QuitToPicker,
 
-    // Board View Actions
-    /// Select the next column to the right.
-    NextColumn,
-    /// Select the previous column to the left.
-    PrevColumn,
-    /// Select the next task (below) in the column.
-    NextTask,
-    /// Select the next task (above) in the column.
-    PrevTask,
-
     // Column Actions
     /// Create a new column with the given title.
     CreateColumn(String),
