@@ -46,16 +46,16 @@ pub enum ConfirmDelete {
 /// Data buffer for text inputs within modals.
 #[derive(Clone, Default, PartialEq)]
 pub struct ModalData {
-    /// Buffer for board name input.
-    pub board_name: String,
-    /// Buffer for column name input.
-    pub column_name: String,
+    /// Buffer for board title input.
+    pub board_title: String,
+    /// Buffer for column title input.
+    pub column_title: String,
     /// Buffer for task title input.
     pub task_title: String,
     /// Buffer for task description input.
     pub task_description: String,
-    /// Buffer for checklist item title input.
-    pub item_title: String,
+    /// Buffer for checklist item description input.
+    pub item_description: String,
 }
 
 /// The complete state of an active modal dialog.
@@ -75,10 +75,10 @@ impl ModalState {
     /// Creates a new `ModalState` of the given type with default data and cursor position.
     pub fn new(modal_type: ModalType) -> Self {
         let focus = match modal_type {
-            ModalType::CreateBoard | ModalType::EditBoard => InputField::BoardName,
-            ModalType::CreateColumn | ModalType::RenameColumn => InputField::ColumnName,
+            ModalType::CreateBoard | ModalType::EditBoard => InputField::BoardTitle,
+            ModalType::CreateColumn | ModalType::RenameColumn => InputField::ColumnTitle,
             ModalType::CreateTask | ModalType::EditTask => InputField::TaskTitle,
-            _ => InputField::BoardName,
+            _ => InputField::BoardTitle,
         };
 
         ModalState {

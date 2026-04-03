@@ -38,10 +38,10 @@ fn handle_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
 
     match modal.modal_type {
         ModalType::CreateBoard | ModalType::EditBoard => {
-            single_line_modal(key, InputField::BoardName, modal.data.board_name.clone())
+            single_line_modal(key, InputField::BoardTitle, modal.data.board_title.clone())
         }
         ModalType::CreateColumn | ModalType::RenameColumn => {
-            single_line_modal(key, InputField::ColumnName, modal.data.column_name.clone())
+            single_line_modal(key, InputField::ColumnTitle, modal.data.column_title.clone())
         }
         ModalType::CreateTask | ModalType::EditTask => handle_task_creation(modal, key),
         ModalType::ConfirmDelete(_) => confirmation(key),

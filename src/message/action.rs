@@ -104,13 +104,13 @@ pub enum Action {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputField {
     /// Field for entering a board title.
-    BoardName,
-    /// Field for entering a column name.
-    ColumnName,
+    BoardTitle,
+    /// Field for entering a column title.
+    ColumnTitle,
     /// Field for entering a task title.
     TaskTitle,
     /// Field for entering a task description.
     TaskDescription,
-    /// Field for entering a checklist item title.
-    TaskItem,
+    /// Field for entering a checklist item description.
+    ItemDescription,
 }

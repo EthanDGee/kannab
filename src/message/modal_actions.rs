@@ -16,16 +16,23 @@ pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action>
             if let Some(board_state) = &model.board_state
                 && let Some(column) = board_state.board.columns.get(board_state.column_index)
             {
-                modal_state.data.column_name = column.title.clone();
+                modal_state.data.column_title = column.title.clone();
                 modal_state.cursor_position.char_index =
-                    modal_state.data.column_name.chars().count();
+                    modal_state.data.column_title.chars().count();
             }
         }
         ModalType::EditBoard => {
             if let Some(board) = model.board_list.get(model.picker_state.index) {
-                modal_state.data.board_name = board.title.clone();
+                modal_state.data.board_title = board.title.clone();
                 modal_state.cursor_position.char_index =
-                    modal_state.data.board_name.chars().count();
+                    modal_state.data.board_title.chars().count();
+            }
+        }
+        ModalType::CreateTask => {
+            if let Some(board_state) = &model.board_state
+                && board_state.board.columns.is_empty()
+            {
+                return None;
             }
         }
         ModalType::EditTask => {
@@ -81,11 +88,11 @@ pub fn update_field(model: &mut AppState, field: InputField, value: String) -> O
         new_cursor_pos = Some((char_index, line_index));
 
         match field {
-            InputField::BoardName => modal.data.board_name = value,
-            InputField::ColumnName => modal.data.column_name = value,
+            InputField::BoardTitle => modal.data.board_title = value,
+            InputField::ColumnTitle => modal.data.column_title = value,
             InputField::TaskTitle => modal.data.task_title = value,
             InputField::TaskDescription => modal.data.task_description = value,
-            InputField::TaskItem => {} // Handle if checklists are implemented
+            InputField::ItemDescription => {} // Handle if checklists are implemented
         }
     }
 
@@ -108,15 +115,15 @@ pub fn confirm(model: &mut AppState) -> Option<Action> {
     let modal = model.modal_state.as_ref()?;
     let action = match &modal.modal_type {
         ModalType::CreateBoard => {
-            let name = modal.data.board_name.clone();
+            let name = modal.data.board_title.clone();
             Some(Action::CreateBoard(name))
         }
         ModalType::CreateColumn => {
-            let name = modal.data.column_name.clone();
+            let name = modal.data.column_title.clone();
             Some(Action::CreateColumn(name))
         }
         ModalType::RenameColumn => {
-            let name = modal.data.column_name.clone();
+            let name = modal.data.column_title.clone();
             Some(Action::RenameColumn(name))
         }
         ModalType::CreateTask => {

@@ -133,7 +133,7 @@ fn board_modal_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect
     let label = Paragraph::new("Board Name:").style(Style::default().add_modifier(Modifier::BOLD));
     frame.render_widget(label, chunks[0]);
 
-    let input = TextInput::new(colors, &modal.data.board_name, modal.cursor_position)
+    let input = TextInput::new(colors, &modal.data.board_title, modal.cursor_position)
         .active(true)
         .block(
             Block::default()
@@ -175,7 +175,7 @@ fn column_modal_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rec
         Paragraph::new("Column Title:").style(Style::default().add_modifier(Modifier::BOLD));
     frame.render_widget(label, chunks[0]);
 
-    let input = TextInput::new(colors, &modal.data.column_name, modal.cursor_position)
+    let input = TextInput::new(colors, &modal.data.column_title, modal.cursor_position)
         .active(true)
         .block(
             Block::default()
