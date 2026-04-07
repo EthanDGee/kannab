@@ -1,3 +1,5 @@
+use std::fmt::format;
+
 use crate::model::board_state::Task;
 use crate::view::theme::ColorScheme;
 use ratatui::prelude::*;
@@ -20,24 +22,32 @@ pub fn render_item<'a>(
     // Using Stylize trait for ergonomic styling on strings (returns a Span)
     let top = Line::from(format!("┌{}┐", "─".repeat(inner_width)).fg(border_color));
 
-    let title = if task.title.len() > inner_width {
-        format!("{}...", &task.title[..inner_width.saturating_sub(3)])
+    let checkmark = if task.complete { "" } else { "" };
+
+    let formatted_title = format!("{} {}", checkmark, task.title.clone());
+
+    let header = if task.title.len() > inner_width {
+        format!("{}...", formatted_title)
     } else {
-        task.title.clone()
+        formatted_title
     };
 
-    let mut title_span = format!("{: <width$}", title, width = inner_width).fg(if selected {
+    let mut header_span = format!("{: <width$}", header, width = inner_width).fg(if selected {
         colors.highlight_text
     } else {
         colors.body_text
     });
     if selected {
-        title_span = title_span.bold();
+        header_span = header_span.bold();
     }
 
-    let title_line = Line::from(vec!["│".fg(border_color), title_span, "│".fg(border_color)]);
+    let header_line = Line::from(vec![
+        "│".fg(border_color),
+        header_span,
+        "│".fg(border_color),
+    ]);
 
-    let mut lines = vec![top, title_line];
+    let mut lines = vec![top, header_line];
 
     if !task.description.is_empty() {
         let desc = if task.description.len() > inner_width {
