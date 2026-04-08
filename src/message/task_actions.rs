@@ -86,13 +86,15 @@ pub fn delete_task(model: &mut AppState) -> Option<Action> {
 
 /// Swaps the current task with the one at the next index.
 pub fn move_task_up(model: &mut AppState) -> Option<Action> {
-    let board_state = model.board_state.as_mut()?;
+    let board_state = model.board_state.as_ref()?;
     let task_index = board_state.task_index;
+
     let column = get_current_column_mut(model)?;
 
-    match increment_no_wrap(task_index, column.tasks.len()) {
+    match decrement_no_wrap(task_index) {
         Some(new_index) => {
             column.tasks.swap(task_index, new_index);
+            model.board_state.as_mut()?.task_index = new_index;
             mark_dirty(model)
         }
         None => None,
@@ -101,13 +103,15 @@ pub fn move_task_up(model: &mut AppState) -> Option<Action> {
 
 /// Swaps the current task with the one at the previous index.
 pub fn move_task_down(model: &mut AppState) -> Option<Action> {
-    let board_state = model.board_state.as_mut()?;
+    let board_state = model.board_state.as_ref()?;
     let task_index = board_state.task_index;
+
     let column = get_current_column_mut(model)?;
 
-    match decrement_no_wrap(task_index) {
+    match increment_no_wrap(task_index, column.tasks.len()) {
         Some(new_index) => {
             column.tasks.swap(task_index, new_index);
+            model.board_state.as_mut()?.task_index = new_index;
             mark_dirty(model)
         }
         None => None,
