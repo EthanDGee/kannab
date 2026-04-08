@@ -52,34 +52,46 @@ pub fn delete_board(model: &mut AppState) -> Option<Action> {
 /// Renames a board in the picker and updates its filename on disk.
 pub fn rename_board(model: &mut AppState, new_title: String) -> Option<Action> {
     let index = model.picker_state.index;
-    let board_name_entry = model.board_list.get_mut(index)?;
-    let old_title = board_name_entry.title.clone();
+    let (old_title, old_snake_case) = {
+        let entry = model.board_list.get(index)?;
+        (entry.title.clone(), entry.snake_case.clone())
+    };
+    let new_snake_case = file_handling::to_snake_case(new_title.clone());
 
-    // 1. Update board_list entry
-    *board_name_entry = BoardName::new(new_title.clone());
+    // Check for filename collision in board_list (ignoring itself)
+    if new_snake_case != old_snake_case
+        && model
+            .board_list
+            .iter()
+            .any(|b| b.snake_case == new_snake_case)
+    {
+        return None;
+    }
 
-    // 2. Handle file renaming and state update
-    let is_active = if let Some(board_state) = &mut model.board_state
+    // Load board/Use loaded, update name, then save
+    if let Some(board_state) = &mut model.board_state
         && board_state.board.title == old_title
     {
         board_state.board.title = new_title.clone();
-        board_state.board.file_name = file_handling::to_snake_case(new_title.clone());
+        board_state.board.file_name = new_snake_case.clone();
         file_handling::save_board(&board_state.board);
-        true
-    } else {
-        false
-    };
-
-    if let Some(mut board) = file_handling::load_board(&old_title)
-        && is_active
-    {
+    } else if let Some(mut board) = file_handling::load_board(&old_title) {
         board.title = new_title.clone();
-        board.file_name = file_handling::to_snake_case(new_title);
+        board.file_name = new_snake_case.clone();
         file_handling::save_board(&board);
+    } else {
+        return None;
     }
 
-    // 3. Delete the old file
-    file_handling::delete_board(&old_title);
+    // Only delete the old file if the filename actually changed
+    if new_snake_case != old_snake_case {
+        file_handling::delete_board(&old_title);
+    }
+
+    // Update board_list entry
+    if let Some(entry) = model.board_list.get_mut(index) {
+        *entry = BoardName::new(new_title);
+    }
 
     Some(Action::MarkDirty)
 }
