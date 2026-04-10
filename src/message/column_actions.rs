@@ -43,7 +43,7 @@ pub fn delete_column(model: &mut AppState) -> Option<Action> {
     let column_index = board_state.column_index;
     let num_columns = board_state.board.columns.len();
 
-    if column_index >= num_columns {
+    if column_index >= num_columns || num_columns == 0 {
         return None;
     }
 

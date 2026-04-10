@@ -3,6 +3,7 @@
 use crate::io::file_handling;
 use crate::message::action::Action;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
+use crate::model;
 use crate::model::app_state::{AppMode, AppState};
 use crate::model::board_state::{Board, BoardName};
 use crate::view::board_view::BoardState;
@@ -32,7 +33,9 @@ pub fn open_board(model: &mut AppState) -> Option<Action> {
 /// Deletes the currently selected board from the picker and deletes its file.
 pub fn delete_board(model: &mut AppState) -> Option<Action> {
     let index = model.picker_state.index;
-    if index >= model.board_list.len() {
+
+    // exit early if at invalid position or the board list is empty
+    if index >= model.board_list.len() || model.board_list.is_empty() {
         return None;
     }
 

@@ -35,6 +35,34 @@ pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action>
                 return None;
             }
         }
+        ModalType::ConfirmDelete(confirm_delete) => match confirm_delete {
+            crate::model::modal_state::ConfirmDelete::Board => {
+                if model.board_list.is_empty() {
+                    return None;
+                }
+            }
+            crate::model::modal_state::ConfirmDelete::Column => {
+                if let Some(board_state) = &model.board_state {
+                    if board_state.board.columns.is_empty()
+                        || board_state.column_index >= board_state.board.columns.len()
+                    {
+                        return None;
+                    }
+                } else {
+                    return None;
+                }
+            }
+            crate::model::modal_state::ConfirmDelete::Task => {
+                if let Some(board_state) = &model.board_state {
+                    let column = board_state.board.columns.get(board_state.column_index)?;
+                    if board_state.task_index >= column.tasks.len() || column.tasks.is_empty() {
+                        return None;
+                    }
+                } else {
+                    return None;
+                }
+            }
+        },
         ModalType::EditTask => {
             if let Some(task) = task_actions::get_current_task_mut(model) {
                 modal_state.data.task_title = task.title.clone();

@@ -62,7 +62,7 @@ pub fn delete_task(model: &mut AppState) -> Option<Action> {
     let column = board_state.board.columns.get_mut(column_index)?;
     let task_count = column.tasks.len();
 
-    if task_index > task_count {
+    if task_index > task_count || task_count == 0 {
         return None;
     }
 
