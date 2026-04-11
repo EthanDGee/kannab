@@ -1,3 +1,5 @@
+//! View components for rendering a full Kanban board.
+
 use crate::app::App;
 use crate::view::column_view::{self, COLUMN_WIDTH};
 use crate::{APP_NAME, model::board_state::Board};
@@ -8,18 +10,23 @@ use ratatui::{
     widgets::Paragraph,
 };
 
-/// Handles associated view data for the Kanban data
+/// Handles associated view data for the Kanban board data.
 ///
-/// In addition to the selecting of tasks all scroll data for every column is stored independently to
-/// make sure the state of scrolling is stored when switching between columns.
+/// In addition to the cursor position for tasks and current column, all scroll data for every column is stored
+/// independently to ensure the scroll position is preserved when switching between columns.
 pub struct BoardState {
+    /// Index of the currently focused column.
     pub column_index: usize,
+    /// Index of the currently focused task within the active column.
     pub task_index: usize,
+    /// Persistent scroll positions for each column.
     pub column_scrolls: Vec<usize>,
+    /// The underlying board data model.
     pub board: Board,
 }
 
 impl BoardState {
+    /// Creates a new `BoardState` for the given board, initializing column scrolls to zero.
     pub fn new(board: Board) -> Self {
         let num_columns = board.columns.len();
         BoardState {
@@ -41,6 +48,7 @@ impl BoardState {
     }
 }
 
+/// Renders the active board view, including its header, columns, and footer.
 pub fn render(app: &App, frame: &mut Frame, area: Rect) {
     let board_state = app.model.board_state.as_ref().unwrap();
     let board = &board_state.board;

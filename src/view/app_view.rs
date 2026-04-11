@@ -1,8 +1,14 @@
+//! The root view component that coordinates rendering of the entire application.
+
 use crate::app::App;
 use crate::model::app_state::AppMode;
 
 use ratatui::Frame;
 
+/// The top-level render function.
+///
+/// This function determines which main view to render based on the current `AppMode`
+/// and ensures that any active modals are drawn as overlays.
 pub fn render(app: &App, frame: &mut Frame) {
     let area = frame.area();
 

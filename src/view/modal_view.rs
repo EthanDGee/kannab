@@ -1,3 +1,5 @@
+//! View components for rendering modal dialogs and overlays.
+
 use crate::message::action::InputField;
 use crate::model::modal_state::{ConfirmDelete, ModalState};
 use crate::widgets::text_input::TextInput;
@@ -9,6 +11,9 @@ use ratatui::{
     widgets::{Block, Borders, Clear, Paragraph},
 };
 
+/// The primary render function for modals.
+///
+/// Dispatches the rendering task to a specialized function based on the modal's type.
 pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
     match modal.modal_type {
         ModalType::CreateBoard => {
@@ -36,6 +41,7 @@ pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
     }
 }
 
+/// Renders a modal for creating or editing a task.
 fn task_modal_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect, title: &str, instruction_text: &str) {
     let colors = app.model.color_scheme;
     let area = centered_rect(70, 40, area);
@@ -106,6 +112,7 @@ fn task_modal_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect,
     frame.render_widget(instructions, chunks[4]);
 }
 
+/// Renders a modal for creating or renaming a board.
 fn board_modal_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect, title: &str, instruction_text: &str) {
     let colors = app.model.color_scheme;
     let area = centered_rect(60, 15, area);
@@ -147,6 +154,7 @@ fn board_modal_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect
     frame.render_widget(instructions, chunks[2]);
 }
 
+/// Renders a modal for creating or renaming a column.
 fn column_modal_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect, title: &str, instruction_text: &str) {
     let colors = app.model.color_scheme;
     let area = centered_rect(60, 15, area);
@@ -189,6 +197,7 @@ fn column_modal_view(app: &App, frame: &mut Frame, modal: &ModalState, area: Rec
     frame.render_widget(instructions, chunks[2]);
 }
 
+/// Renders a confirmation dialog for deleting an item.
 fn confirm_delete(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
     // --- Setup: Get colors and calculate centered area ---
     let colors = &app.model.color_scheme;
@@ -276,7 +285,7 @@ fn confirm_delete(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) 
     frame.render_widget(instructions, chunks[2]);
 }
 
-/// helper function to create a centered rect using up to certain % of available rect `r`
+/// Helper function to create a centered rectangle using up to a certain percentage of the available area.
 fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
     let popup_layout = Layout::default()
         .direction(Direction::Vertical)

@@ -1,3 +1,5 @@
+//! A customizable text input widget for the TUI.
+
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
@@ -8,23 +10,23 @@ use ratatui::{
 
 use crate::{model::modal_state::CursorPosition, view::theme::ColorScheme};
 
-/// A simple text input widget that can be single-line or multi-line
+/// A simple text input widget that can be single-line or multi-line.
 pub struct TextInput<'a> {
-    /// The block to wrap the widget in
+    /// The block to wrap the widget in.
     block: Option<Block<'a>>,
-    /// The text currently in the input
+    /// The text currently in the input.
     value: &'a str,
-    /// The cursor position (char_index, line_index)
+    /// The cursor position (char_index, line_index).
     cursor_pos: CursorPosition,
-    /// Whether the input is active
+    /// Whether the input is active.
     active: bool,
-    /// Whether to wrap long lines
+    /// Whether to wrap long lines.
     wrap: bool,
-    /// Whether the input supports multiple lines
+    /// Whether the input supports multiple lines.
     is_multiline: bool,
-    /// Color Palette
+    /// Color Palette.
     theme: ColorScheme,
-    /// ratatui styling
+    /// Ratatui styling.
     style: Style,
 }
 
@@ -132,6 +134,7 @@ impl<'a> TextInput<'a> {
 }
 
 impl<'a> Widget for TextInput<'a> {
+    /// Renders the `TextInput` widget onto the buffer.
     fn render(self, area: Rect, buffer: &mut Buffer) {
         let text_area = self.block.as_ref().map_or(area, |block| {
             let inner = block.inner(area);

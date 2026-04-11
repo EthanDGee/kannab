@@ -1,8 +1,14 @@
+//! View components for rendering individual tasks.
+
 use crate::model::board_state::Task;
 use crate::view::theme::ColorScheme;
 use ratatui::prelude::*;
 use ratatui::widgets::ListItem;
 
+/// Renders a single task as a `ListItem` of its column
+///
+/// Each task is drawn within a bordered box, showing its completion status,
+/// title, and an optional description preview.
 pub fn render_item<'a>(
     task: &Task,
     colors: &ColorScheme,

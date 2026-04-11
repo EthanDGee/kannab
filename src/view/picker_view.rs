@@ -1,3 +1,5 @@
+//! View components for rendering the board picker screen.
+
 use crate::{APP_NAME, app::App};
 use ratatui::{
     Frame,
@@ -6,17 +8,21 @@ use ratatui::{
     widgets::{Block, List, ListItem, Paragraph},
 };
 
+/// Transient UI state for the board picker.
 #[derive(Clone, Default)]
 pub struct PickerState {
+    /// Index of the currently highlighted board in the list.
     pub index: usize,
 }
 
 impl PickerState {
+    /// Creates a new `PickerState` with default values.
     pub fn new() -> Self {
         Self::default()
     }
 }
 
+/// Renders the board picker view, including the header, list of boards, and status bar.
 pub fn render(app: &App, frame: &mut Frame, area: Rect) {
     let colors = &app.model.color_scheme;
     let chunks = Layout::default()

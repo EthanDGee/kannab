@@ -1,23 +1,34 @@
+//! Event handling and keyboard input processing.
+//!
+//! This module translates raw terminal events (primarily key presses) into
+//! application-level `Action`s, taking into account the current `AppMode`
+//! and active modals.
+
 use crate::message::action::{Action, InputField};
 use crate::model::app_state::AppMode;
 use crate::model::modal_state::{ConfirmDelete, ModalState};
 use crate::{app::App, model::modal_state::ModalType};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent};
 
+/// Top-level event type.
 pub enum Event {
+    /// A keyboard event.
     Key(KeyEvent),
+    /// A mouse event.
     Mouse(MouseEvent),
+    /// A periodic timer event.
     Tick,
 }
 
+/// Dispatches an event to the appropriate handler based on its type.
 pub fn handle_event(app: &App, event: Event) -> Option<Action> {
     match event {
         Event::Key(key) => handle_key_event(app, key),
-
         _ => None,
     }
 }
 
+/// Routes key events to either modal handlers or mode-specific handlers.
 fn handle_key_event(app: &App, key: KeyEvent) -> Option<Action> {
     if let Some(modal) = &app.model.modal_state {
         return handle_modal_key(modal, key);
@@ -31,6 +42,7 @@ fn handle_key_event(app: &App, key: KeyEvent) -> Option<Action> {
     }
 }
 
+/// Handles keyboard input when a modal overlay is active.
 fn handle_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
     if key.code == KeyCode::Esc {
         return Some(Action::CloseModal);
@@ -90,7 +102,7 @@ fn handle_task_creation(modal: &ModalState, key: KeyEvent) -> Option<Action> {
     }
 }
 
-/// Helper for handling single line text edit modals
+/// Helper for handling single line text edit modals.
 fn single_line_modal(key: KeyEvent, field: InputField, current_text: String) -> Option<Action> {
     if key.code == KeyCode::Enter {
         return Some(Action::Confirm);
@@ -113,6 +125,7 @@ fn update_text_field(key: KeyEvent, field: InputField, mut current_text: String)
     }
 }
 
+/// Processes input for confirmation modals.
 fn confirmation(key: KeyEvent) -> Option<Action> {
     if key.code == KeyCode::Enter {
         return Some(Action::Confirm);
@@ -120,6 +133,7 @@ fn confirmation(key: KeyEvent) -> Option<Action> {
     None
 }
 
+/// Processes keyboard input when in the board picker mode.
 fn handle_picker_keys(key: KeyEvent) -> Option<Action> {
     let shift = key.modifiers.contains(KeyModifiers::SHIFT);
     if shift {
@@ -160,6 +174,7 @@ fn handle_picker_keys(key: KeyEvent) -> Option<Action> {
     }
 }
 
+/// Processes keyboard input when viewing a specific board.
 fn handle_board_keys(key: KeyEvent) -> Option<Action> {
     let ctrl = key.modifiers.contains(KeyModifiers::CONTROL);
     let shift = key.modifiers.contains(KeyModifiers::SHIFT);

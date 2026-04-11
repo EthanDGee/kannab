@@ -1,3 +1,5 @@
+//! View components for rendering individual columns within a board.
+
 use crate::app::App;
 use crate::model::board_state::Column;
 use crate::view::task_view;
@@ -8,8 +10,10 @@ use ratatui::{
     widgets::{Block, Borders, List, ListState},
 };
 
+/// The fixed width used for all Kanban columns.
 pub const COLUMN_WIDTH: u16 = 40;
 
+/// Renders a single column, including its title and the list of tasks it contains.
 pub fn render(
     app: &App,
     frame: &mut Frame,
