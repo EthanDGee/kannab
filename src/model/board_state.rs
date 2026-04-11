@@ -74,6 +74,11 @@ impl Column {
             tasks: Vec::new(),
         }
     }
+
+    /// Returns true if the column contains no tasks.
+    pub fn task_list_empty(&self) -> bool {
+        self.tasks.is_empty()
+    }
 }
 
 /// A lightweight representation of a board used in lists and metadata.
@@ -119,5 +124,18 @@ impl Board {
     /// Provides a mutable reference to the board's columns.
     pub fn get_columns(&mut self) -> &mut Vec<Column> {
         &mut self.columns
+    }
+
+    /// Returns true if the board contains no columns.
+    pub fn column_list_empty(&self) -> bool {
+        self.columns.is_empty()
+    }
+
+    /// Returns true if the column at the provided index contains no tasks.
+    pub fn task_list_empty(&self, column_index: usize) -> bool {
+        self.columns
+            .get(column_index)
+            .map(|col| col.task_list_empty())
+            .unwrap_or(true)
     }
 }

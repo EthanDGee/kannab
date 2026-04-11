@@ -49,4 +49,9 @@ impl AppState {
             should_quit: false,
         }
     }
+
+    /// Returns true if the board list is empty.
+    pub fn board_list_empty(&self) -> bool {
+        self.board_list.is_empty()
+    }
 }

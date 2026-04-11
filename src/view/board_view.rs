@@ -29,6 +29,16 @@ impl BoardState {
             board,
         }
     }
+
+    /// Returns true if the board contains no columns.
+    pub fn column_list_empty(&self) -> bool {
+        self.board.column_list_empty()
+    }
+
+    /// Returns true if the column at the provided index contains no tasks.
+    pub fn task_list_empty(&self, column_index: usize) -> bool {
+        self.board.task_list_empty(column_index)
+    }
 }
 
 pub fn render(app: &App, frame: &mut Frame, area: Rect) {
