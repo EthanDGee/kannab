@@ -21,6 +21,9 @@ pub fn create_board(model: &mut AppState, title: String) -> Option<Action> {
 
 /// Loads and opens the board selected in the board picker.
 pub fn open_board(model: &mut AppState) -> Option<Action> {
+    if model.board_list_empty() {
+        return None;
+    }
     let index = model.picker_state.index;
     let board_name = model.board_list.get(index)?;
     let board = file_handling::load_board(&board_name.title)?;
@@ -35,7 +38,7 @@ pub fn delete_board(model: &mut AppState) -> Option<Action> {
     let index = model.picker_state.index;
 
     // exit early if at invalid position or the board list is empty
-    if index >= model.board_list.len() || model.board_list.is_empty() {
+    if index >= model.board_list.len() || model.board_list_empty() {
         return None;
     }
 
@@ -43,9 +46,9 @@ pub fn delete_board(model: &mut AppState) -> Option<Action> {
     file_handling::delete_board(&board_name.title);
 
     // update picker index as needed to ensure that is at valid position
-    if model.picker_state.index >= model.board_list.len() && !model.board_list.is_empty() {
+    if model.picker_state.index >= model.board_list.len() && !model.board_list_empty() {
         model.picker_state.index = model.board_list.len() - 1;
-    } else if model.board_list.is_empty() {
+    } else if model.board_list_empty() {
         model.picker_state.index = 0;
     }
 
@@ -101,6 +104,9 @@ pub fn rename_board(model: &mut AppState, new_title: String) -> Option<Action> {
 
 /// Reorders the board list by swapping the selected board with the one above it.
 pub fn move_board_up(model: &mut AppState) -> Option<Action> {
+    if model.board_list_empty() {
+        return None;
+    }
     let current_index = model.picker_state.index;
     let new_index = decrement_no_wrap(current_index)?;
     model.board_list.swap(current_index, new_index);
@@ -111,6 +117,9 @@ pub fn move_board_up(model: &mut AppState) -> Option<Action> {
 
 /// Reorders the board list by swapping the selected board with the one below it.
 pub fn move_board_down(model: &mut AppState) -> Option<Action> {
+    if model.board_list_empty() {
+        return None;
+    }
     let current_index = model.picker_state.index;
     let max = model.board_list.len();
     let new_index = increment_no_wrap(current_index, max)?;

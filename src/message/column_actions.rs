@@ -31,7 +31,10 @@ pub fn create_column(model: &mut AppState, title: String) -> Option<Action> {
 
 /// Updates the title of the currently selected column.
 pub fn rename_column(model: &mut AppState, new_name: String) -> Option<Action> {
-    model.board_state.as_ref()?;
+    let board_state = model.board_state.as_ref()?;
+    if board_state.column_list_empty() {
+        return None;
+    }
     let column = get_current_column_mut(model)?;
     column.title = new_name;
     mark_dirty(model)
@@ -43,7 +46,7 @@ pub fn delete_column(model: &mut AppState) -> Option<Action> {
     let column_index = board_state.column_index;
     let num_columns = board_state.board.columns.len();
 
-    if column_index >= num_columns || num_columns == 0 {
+    if column_index >= num_columns || board_state.column_list_empty() {
         return None;
     }
 
@@ -54,7 +57,7 @@ pub fn delete_column(model: &mut AppState) -> Option<Action> {
         board_state.column_scrolls.remove(column_index);
     }
 
-    let has_columns = !board_state.board.columns.is_empty();
+    let has_columns = !board_state.column_list_empty();
 
     // Adjust column_index if it's now out of bounds
     if has_columns && board_state.column_index >= board_state.board.columns.len() {
@@ -74,6 +77,9 @@ pub fn delete_column(model: &mut AppState) -> Option<Action> {
 /// Swaps the current column with the one to its left (lower index).
 pub fn move_column_left(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
+    if board_state.column_list_empty() {
+        return None;
+    }
     let column_index = board_state.column_index;
     let columns_ref = board_state.board.get_columns();
     let columns = columns_ref;
@@ -91,6 +97,9 @@ pub fn move_column_left(model: &mut AppState) -> Option<Action> {
 /// Swaps the current column with the one to its right (higher index).
 pub fn move_column_right(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
+    if board_state.column_list_empty() {
+        return None;
+    }
     let column_index = board_state.column_index;
     let columns = board_state.board.get_columns();
 

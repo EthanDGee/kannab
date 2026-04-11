@@ -23,6 +23,9 @@ pub fn get_current_task_mut(model: &mut AppState) -> Option<&mut Task> {
 /// column are active.
 pub fn create_task(model: &mut AppState, title: String, description: String) -> Option<Action> {
     if let Some(board_state) = &mut model.board_state {
+        if board_state.column_list_empty() {
+            return None;
+        }
         let mut task = Task::new();
         task.title = title;
         task.description = description;
@@ -62,12 +65,12 @@ pub fn delete_task(model: &mut AppState) -> Option<Action> {
     let column = board_state.board.columns.get_mut(column_index)?;
     let task_count = column.tasks.len();
 
-    if task_index > task_count || task_count == 0 {
+    if task_index >= task_count || column.task_list_empty() {
         return None;
     }
 
     column.tasks.remove(task_index);
-    let has_tasks = !column.tasks.is_empty();
+    let has_tasks = !column.task_list_empty();
 
     // Adjust task_index if it's now out of bounds
     if task_index >= task_count && has_tasks {
@@ -87,6 +90,9 @@ pub fn delete_task(model: &mut AppState) -> Option<Action> {
 /// Swaps the current task with the one at the next index.
 pub fn move_task_up(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_ref()?;
+    if board_state.task_list_empty(board_state.column_index) {
+        return None;
+    }
     let task_index = board_state.task_index;
 
     let column = get_current_column_mut(model)?;
@@ -104,6 +110,9 @@ pub fn move_task_up(model: &mut AppState) -> Option<Action> {
 /// Swaps the current task with the one at the previous index.
 pub fn move_task_down(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_ref()?;
+    if board_state.task_list_empty(board_state.column_index) {
+        return None;
+    }
     let task_index = board_state.task_index;
 
     let column = get_current_column_mut(model)?;
@@ -121,6 +130,9 @@ pub fn move_task_down(model: &mut AppState) -> Option<Action> {
 /// Moves the currently selected task to the beginning of the next column.
 pub fn move_task_to_next_column(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
+    if board_state.task_list_empty(board_state.column_index) {
+        return None;
+    }
     let column_index = board_state.column_index;
     let task_index = board_state.task_index;
     let num_columns = board_state.board.columns.len();
@@ -149,6 +161,9 @@ pub fn move_task_to_next_column(model: &mut AppState) -> Option<Action> {
 /// Moves the currently selected task to the beginning of the previous column.
 pub fn move_task_to_prev_column(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
+    if board_state.task_list_empty(board_state.column_index) {
+        return None;
+    }
     let column_index = board_state.column_index;
     let task_index = board_state.task_index;
 
@@ -175,7 +190,10 @@ pub fn move_task_to_prev_column(model: &mut AppState) -> Option<Action> {
 
 /// Flips the `complete` status of the currently selected task.
 pub fn toggle_completion(model: &mut AppState) -> Option<Action> {
-    let _board_state = model.board_state.as_mut()?;
+    let board_state = model.board_state.as_mut()?;
+    if board_state.task_list_empty(board_state.column_index) {
+        return None;
+    }
     let task = get_current_task_mut(model)?;
 
     // flips completion

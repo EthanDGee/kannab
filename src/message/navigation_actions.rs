@@ -103,8 +103,7 @@ pub fn move_left(model: &mut AppState) -> Option<Action> {
         AppMode::Picker => {}
         AppMode::Board => {
             if let Some(board_state) = &mut model.board_state {
-                let num_columns = board_state.board.columns.len();
-                if num_columns == 0 {
+                if board_state.column_list_empty() {
                     return None;
                 }
 
@@ -123,7 +122,7 @@ pub fn move_left(model: &mut AppState) -> Option<Action> {
                 // Clamp task_index to new column's task count
                 let new_col = board_state.column_index;
                 let num_tasks = board_state.board.columns[new_col].tasks.len();
-                if num_tasks == 0 {
+                if board_state.task_list_empty(new_col) {
                     board_state.task_index = 0;
                 } else if board_state.task_index >= num_tasks {
                     board_state.task_index = num_tasks - 1;
@@ -144,7 +143,7 @@ pub fn move_right(model: &mut AppState) -> Option<Action> {
             if let Some(board_state) = &mut model.board_state {
                 let current_index = board_state.column_index;
                 let num_columns = board_state.board.columns.len();
-                if num_columns == 0 {
+                if board_state.column_list_empty() {
                     return None;
                 }
 
@@ -163,7 +162,7 @@ pub fn move_right(model: &mut AppState) -> Option<Action> {
                 // Clamp task_index to new column's task count
                 let new_col = board_state.column_index;
                 let num_tasks = board_state.board.columns[new_col].tasks.len();
-                if num_tasks == 0 {
+                if board_state.task_list_empty(new_col) {
                     board_state.task_index = 0;
                 } else if board_state.task_index >= num_tasks {
                     board_state.task_index = num_tasks - 1;

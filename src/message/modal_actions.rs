@@ -30,20 +30,20 @@ pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action>
         }
         ModalType::CreateTask => {
             if let Some(board_state) = &model.board_state
-                && board_state.board.columns.is_empty()
+                && board_state.column_list_empty()
             {
                 return None;
             }
         }
         ModalType::ConfirmDelete(confirm_delete) => match confirm_delete {
             crate::model::modal_state::ConfirmDelete::Board => {
-                if model.board_list.is_empty() {
+                if model.board_list_empty() {
                     return None;
                 }
             }
             crate::model::modal_state::ConfirmDelete::Column => {
                 if let Some(board_state) = &model.board_state {
-                    if board_state.board.columns.is_empty()
+                    if board_state.column_list_empty()
                         || board_state.column_index >= board_state.board.columns.len()
                     {
                         return None;
@@ -55,7 +55,7 @@ pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action>
             crate::model::modal_state::ConfirmDelete::Task => {
                 if let Some(board_state) = &model.board_state {
                     let column = board_state.board.columns.get(board_state.column_index)?;
-                    if board_state.task_index >= column.tasks.len() || column.tasks.is_empty() {
+                    if board_state.task_index >= column.tasks.len() || column.task_list_empty() {
                         return None;
                     }
                 } else {
