@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 use crate::model::board_state::Task;
 use crate::view::theme::ColorScheme;
 use ratatui::prelude::*;
