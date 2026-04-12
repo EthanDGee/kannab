@@ -1,8 +1,14 @@
 //! View components for rendering a full Kanban board.
 
 use crate::app::App;
+use crate::message::action::InputField;
+use crate::model::modal_state::ModalState;
 use crate::view::column_view::{self, COLUMN_WIDTH};
+use crate::widgets::floating_window::centered_rect;
+use crate::widgets::text_input::TextInput;
 use crate::{APP_NAME, model::board_state::Board};
+use ratatui::style::Modifier;
+use ratatui::widgets::{Block, Borders, Clear};
 use ratatui::{
     Frame,
     layout::{Constraint, Direction, Layout, Rect},
@@ -106,4 +112,53 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
     let footer = Paragraph::new(footer_text)
         .style(Style::default().fg(colors.body_text).bg(colors.background));
     frame.render_widget(footer, chunks[2]);
+}
+
+/// Renders a modal for creating or renaming a board.
+pub fn board_modal_view(
+    app: &App,
+    frame: &mut Frame,
+    modal: &ModalState,
+    area: Rect,
+    title: &str,
+    instruction_text: &str,
+) {
+    let colors = app.model.color_scheme;
+    let area = centered_rect(60, 15, area);
+
+    frame.render_widget(Clear, area); //this clears out the background
+
+    let block = Block::default()
+        .title(title)
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(colors.highlight))
+        .style(Style::default().bg(colors.background).fg(colors.body_text));
+
+    let inner_area = block.inner(area);
+    frame.render_widget(block, area);
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(1), // Title Label
+            Constraint::Length(3), // Input Field
+            Constraint::Length(1), // Instructions
+        ])
+        .split(inner_area);
+
+    let label = Paragraph::new("Board Name:").style(Style::default().add_modifier(Modifier::BOLD));
+    frame.render_widget(label, chunks[0]);
+
+    let input = TextInput::new(colors, &modal.data.board_title, modal.cursor_position)
+        .active(true)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(colors.inner_border)),
+        );
+    frame.render_widget(input, chunks[1]);
+
+    let instructions =
+        Paragraph::new(instruction_text).style(Style::default().fg(colors.inner_border));
+    frame.render_widget(instructions, chunks[2]);
 }

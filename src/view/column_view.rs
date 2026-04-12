@@ -1,8 +1,13 @@
 //! View components for rendering individual columns within a board.
 
-use crate::app::App;
 use crate::model::board_state::Column;
+use crate::model::modal_state::ModalState;
 use crate::view::task_view;
+use crate::widgets::floating_window::centered_rect;
+use crate::widgets::text_input::TextInput;
+use crate::{app::App, model::modal_state::ModalData};
+use ratatui::layout::{Constraint, Direction, Layout};
+use ratatui::widgets::{Clear, Paragraph};
 use ratatui::{
     Frame,
     layout::Rect,
@@ -72,4 +77,54 @@ pub fn render(
     }
 
     frame.render_stateful_widget(list, inner, &mut list_state);
+}
+
+/// Renders a modal for creating or renaming a column.
+pub fn column_modal_view(
+    app: &App,
+    frame: &mut Frame,
+    modal: &ModalState,
+    area: Rect,
+    title: &str,
+    instruction_text: &str,
+) {
+    let colors = app.model.color_scheme;
+    let area = centered_rect(60, 15, area);
+
+    frame.render_widget(Clear, area);
+
+    let block = Block::default()
+        .title(title)
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(colors.highlight))
+        .style(Style::default().bg(colors.background).fg(colors.body_text));
+
+    let inner_area = block.inner(area);
+    frame.render_widget(block, area);
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(1), // Title Label
+            Constraint::Length(3), // Input Field
+            Constraint::Length(1), // Instructions
+        ])
+        .split(inner_area);
+
+    let label =
+        Paragraph::new("Column Title:").style(Style::default().add_modifier(Modifier::BOLD));
+    frame.render_widget(label, chunks[0]);
+
+    let input = TextInput::new(colors, &modal.data.column_title, modal.cursor_position)
+        .active(true)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(colors.inner_border)),
+        );
+    frame.render_widget(input, chunks[1]);
+
+    let instructions =
+        Paragraph::new(instruction_text).style(Style::default().fg(colors.inner_border));
+    frame.render_widget(instructions, chunks[2]);
 }
