@@ -5,7 +5,7 @@ use crate::model::modal_state::ModalState;
 use crate::view::task_view;
 use crate::widgets::floating_window::centered_rect;
 use crate::widgets::text_input::TextInput;
-use crate::{app::App, model::modal_state::ModalData};
+use crate::app::App;
 use ratatui::layout::{Constraint, Direction, Layout};
 use ratatui::widgets::{Clear, Paragraph};
 use ratatui::{
@@ -61,7 +61,7 @@ pub fn render(
         .enumerate()
         .map(|(i, task)| {
             let is_selected = selected && i == board_state.task_index;
-            task_view::render_item(task, colors, is_selected, inner_width)
+            task_view::render(task, colors, is_selected, inner_width)
         })
         .collect();
 

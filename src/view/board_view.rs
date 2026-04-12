@@ -1,7 +1,6 @@
 //! View components for rendering a full Kanban board.
 
 use crate::app::App;
-use crate::message::action::InputField;
 use crate::model::modal_state::ModalState;
 use crate::view::column_view::{self, COLUMN_WIDTH};
 use crate::widgets::floating_window::centered_rect;

@@ -1,12 +1,10 @@
 //! View components for rendering modal dialogs and overlays.
 
-use crate::message::action::InputField;
 use crate::model::modal_state::{ConfirmDelete, ModalState};
 use crate::view::board_view::board_modal_view;
 use crate::view::column_view::column_modal_view;
-use crate::view::task_view::task_modal_view;
+use crate::view::task_view;
 use crate::widgets::floating_window::centered_rect;
-use crate::widgets::text_input::TextInput;
 use crate::{app::App, model::modal_state::ModalType};
 use ratatui::{
     Frame,
@@ -52,7 +50,7 @@ pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
             " Rename Column ",
             "Press Enter to rename, Esc to cancel",
         ),
-        ModalType::CreateTask => task_modal_view(
+        ModalType::CreateTask => task_view::task_modal(
             app,
             frame,
             modal,
@@ -60,7 +58,7 @@ pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
             " Create New Task ",
             "Tab: Switch fields | Enter: Create | Esc: Cancel",
         ),
-        ModalType::EditTask => task_modal_view(
+        ModalType::EditTask => task_view::task_modal(
             app,
             frame,
             modal,

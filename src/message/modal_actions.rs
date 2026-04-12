@@ -89,6 +89,7 @@ pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
     if let Some(modal) = &mut model.modal_state {
         modal.focus = match modal.focus {
             InputField::TaskTitle => InputField::TaskDescription,
+            InputField::TaskDescription => InputField::ItemDescription,
             _ => InputField::TaskTitle,
         };
 
@@ -96,6 +97,7 @@ pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
         let content = match modal.focus {
             InputField::TaskTitle => &modal.data.task_title,
             InputField::TaskDescription => &modal.data.task_description,
+            InputField::ItemDescription => &modal.data.item_description,
             _ => "",
         };
 
@@ -120,7 +122,7 @@ pub fn update_field(model: &mut AppState, field: InputField, value: String) -> O
             InputField::ColumnTitle => modal.data.column_title = value,
             InputField::TaskTitle => modal.data.task_title = value,
             InputField::TaskDescription => modal.data.task_description = value,
-            InputField::ItemDescription => {} // Handle if checklists are implemented
+            InputField::ItemDescription => modal.data.item_description = value,
         }
     }
 
