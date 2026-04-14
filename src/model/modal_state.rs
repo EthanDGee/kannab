@@ -56,6 +56,8 @@ pub struct ModalData {
     pub task_description: String,
     /// Buffer for checklist item description input.
     pub item_description: String,
+    /// Working copy of checklist items for a task.
+    pub checklist: Vec<crate::model::board_state::Item>,
 }
 
 /// The complete state of an active modal dialog.

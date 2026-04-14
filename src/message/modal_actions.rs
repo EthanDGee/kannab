@@ -1,7 +1,7 @@
 //! Handlers for modal-related actions and user input.
 
 use crate::message::action::{Action, InputField};
-use crate::message::task_actions::{self, get_current_task_mut};
+use crate::message::task_actions;
 use crate::model::{
     app_state::AppState,
     modal_state::{ModalState, ModalType},
@@ -67,6 +67,7 @@ pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action>
             if let Some(task) = task_actions::get_current_task_mut(model) {
                 modal_state.data.task_title = task.title.clone();
                 modal_state.data.task_description = task.description.clone();
+                modal_state.data.checklist = task.checklist.clone();
                 modal_state.cursor_position.char_index =
                     modal_state.data.task_title.chars().count();
             }
@@ -95,14 +96,8 @@ pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
             }
             InputField::ItemDescription => {
                 // check if the next index is out of range of items +1 to account for the empty item
-                // then increment to next item or switch to task description
-                let board_state = model.board_state.as_ref()?;
-                let col_id = board_state.column_index;
-                let task_id = board_state.task_index;
-
-                let item_count = board_state.board.columns[col_id].tasks[task_id]
-                    .checklist
-                    .len();
+                // then increment to next item, add new item, or switch to task description
+                let item_count = modal.data.checklist.len();
 
                 if modal.item_index + 1 > item_count + 1 {
                     InputField::TaskTitle
@@ -115,14 +110,23 @@ pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
         };
 
         // Reset cursor position to end of the new field's content
-        let content = match modal.focus {
-            InputField::TaskTitle => &modal.data.task_title,
-            InputField::TaskDescription => &modal.data.task_description,
-            InputField::ItemDescription => &modal.data.item_description,
-            _ => "",
+        let char_count = match modal.focus {
+            InputField::TaskTitle => modal.data.task_title.chars().count(),
+            InputField::TaskDescription => modal.data.task_description.chars().count(),
+            InputField::ItemDescription => {
+                if modal.item_index < modal.data.checklist.len() {
+                    modal.data.checklist[modal.item_index]
+                        .description
+                        .chars()
+                        .count()
+                } else {
+                    modal.data.item_description.chars().count()
+                }
+            }
+            _ => 0,
         };
 
-        modal.cursor_position.char_index = content.chars().count();
+        modal.cursor_position.char_index = char_count;
         modal.cursor_position.line_index = 0; // Simple for now
     }
     None
@@ -143,7 +147,13 @@ pub fn update_field(model: &mut AppState, field: InputField, value: String) -> O
             InputField::ColumnTitle => modal.data.column_title = value,
             InputField::TaskTitle => modal.data.task_title = value,
             InputField::TaskDescription => modal.data.task_description = value,
-            InputField::ItemDescription => modal.data.item_description = value,
+            InputField::ItemDescription => {
+                if modal.item_index < modal.data.checklist.len() {
+                    modal.data.checklist[modal.item_index].description = value;
+                } else {
+                    modal.data.item_description = value;
+                }
+            }
         }
     }
 
@@ -182,16 +192,12 @@ pub fn confirm(model: &mut AppState) -> Option<Action> {
             Some(Action::RenameBoard(name))
         }
         ModalType::CreateTask => {
-            let title = modal.data.task_title.clone();
-            let description = modal.data.task_description.clone();
-            Some(Action::CreateTask(title, description))
+            let (title, description, checklist) = finalize_task_data(modal);
+            Some(Action::CreateTask(title, description, checklist))
         }
         ModalType::EditTask => {
-            let title = modal.data.task_title.clone();
-            let description = modal.data.task_description.clone();
-            task_actions::edit_task(model, InputField::TaskTitle, title);
-            task_actions::edit_task(model, InputField::TaskDescription, description);
-            None
+            let (title, description, checklist) = finalize_task_data(modal);
+            Some(Action::EditTask(title, description, checklist))
         }
         ModalType::ConfirmDelete(target) => match target {
             crate::model::modal_state::ConfirmDelete::Board => Some(Action::DeleteBoard),
@@ -209,4 +215,21 @@ pub fn confirm(model: &mut AppState) -> Option<Action> {
 pub fn cancel(model: &mut AppState) -> Option<Action> {
     model.modal_state = None;
     None
+}
+
+/// Extracts and prepares task data from the modal state, including appending any new checklist item.
+fn finalize_task_data(
+    modal: &ModalState,
+) -> (String, String, Vec<crate::model::board_state::Item>) {
+    let mut checklist = modal.data.checklist.clone();
+    if !modal.data.item_description.is_empty() {
+        let mut new_item = crate::model::board_state::Item::new();
+        new_item.description = modal.data.item_description.clone();
+        checklist.push(new_item);
+    }
+    (
+        modal.data.task_title.clone(),
+        modal.data.task_description.clone(),
+        checklist,
+    )
 }

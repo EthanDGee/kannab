@@ -102,17 +102,26 @@ pub fn task_modal(
     let inner_area = block.inner(area);
     frame.render_widget(block, area);
 
+    let mut constraints = vec![
+        Constraint::Length(1), // Title Label
+        Constraint::Length(3), // Title Input
+        Constraint::Length(1), // Description Label
+        Constraint::Length(5), // Description Input
+        Constraint::Length(1), // Checklist Label
+    ];
+
+    // Dynamically add checklist_items
+    let checklist_start_index = 5;
+    let checklist_items = &modal.data.checklist;
+    for _ in 0..checklist_items.len() {
+        constraints.push(Constraint::Length(3));
+    }
+    constraints.push(Constraint::Length(3)); // For new checklist item
+    constraints.push(Constraint::Min(1)); // Instructions
+
     let chunks = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([
-            Constraint::Length(1), // Title Label
-            Constraint::Length(3), // Title Input
-            Constraint::Length(1), // Description Label
-            Constraint::Length(5), // Description Input
-            Constraint::Length(1), // Checklist Label
-            Constraint::Length(3), // Checklist Item (Currently one to work on item formatting)
-            Constraint::Min(1),    // Instructions
-        ])
+        .constraints(constraints)
         .split(inner_area);
 
     // Title Field
@@ -159,12 +168,36 @@ pub fn task_modal(
         Paragraph::new("Checklist:").style(Style::default().add_modifier(Modifier::BOLD));
     frame.render_widget(checklist_label, chunks[4]);
 
-    // Checklist Item
-    render_check_list_item(frame, chunks[5], modal, &colors);
+    // Checklist Items
+    let mut current_chunk = checklist_start_index;
+    for (i, item) in checklist_items.iter().enumerate() {
+        render_check_list_item(
+            frame,
+            chunks[current_chunk],
+            modal,
+            &colors,
+            i,
+            &item.description,
+            item.complete,
+        );
+        current_chunk += 1;
+    }
+
+    // New Checklist Item
+    render_check_list_item(
+        frame,
+        chunks[current_chunk],
+        modal,
+        &colors,
+        checklist_items.len(),
+        &modal.data.item_description,
+        false,
+    );
+    current_chunk += 1;
 
     let instructions =
         Paragraph::new(instruction_text).style(Style::default().fg(colors.inner_border));
-    frame.render_widget(instructions, chunks[6]);
+    frame.render_widget(instructions, chunks[current_chunk]);
 }
 
 /// Renders an individual checklist item within the task modal.
@@ -173,8 +206,11 @@ pub fn render_check_list_item(
     area: Rect,
     modal: &ModalState,
     colors: &ColorScheme,
+    item_index: usize,
+    content: &str,
+    completed: bool,
 ) {
-    let item_active = modal.focus == InputField::ItemDescription;
+    let item_active = modal.focus == InputField::ItemDescription && modal.item_index == item_index;
     let item_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
@@ -194,11 +230,11 @@ pub fn render_check_list_item(
         .split(item_chunks[0])[1];
 
     // Render checkbox
-    let checkbox = Paragraph::new(format!(" {} ", checkbox_symbol(false)))
+    let checkbox = Paragraph::new(format!(" {} ", checkbox_symbol(completed)))
         .style(Style::default().fg(colors.body_text));
     frame.render_widget(checkbox, checkbox_area);
 
-    let item_input = TextInput::new(*colors, &modal.data.item_description, modal.cursor_position)
+    let item_input = TextInput::new(*colors, content, modal.cursor_position)
         .active(item_active)
         .block(
             Block::default()
