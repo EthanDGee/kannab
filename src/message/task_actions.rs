@@ -1,11 +1,11 @@
 //! Handlers for task-level actions.
 
-use crate::message::action::{Action, InputField};
+use crate::message::action::Action;
 use crate::message::column_actions::get_current_column_mut;
 use crate::message::io_actions::mark_dirty;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
 use crate::model::app_state::AppState;
-use crate::model::board_state::Task;
+use crate::model::board_state::{Item, Task};
 
 /// Returns a mutable reference to the currently selected task, if a board and column are active.
 pub fn get_current_task_mut(model: &mut AppState) -> Option<&mut Task> {
@@ -19,41 +19,37 @@ pub fn get_current_task_mut(model: &mut AppState) -> Option<&mut Task> {
     column.tasks.get_mut(task_index)
 }
 
-/// Creates a new task with the specified title and description in the active column, if a board and
-/// column are active.
-pub fn create_task(model: &mut AppState, title: String, description: String) -> Option<Action> {
-    if let Some(board_state) = &mut model.board_state {
-        if board_state.column_list_empty() {
-            return None;
-        }
-        let mut task = Task::new();
-        task.title = title;
-        task.description = description;
-
-        let column_index = board_state.column_index;
-        if let Some(column) = board_state.board.columns.get_mut(column_index) {
-            column.tasks.push(task);
-            board_state.task_index = column.tasks.len() - 1;
-            mark_dirty(model)
-        } else {
-            None
-        }
-    } else {
-        None
+/// Creates a new task with the specified data in the active column.
+pub fn create_task(
+    model: &mut AppState,
+    title: String,
+    description: String,
+    checklist: Vec<Item>,
+) -> Option<Action> {
+    {
+        let board_state = model.board_state.as_mut()?;
+        let column = board_state.board.columns.get_mut(board_state.column_index)?;
+        column.tasks.push(Task::new());
+        board_state.task_index = column.tasks.len() - 1;
     }
+
+    edit_task(model, title, description, checklist)
 }
 
-/// Updates a specific field (title or description) of the currently selected task.
-pub fn edit_task(model: &mut AppState, input_field: InputField, edit: String) -> Option<Action> {
+/// Updates the currently selected task's fields.
+pub fn edit_task(
+    model: &mut AppState,
+    title: String,
+    description: String,
+    checklist: Vec<Item>,
+) -> Option<Action> {
     model.board_state.as_ref()?;
 
     let task = get_current_task_mut(model)?;
+    task.title = title;
+    task.description = description;
+    task.checklist = checklist;
 
-    match input_field {
-        InputField::TaskTitle => task.title = edit,
-        InputField::TaskDescription => task.description = edit,
-        _ => {}
-    }
     mark_dirty(model)
 }
 
@@ -199,4 +195,15 @@ pub fn toggle_completion(model: &mut AppState) -> Option<Action> {
     // flips completion
     task.complete = !task.complete;
     mark_dirty(model)
+}
+
+pub fn add_checklist_item(model: &mut AppState) -> Option<Action> {
+    let board_state = model.board_state.as_mut()?;
+    if board_state.task_list_empty(board_state.column_index) {
+        return None;
+    }
+    let task = get_current_task_mut(model)?;
+    task.checklist.push(Item::new());
+
+    Some(Action::MarkDirty)
 }

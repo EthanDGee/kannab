@@ -78,6 +78,8 @@ fn handle_task_creation(modal: &ModalState, key: KeyEvent) -> Option<Action> {
         KeyCode::Enter => {
             if modal.focus == InputField::TaskTitle {
                 Some(Action::Confirm)
+            } else if modal.focus == InputField::ItemDescription {
+                Some(Action::SwitchInputField)
             } else {
                 // Insert newline in description
                 let mut current_text = modal.data.task_description.clone();
@@ -95,6 +97,14 @@ fn handle_task_creation(modal: &ModalState, key: KeyEvent) -> Option<Action> {
                     InputField::TaskDescription,
                     modal.data.task_description.clone(),
                 ),
+                InputField::ItemDescription => {
+                    let text = if modal.item_index < modal.data.checklist.len() {
+                        modal.data.checklist[modal.item_index].description.clone()
+                    } else {
+                        modal.data.item_description.clone()
+                    };
+                    (InputField::ItemDescription, text)
+                }
                 _ => (InputField::TaskTitle, modal.data.task_title.clone()),
             };
             update_text_field(key, field, current_text)

@@ -41,10 +41,12 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::MoveColumnRight => column_actions::move_column_right(model),
 
         // Task Handling
-        Action::CreateTask(title, description) => {
-            task_actions::create_task(model, title, description)
+        Action::CreateTask(title, description, checklist) => {
+            task_actions::create_task(model, title, description, checklist)
         }
-        Action::EditTask(input_field, edit) => task_actions::edit_task(model, input_field, edit),
+        Action::EditTask(title, description, checklist) => {
+            task_actions::edit_task(model, title, description, checklist)
+        }
         Action::DeleteTask => task_actions::delete_task(model),
         Action::MoveTaskUp => task_actions::move_task_up(model),
         Action::MoveTaskDown => task_actions::move_task_down(model),
