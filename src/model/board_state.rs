@@ -4,6 +4,8 @@ use crate::io::file_handling::to_snake_case;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+pub const VERSION_NUMBER: &str = "0.1.0";
+
 /// A single checklist item within a task.
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub struct Item {
@@ -102,6 +104,8 @@ impl BoardName {
 /// A complete Kanban board containing multiple columns of tasks.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Board {
+    /// Version number of the Board
+    pub version_number: String,
     /// The title of the board.
     pub title: String,
     /// The filename where this board is stored (without extension).
@@ -115,6 +119,7 @@ impl Board {
     pub fn new(title: String) -> Self {
         let file_name = to_snake_case(title.clone());
         Board {
+            version_number: VERSION_NUMBER.to_string(),
             title,
             file_name,
             columns: Vec::new(),
