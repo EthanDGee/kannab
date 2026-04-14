@@ -69,6 +69,8 @@ pub struct ModalState {
     pub cursor_position: CursorPosition,
     /// The currently focused input field.
     pub focus: InputField,
+    /// Index of the currently focused checklist item.
+    pub item_index: usize,
 }
 
 impl ModalState {
@@ -86,6 +88,7 @@ impl ModalState {
             data: ModalData::default(),
             cursor_position: CursorPosition::default(),
             focus,
+            item_index: 0,
         }
     }
 }

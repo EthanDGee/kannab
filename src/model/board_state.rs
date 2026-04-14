@@ -38,7 +38,7 @@ pub struct Task {
     /// Whether the overall task is marked as complete.
     pub complete: bool,
     /// Optional list of smaller steps/items.
-    pub checklist: Option<Vec<Item>>,
+    pub checklist: Vec<Item>,
 }
 
 impl Task {
@@ -49,7 +49,7 @@ impl Task {
             title: String::new(),
             description: String::new(),
             complete: false,
-            checklist: None,
+            checklist: vec![],
         }
     }
 }

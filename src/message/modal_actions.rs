@@ -1,7 +1,7 @@
 //! Handlers for modal-related actions and user input.
 
 use crate::message::action::{Action, InputField};
-use crate::message::task_actions;
+use crate::message::task_actions::{self, get_current_task_mut};
 use crate::model::{
     app_state::AppState,
     modal_state::{ModalState, ModalType},
@@ -89,7 +89,28 @@ pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
     if let Some(modal) = &mut model.modal_state {
         modal.focus = match modal.focus {
             InputField::TaskTitle => InputField::TaskDescription,
-            InputField::TaskDescription => InputField::ItemDescription,
+            InputField::TaskDescription => {
+                modal.item_index = 0;
+                InputField::ItemDescription
+            }
+            InputField::ItemDescription => {
+                // check if the next index is out of range of items +1 to account for the empty item
+                // then increment to next item or switch to task description
+                let board_state = model.board_state.as_ref()?;
+                let col_id = board_state.column_index;
+                let task_id = board_state.task_index;
+
+                let item_count = board_state.board.columns[col_id].tasks[task_id]
+                    .checklist
+                    .len();
+
+                if modal.item_index + 1 > item_count + 1 {
+                    InputField::TaskTitle
+                } else {
+                    modal.item_index += 1;
+                    InputField::ItemDescription
+                }
+            }
             _ => InputField::TaskTitle,
         };
 
