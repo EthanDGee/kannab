@@ -96,16 +96,25 @@ pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
             }
             InputField::ItemDescription => {
                 // check if the next index is out of range of items +1 to account for the empty item
-                // then increment to next item, add new item, or switch to task description
+                // then increment to next item or switch to task description
                 let item_count = modal.data.checklist.len();
 
-                if modal.item_index + 1 > item_count + 1 {
+                // If we are at the end of the checklist and have text, append it and move to a new empty item
+                if modal.item_index == item_count && !modal.data.item_description.is_empty() {
+                    let mut new_item = crate::model::board_state::Item::new();
+                    new_item.description = modal.data.item_description.clone();
+                    modal.data.checklist.push(new_item);
+                    modal.data.item_description.clear();
+                    modal.item_index += 1;
+                    InputField::ItemDescription
+                } else if modal.item_index + 1 > item_count + 1 {
                     InputField::TaskTitle
                 } else {
                     modal.item_index += 1;
                     InputField::ItemDescription
                 }
             }
+
             _ => InputField::TaskTitle,
         };
 

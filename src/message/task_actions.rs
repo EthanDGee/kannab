@@ -196,14 +196,3 @@ pub fn toggle_completion(model: &mut AppState) -> Option<Action> {
     task.complete = !task.complete;
     mark_dirty(model)
 }
-
-pub fn add_checklist_item(model: &mut AppState) -> Option<Action> {
-    let board_state = model.board_state.as_mut()?;
-    if board_state.task_list_empty(board_state.column_index) {
-        return None;
-    }
-    let task = get_current_task_mut(model)?;
-    task.checklist.push(Item::new());
-
-    Some(Action::MarkDirty)
-}

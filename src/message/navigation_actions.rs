@@ -85,8 +85,13 @@ pub fn move_down(model: &mut AppState) -> Option<Action> {
         AppMode::Board => {
             if let Some(board_state) = &mut model.board_state {
                 let current_col = board_state.column_index;
-                if let Some(column) = board_state.board.columns.get(current_col) {
+                if let Some(column) = board_state.board.columns.get_mut(current_col) {
                     let len = column.tasks.len();
+                    if len > 0 && board_state.task_index == len - 1 && !column.tasks[len - 1].title.is_empty() {
+                        column.tasks.push(crate::model::board_state::Task::new());
+                        board_state.task_index = len;
+                        return Some(Action::MarkDirty);
+                    }
                     board_state.task_index = increment_wrap(board_state.task_index, len);
                 }
             }
