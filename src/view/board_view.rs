@@ -51,6 +51,41 @@ impl BoardState {
     pub fn task_list_empty(&self, column_index: usize) -> bool {
         self.board.task_list_empty(column_index)
     }
+
+    /// Returns an immutable reference to the currently selected column.
+    pub fn current_column(&self) -> Option<&crate::model::board_state::Column> {
+        self.board.get_column(self.column_index)
+    }
+
+    /// Returns an immutable reference to the currently selected task.
+    pub fn current_task(&self) -> Option<&crate::model::board_state::Task> {
+        self.current_column()?.get_task(self.task_index)
+    }
+
+    /// Switches the currently focused column to the given index, preserving scroll positions.
+    pub fn switch_column(&mut self, new_index: usize) {
+        if new_index < self.board.columns.len() {
+            // Save current task_index
+            if self.column_index < self.column_scrolls.len() {
+                self.column_scrolls[self.column_index] = self.task_index;
+            }
+
+            self.column_index = new_index;
+
+            // Restore new task_index
+            if self.column_index < self.column_scrolls.len() {
+                self.task_index = self.column_scrolls[self.column_index];
+            }
+
+            // Clamp task_index to new column's task count
+            let num_tasks = self.current_column().map_or(0, |c| c.tasks.len());
+            if num_tasks == 0 {
+                self.task_index = 0;
+            } else if self.task_index >= num_tasks {
+                self.task_index = num_tasks - 1;
+            }
+        }
+    }
 }
 
 /// Renders the active board view, including its header, columns, and footer.

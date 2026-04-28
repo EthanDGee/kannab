@@ -61,8 +61,7 @@ pub fn move_up(model: &mut AppState) -> Option<Action> {
         }
         AppMode::Board => {
             if let Some(board_state) = &mut model.board_state {
-                let current_col = board_state.column_index;
-                if let Some(column) = board_state.board.columns.get(current_col) {
+                if let Some(column) = board_state.current_column() {
                     let len = column.tasks.len();
                     board_state.task_index = decrement_wrap(board_state.task_index, len);
                 }
@@ -84,15 +83,16 @@ pub fn move_down(model: &mut AppState) -> Option<Action> {
         }
         AppMode::Board => {
             if let Some(board_state) = &mut model.board_state {
-                let current_col = board_state.column_index;
-                if let Some(column) = board_state.board.columns.get_mut(current_col) {
+                let task_index = board_state.task_index;
+                let col_index = board_state.column_index;
+                if let Some(column) = board_state.board.get_column_mut(col_index) {
                     let len = column.tasks.len();
-                    if len > 0 && board_state.task_index == len - 1 && !column.tasks[len - 1].title.is_empty() {
+                    if len > 0 && task_index == len - 1 && !column.tasks[len - 1].title.is_empty() {
                         column.tasks.push(crate::model::board_state::Task::new());
                         board_state.task_index = len;
                         return Some(Action::MarkDirty);
                     }
-                    board_state.task_index = increment_wrap(board_state.task_index, len);
+                    board_state.task_index = increment_wrap(task_index, len);
                 }
             }
         }
@@ -112,25 +112,8 @@ pub fn move_left(model: &mut AppState) -> Option<Action> {
                     return None;
                 }
 
-                // Save current task_index
-                if board_state.column_index < board_state.column_scrolls.len() {
-                    board_state.column_scrolls[board_state.column_index] = board_state.task_index;
-                }
-
-                board_state.column_index = decrement_no_wrap(board_state.column_index)?;
-
-                // Fetch new task_index
-                if board_state.column_index < board_state.column_scrolls.len() {
-                    board_state.task_index = board_state.column_scrolls[board_state.column_index];
-                }
-
-                // Clamp task_index to new column's task count
-                let new_col = board_state.column_index;
-                let num_tasks = board_state.board.columns[new_col].tasks.len();
-                if board_state.task_list_empty(new_col) {
-                    board_state.task_index = 0;
-                } else if board_state.task_index >= num_tasks {
-                    board_state.task_index = num_tasks - 1;
+                if let Some(new_index) = decrement_no_wrap(board_state.column_index) {
+                    board_state.switch_column(new_index);
                 }
             }
         }
@@ -152,25 +135,8 @@ pub fn move_right(model: &mut AppState) -> Option<Action> {
                     return None;
                 }
 
-                // Save current task_index
-                if board_state.column_index < board_state.column_scrolls.len() {
-                    board_state.column_scrolls[board_state.column_index] = board_state.task_index;
-                }
-
-                board_state.column_index = increment_no_wrap(current_index, num_columns)?;
-
-                // Fetch new task_index
-                if board_state.column_index < board_state.column_scrolls.len() {
-                    board_state.task_index = board_state.column_scrolls[board_state.column_index];
-                }
-
-                // Clamp task_index to new column's task count
-                let new_col = board_state.column_index;
-                let num_tasks = board_state.board.columns[new_col].tasks.len();
-                if board_state.task_list_empty(new_col) {
-                    board_state.task_index = 0;
-                } else if board_state.task_index >= num_tasks {
-                    board_state.task_index = num_tasks - 1;
+                if let Some(new_index) = increment_no_wrap(current_index, num_columns) {
+                    board_state.switch_column(new_index);
                 }
             }
         }

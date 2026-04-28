@@ -1,7 +1,6 @@
 //! Handlers for modal-related actions and user input.
 
 use crate::message::action::{Action, InputField};
-use crate::message::task_actions;
 use crate::model::{
     app_state::AppState,
     modal_state::{ModalState, ModalType},
@@ -14,7 +13,7 @@ pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action>
     match &modal_type {
         ModalType::RenameColumn => {
             if let Some(board_state) = &model.board_state
-                && let Some(column) = board_state.board.columns.get(board_state.column_index)
+                && let Some(column) = board_state.current_column()
             {
                 modal_state.data.column_title = column.title.clone();
                 modal_state.cursor_position.char_index =
@@ -54,7 +53,7 @@ pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action>
             }
             crate::model::modal_state::ConfirmDelete::Task => {
                 if let Some(board_state) = &model.board_state {
-                    let column = board_state.board.columns.get(board_state.column_index)?;
+                    let column = board_state.current_column()?;
                     if board_state.task_index >= column.tasks.len() || column.task_list_empty() {
                         return None;
                     }
@@ -64,7 +63,9 @@ pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action>
             }
         },
         ModalType::EditTask => {
-            if let Some(task) = task_actions::get_current_task_mut(model) {
+            if let Some(board_state) = &model.board_state
+                && let Some(task) = board_state.current_task()
+            {
                 modal_state.data.task_title = task.title.clone();
                 modal_state.data.task_description = task.description.clone();
                 modal_state.data.checklist = task.checklist.clone();
