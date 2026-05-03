@@ -102,32 +102,23 @@ pub fn task_modal(
     let inner_area = block.inner(area);
     frame.render_widget(block, area);
 
-    let mut constraints = vec![
-        Constraint::Length(1), // Title Label
-        Constraint::Length(3), // Title Input
-        Constraint::Length(1), // Description Label
-        Constraint::Length(5), // Description Input
-        Constraint::Length(1), // Checklist Label
-    ];
-
-    // Dynamically add checklist_items
-    let checklist_start_index = 5;
-    let checklist_items = &modal.data.checklist;
-    for _ in 0..checklist_items.len() {
-        constraints.push(Constraint::Length(3));
-    }
-    constraints.push(Constraint::Length(3)); // For new checklist item
-    constraints.push(Constraint::Min(1)); // Instructions
-
-    let chunks = Layout::default()
+    let main_chunks = Layout::default()
         .direction(Direction::Vertical)
-        .constraints(constraints)
+        .constraints([
+            Constraint::Length(1), // Title Label
+            Constraint::Length(3), // Title Input
+            Constraint::Length(1), // Description Label
+            Constraint::Length(8), // Description Input
+            Constraint::Length(1), // Checklist Label
+            Constraint::Min(3),    // Checklist Items Area
+            Constraint::Length(1), // Instructions
+        ])
         .split(inner_area);
 
     // Title Field
     let title_label =
         Paragraph::new("Task Title:").style(Style::default().add_modifier(Modifier::BOLD));
-    frame.render_widget(title_label, chunks[0]);
+    frame.render_widget(title_label, main_chunks[0]);
 
     let title_active = modal.focus == InputField::TaskTitle;
     let title_input = TextInput::new(colors, &modal.data.task_title, modal.cursor_position)
@@ -141,12 +132,12 @@ pub fn task_modal(
                     colors.inner_border
                 })),
         );
-    frame.render_widget(title_input, chunks[1]);
+    frame.render_widget(title_input, main_chunks[1]);
 
     // Description Field
     let desc_label =
         Paragraph::new("Description:").style(Style::default().add_modifier(Modifier::BOLD));
-    frame.render_widget(desc_label, chunks[2]);
+    frame.render_widget(desc_label, main_chunks[2]);
 
     let desc_active = modal.focus == InputField::TaskDescription;
     let desc_input = TextInput::new(colors, &modal.data.task_description, modal.cursor_position)
@@ -161,43 +152,67 @@ pub fn task_modal(
                     colors.inner_border
                 })),
         );
-    frame.render_widget(desc_input, chunks[3]);
+    frame.render_widget(desc_input, main_chunks[3]);
 
     // Checklist Label
     let checklist_label =
         Paragraph::new("Checklist:").style(Style::default().add_modifier(Modifier::BOLD));
-    frame.render_widget(checklist_label, chunks[4]);
+    frame.render_widget(checklist_label, main_chunks[4]);
 
-    // Checklist Items
-    let mut current_chunk = checklist_start_index;
-    for (i, item) in checklist_items.iter().enumerate() {
-        render_check_list_item(
-            frame,
-            chunks[current_chunk],
-            modal,
-            &colors,
-            i,
-            &item.description,
-            item.complete,
-        );
-        current_chunk += 1;
+    // Checklist Items Scrolling Logic
+    let checklist_area = main_chunks[5];
+    let checklist_items = &modal.data.checklist;
+    let total_items = checklist_items.len() + 1; // Existing items + one new item field
+    let items_per_page = (checklist_area.height / 3) as usize;
+
+    // Calculate effective scroll offset to ensure focused item is visible
+    let mut scroll_offset = modal.scroll_offset;
+    if modal.focus == InputField::ItemDescription {
+        if modal.item_index < scroll_offset {
+            scroll_offset = modal.item_index;
+        } else if items_per_page > 0 && modal.item_index >= scroll_offset + items_per_page {
+            scroll_offset = modal.item_index - items_per_page + 1;
+        }
     }
+    // Final boundary check
+    scroll_offset = scroll_offset.min(total_items.saturating_sub(1));
 
-    // New Checklist Item
-    render_check_list_item(
-        frame,
-        chunks[current_chunk],
-        modal,
-        &colors,
-        checklist_items.len(),
-        &modal.data.item_description,
-        false,
-    );
-    current_chunk += 1;
+    let visible_count = items_per_page.min(total_items.saturating_sub(scroll_offset));
+    let checklist_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints(vec![Constraint::Length(3); visible_count])
+        .split(checklist_area);
+
+    for i in 0..visible_count {
+        let item_idx = scroll_offset + i;
+        if item_idx < checklist_items.len() {
+            let item = &checklist_items[item_idx];
+            render_check_list_item(
+                frame,
+                checklist_chunks[i],
+                modal,
+                &colors,
+                item_idx,
+                &item.description,
+                item.complete,
+            );
+        } else if item_idx == checklist_items.len() {
+            // New Checklist Item
+            render_check_list_item(
+                frame,
+                checklist_chunks[i],
+                modal,
+                &colors,
+                item_idx,
+                &modal.data.item_description,
+                false,
+            );
+        }
+    }
 
     let instructions =
         Paragraph::new(instruction_text).style(Style::default().fg(colors.inner_border));
-    frame.render_widget(instructions, chunks[current_chunk]);
+    frame.render_widget(instructions, main_chunks[6]);
 }
 
 /// Renders an individual checklist item within the task modal.

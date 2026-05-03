@@ -73,6 +73,8 @@ pub struct ModalState {
     pub focus: InputField,
     /// Index of the currently focused checklist item.
     pub item_index: usize,
+    /// Scroll offset for the checklist items.
+    pub scroll_offset: usize,
 }
 
 impl ModalState {
@@ -91,6 +93,7 @@ impl ModalState {
             cursor_position: CursorPosition::default(),
             focus,
             item_index: 0,
+            scroll_offset: 0,
         }
     }
 }

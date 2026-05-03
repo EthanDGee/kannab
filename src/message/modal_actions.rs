@@ -96,7 +96,7 @@ pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
                 InputField::ItemDescription
             }
             InputField::ItemDescription => {
-                // check if the next index is out of range of items +1 to account for the empty item
+                // check if the next index is out of range of items
                 // then increment to next item or switch to task description
                 let item_count = modal.data.checklist.len();
 
@@ -108,7 +108,7 @@ pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
                     modal.data.item_description.clear();
                     modal.item_index += 1;
                     InputField::ItemDescription
-                } else if modal.item_index + 1 > item_count + 1 {
+                } else if modal.item_index + 1 > item_count {
                     InputField::TaskTitle
                 } else {
                     modal.item_index += 1;
