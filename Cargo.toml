@@ -1,7 +1,8 @@
 [package]
 name = "kannab"
 description = "A kanban CLI tool."
-version = "0.1.2"
+repository = "https://github.com/EthanDGee/kannab"
+version = "0.2.0"
 edition = "2024"
 license = "MIT"
 
