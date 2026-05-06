@@ -227,3 +227,129 @@ impl Board {
             .unwrap_or(true)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_item_new() {
+        let item = Item::new();
+        assert_eq!(item.description, "");
+        assert!(!item.complete);
+    }
+
+    #[test]
+    fn test_item_toggle_completion() {
+        let mut item = Item::new();
+        item.toggle_completion();
+        assert!(item.complete);
+        item.toggle_completion();
+        assert!(!item.complete);
+    }
+
+    #[test]
+    fn test_task_new() {
+        let task = Task::new();
+        assert_eq!(task.title, "");
+        assert_eq!(task.description, "");
+        assert!(!task.complete);
+        assert!(task.checklist.is_empty());
+    }
+
+    #[test]
+    fn test_task_toggle_completion() {
+        let mut task = Task::new();
+        task.toggle_completion();
+        assert!(task.complete);
+        task.toggle_completion();
+        assert!(!task.complete);
+    }
+
+    #[test]
+    fn test_column_new() {
+        let column = Column::new();
+        assert_eq!(column.title, "");
+        assert!(column.task_list_empty());
+    }
+
+    #[test]
+    fn test_column_task_manipulation() {
+        let mut column = Column::new();
+        let mut task = Task::new();
+        task.title = "Test Task".to_string();
+
+        column.insert_task(0, task.clone());
+        assert_eq!(column.tasks.len(), 1);
+        assert_eq!(column.get_task(0).unwrap().title, "Test Task");
+
+        let mut task2 = Task::new();
+        task2.title = "Second Task".to_string();
+        column.insert_task(1, task2);
+        assert_eq!(column.tasks.len(), 2);
+
+        column.swap_tasks(0, 1);
+        assert_eq!(column.get_task(0).unwrap().title, "Second Task");
+
+        let removed = column.remove_task(0).unwrap();
+        assert_eq!(removed.title, "Second Task");
+        assert_eq!(column.tasks.len(), 1);
+    }
+
+    #[test]
+    fn test_board_name_new() {
+        let bn = BoardName::new("My Board".to_string());
+        assert_eq!(bn.title, "My Board");
+        assert_eq!(bn.snake_case, "my_board");
+    }
+
+    #[test]
+    fn test_board_new() {
+        let board = Board::new("Project X".to_string());
+        assert_eq!(board.title, "Project X");
+        assert_eq!(board.file_name, "project_x");
+        assert!(board.column_list_empty());
+    }
+
+    #[test]
+    fn test_board_column_manipulation() {
+        let mut board = Board::new("Test Board".to_string());
+        let mut col = Column::new();
+        col.title = "Todo".to_string();
+
+        board.columns.push(col);
+        assert_eq!(board.columns.len(), 1);
+        assert_eq!(board.get_column(0).unwrap().title, "Todo");
+
+        let mut col2 = Column::new();
+        col2.title = "Done".to_string();
+        board.columns.push(col2);
+
+        board.swap_columns(0, 1);
+        assert_eq!(board.get_column(0).unwrap().title, "Done");
+
+        board.remove_column(0);
+        assert_eq!(board.columns.len(), 1);
+        assert_eq!(board.get_column(0).unwrap().title, "Todo");
+    }
+
+    #[test]
+    fn test_board_get_task_helpers() {
+        let mut board = Board::new("Test".to_string());
+        let mut col = Column::new();
+        let mut task = Task::new();
+        task.title = "T1".to_string();
+        col.tasks.push(task);
+        board.columns.push(col);
+
+        assert!(board.get_task(0, 0).is_some());
+        assert_eq!(board.get_task(0, 0).unwrap().title, "T1");
+        assert!(board.get_task(1, 0).is_none());
+        assert!(board.get_task(0, 1).is_none());
+
+        if let Some(t) = board.get_task_mut(0, 0) {
+            t.title = "Updated".to_string();
+        }
+        assert_eq!(board.get_task(0, 0).unwrap().title, "Updated");
+    }
+}
