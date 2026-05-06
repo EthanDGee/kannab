@@ -1,6 +1,6 @@
 //! Handlers for task-level actions.
 
-use crate::message::action::Action;
+use crate::message::action::{Action, InputField};
 use crate::message::io_actions::mark_dirty;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
 use crate::model::app_state::AppState;
@@ -185,12 +185,30 @@ pub fn move_task_to_prev_column(model: &mut AppState) -> Option<Action> {
 }
 
 /// Flips the `complete` status of the currently selected task.
-pub fn toggle_completion(model: &mut AppState) -> Option<Action> {
+pub fn toggle_task_completion(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
     let (col_idx, task_idx) = (board_state.column_index, board_state.task_index);
     let task = board_state.board.get_task_mut(col_idx, task_idx)?;
 
     // flips completion
-    task.complete = !task.complete;
+    task.toggle_completion();
     mark_dirty(model)
+}
+
+/// flips the completion status of currently selected checklist item.
+pub fn toggle_item_completion(model: &mut AppState) -> Option<Action> {
+    let modal_state = model.modal_state.as_mut()?;
+
+    if modal_state.focus != InputField::ItemDescription {
+        return None;
+    }
+
+    let item_index = modal_state.item_index;
+
+    if item_index < modal_state.data.checklist.len() {
+        modal_state.data.checklist[item_index].toggle_completion();
+        return Some(Action::MarkDirty);
+    }
+
+    None
 }

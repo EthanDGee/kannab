@@ -52,9 +52,11 @@ fn handle_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
         ModalType::CreateBoard | ModalType::EditBoard => {
             single_line_modal(key, InputField::BoardTitle, modal.data.board_title.clone())
         }
-        ModalType::CreateColumn | ModalType::RenameColumn => {
-            single_line_modal(key, InputField::ColumnTitle, modal.data.column_title.clone())
-        }
+        ModalType::CreateColumn | ModalType::RenameColumn => single_line_modal(
+            key,
+            InputField::ColumnTitle,
+            modal.data.column_title.clone(),
+        ),
         ModalType::CreateTask | ModalType::EditTask => handle_task_creation(modal, key),
         ModalType::ConfirmDelete(_) => confirmation(key),
         ModalType::Help => None,
@@ -79,7 +81,7 @@ fn handle_task_creation(modal: &ModalState, key: KeyEvent) -> Option<Action> {
             if modal.focus == InputField::TaskTitle {
                 Some(Action::Confirm)
             } else if modal.focus == InputField::ItemDescription {
-                Some(Action::SwitchInputField)
+                Some(Action::ToggleItemCompletion)
             } else {
                 // Insert newline in description
                 let mut current_text = modal.data.task_description.clone();
@@ -250,7 +252,7 @@ fn handle_board_keys(key: KeyEvent) -> Option<Action> {
             ))),
 
             // Toggle Completion
-            KeyCode::Tab => Some(Action::ToggleCompletion),
+            KeyCode::Tab => Some(Action::ToggleTaskCompletion),
 
             // Help
             KeyCode::Char('?') => Some(Action::OpenModal(ModalType::Help)),

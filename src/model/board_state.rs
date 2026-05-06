@@ -26,6 +26,11 @@ impl Item {
             complete: false,
         }
     }
+
+    /// Toggles completion of the checklist item.
+    pub fn toggle_completion(&mut self) {
+        self.complete = !self.complete;
+    }
 }
 
 /// A task within a Kanban column, optionally containing a checklist.
@@ -53,6 +58,11 @@ impl Task {
             complete: false,
             checklist: vec![],
         }
+    }
+
+    /// Toggles completion of the task.
+    pub fn toggle_completion(&mut self) {
+        self.complete = !self.complete;
     }
 }
 
