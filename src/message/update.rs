@@ -71,3 +71,38 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::Tick => io_actions::handle_tick(model),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::app_state::AppMode;
+
+    #[test]
+    fn test_update_quit() {
+        let mut model = AppState::new();
+        update(&mut model, Action::Quit);
+        assert!(model.should_quit);
+    }
+
+    #[test]
+    fn test_update_mark_dirty() {
+        let mut model = AppState::new();
+        update(&mut model, Action::MarkDirty);
+        assert!(model.pending_changes);
+    }
+
+    #[test]
+    fn test_update_navigation_picker() {
+        let mut model = AppState::new();
+        model.mode = AppMode::Picker;
+        model
+            .board_list
+            .push(crate::model::board_state::BoardName::new("B1".to_string()));
+        model
+            .board_list
+            .push(crate::model::board_state::BoardName::new("B2".to_string()));
+
+        update(&mut model, Action::MoveDown);
+        assert_eq!(model.picker_state.index, 1);
+    }
+}

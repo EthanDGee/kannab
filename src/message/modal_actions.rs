@@ -323,4 +323,61 @@ mod tests {
         let modal = model.modal_state.as_ref().unwrap();
         assert_eq!(modal.data.item_description, "");
     }
+
+    #[test]
+    fn test_open_modal_create_board() {
+        let mut model = AppState::new();
+        open_modal(&mut model, ModalType::CreateBoard);
+
+        let modal = model.modal_state.as_ref().unwrap();
+        assert!(matches!(modal.modal_type, ModalType::CreateBoard));
+        assert_eq!(modal.focus, InputField::BoardTitle);
+    }
+
+    #[test]
+    fn test_switch_input_field_task() {
+        let mut model = AppState::new();
+        let mut modal = ModalState::new(ModalType::CreateTask);
+        modal.focus = InputField::TaskTitle;
+        model.modal_state = Some(modal);
+
+        switch_input_field(&mut model);
+        assert_eq!(
+            model.modal_state.as_ref().unwrap().focus,
+            InputField::TaskDescription
+        );
+
+        switch_input_field(&mut model);
+        assert_eq!(
+            model.modal_state.as_ref().unwrap().focus,
+            InputField::ItemDescription
+        );
+    }
+
+    #[test]
+    fn test_update_field() {
+        let mut model = AppState::new();
+        model.modal_state = Some(ModalState::new(ModalType::CreateBoard));
+
+        let action = update_field(&mut model, InputField::BoardTitle, "My Board".to_string());
+
+        assert!(matches!(action, Some(Action::MoveCursor(8, 0))));
+        assert_eq!(
+            model.modal_state.as_ref().unwrap().data.board_title,
+            "My Board"
+        );
+    }
+
+    #[test]
+    fn test_confirm_create_board() {
+        let mut model = AppState::new();
+        let mut modal = ModalState::new(ModalType::CreateBoard);
+        modal.data.board_title = "New Board".to_string();
+        model.modal_state = Some(modal);
+
+        let action = confirm(&mut model);
+
+        assert!(matches!(action, Some(Action::CreateBoard(name)) if name == "New Board"));
+        assert!(model.modal_state.is_none());
+    }
 }

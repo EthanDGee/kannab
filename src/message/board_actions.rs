@@ -127,3 +127,84 @@ pub fn move_board_down(model: &mut AppState) -> Option<Action> {
 
     Some(Action::MarkDirty)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::app_state::{AppMode, AppState};
+    use crate::model::board_state::BoardName;
+
+    #[test]
+    fn test_create_board() {
+        let mut model = AppState::new();
+        create_board(&mut model, "New Board".to_string());
+
+        assert_eq!(model.board_list.len(), 1);
+        assert_eq!(model.board_list[0].title, "New Board");
+        assert!(matches!(model.mode, AppMode::Board));
+        assert!(model.board_state.is_some());
+        assert_eq!(model.board_state.as_ref().unwrap().board.title, "New Board");
+    }
+
+    #[test]
+    fn test_delete_board() {
+        let mut model = AppState::new();
+        model.board_list.push(BoardName::new("B1".to_string()));
+        model.board_list.push(BoardName::new("B2".to_string()));
+        model.picker_state.index = 1;
+
+        delete_board(&mut model);
+
+        assert_eq!(model.board_list.len(), 1);
+        assert_eq!(model.board_list[0].title, "B1");
+        assert_eq!(model.picker_state.index, 0);
+
+        delete_board(&mut model);
+        assert!(model.board_list.is_empty());
+        assert_eq!(model.picker_state.index, 0);
+    }
+
+    #[test]
+    fn test_move_board_up_down() {
+        let mut model = AppState::new();
+        model.board_list.push(BoardName::new("B1".to_string()));
+        model.board_list.push(BoardName::new("B2".to_string()));
+        model.picker_state.index = 1;
+
+        // Move B2 up
+        move_board_up(&mut model);
+        assert_eq!(model.board_list[0].title, "B2");
+        assert_eq!(model.picker_state.index, 0);
+
+        // Move B2 down
+        move_board_down(&mut model);
+        assert_eq!(model.board_list[1].title, "B2");
+        assert_eq!(model.picker_state.index, 1);
+    }
+
+    #[test]
+    fn test_rename_board() {
+        let mut model = AppState::new();
+        create_board(&mut model, "Old Name".to_string());
+        model.picker_state.index = 0;
+
+        rename_board(&mut model, "New Name".to_string());
+
+        assert_eq!(model.board_list[0].title, "New Name");
+        assert_eq!(model.board_state.as_ref().unwrap().board.title, "New Name");
+    }
+
+    #[test]
+    fn test_rename_board_collision() {
+        let mut model = AppState::new();
+        model.board_list.push(BoardName::new("B1".to_string()));
+        model.board_list.push(BoardName::new("B2".to_string()));
+
+        // Try to rename B1 to B2
+        model.picker_state.index = 0;
+        let result = rename_board(&mut model, "B2".to_string());
+
+        assert!(result.is_none());
+        assert_eq!(model.board_list[0].title, "B1");
+    }
+}

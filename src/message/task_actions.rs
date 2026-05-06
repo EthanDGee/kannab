@@ -212,3 +212,167 @@ pub fn toggle_item_completion(model: &mut AppState) -> Option<Action> {
 
     None
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::board_state::{Board, Column};
+    use crate::view::board_view::BoardState;
+
+    fn setup_test_state() -> AppState {
+        let mut model = AppState::new();
+        let mut board = Board::new("Test Board".to_string());
+        board.columns.push(Column::new());
+        model.board_state = Some(BoardState::new(board));
+        model
+    }
+
+    #[test]
+    fn test_create_task() {
+        let mut model = setup_test_state();
+        create_task(
+            &mut model,
+            "New Task".to_string(),
+            "Desc".to_string(),
+            vec![],
+        );
+
+        let board_state = model.board_state.as_ref().unwrap();
+        let task = board_state.board.get_task(0, 0).unwrap();
+        assert_eq!(task.title, "New Task");
+        assert_eq!(board_state.task_index, 0);
+        assert!(model.pending_changes);
+    }
+
+    #[test]
+    fn test_edit_task() {
+        let mut model = setup_test_state();
+        create_task(
+            &mut model,
+            "Old Title".to_string(),
+            "Old Desc".to_string(),
+            vec![],
+        );
+        edit_task(
+            &mut model,
+            "New Title".to_string(),
+            "New Desc".to_string(),
+            vec![],
+        );
+
+        let board_state = model.board_state.as_ref().unwrap();
+        let task = board_state.board.get_task(0, 0).unwrap();
+        assert_eq!(task.title, "New Title");
+        assert_eq!(task.description, "New Desc");
+    }
+
+    #[test]
+    fn test_delete_task() {
+        let mut model = setup_test_state();
+        create_task(&mut model, "Task 1".to_string(), "".to_string(), vec![]);
+        create_task(&mut model, "Task 2".to_string(), "".to_string(), vec![]);
+
+        model.board_state.as_mut().unwrap().task_index = 1;
+        delete_task(&mut model);
+
+        let board_state = model.board_state.as_ref().unwrap();
+        assert_eq!(board_state.board.columns[0].tasks.len(), 1);
+        assert_eq!(board_state.task_index, 0);
+    }
+
+    #[test]
+    fn test_move_task_up_down() {
+        let mut model = setup_test_state();
+        create_task(&mut model, "T1".to_string(), "".to_string(), vec![]);
+        create_task(&mut model, "T2".to_string(), "".to_string(), vec![]);
+
+        // T2 is at index 1
+        move_task_up(&mut model);
+        assert_eq!(model.board_state.as_ref().unwrap().task_index, 0);
+        assert_eq!(
+            model
+                .board_state
+                .as_ref()
+                .unwrap()
+                .board
+                .get_task(0, 0)
+                .unwrap()
+                .title,
+            "T2"
+        );
+
+        move_task_down(&mut model);
+        assert_eq!(model.board_state.as_ref().unwrap().task_index, 1);
+        assert_eq!(
+            model
+                .board_state
+                .as_ref()
+                .unwrap()
+                .board
+                .get_task(0, 1)
+                .unwrap()
+                .title,
+            "T2"
+        );
+    }
+
+    #[test]
+    fn test_move_task_between_columns() {
+        let mut model = setup_test_state();
+        // Add second column
+        model
+            .board_state
+            .as_mut()
+            .unwrap()
+            .board
+            .columns
+            .push(Column::new());
+
+        create_task(&mut model, "Move Me".to_string(), "".to_string(), vec![]);
+
+        move_task_to_next_column(&mut model);
+        {
+            let bs = model.board_state.as_ref().unwrap();
+            assert_eq!(bs.column_index, 1);
+            assert_eq!(bs.board.columns[1].tasks.len(), 1);
+            assert_eq!(bs.board.columns[0].tasks.len(), 0);
+        }
+
+        move_task_to_prev_column(&mut model);
+        {
+            let bs = model.board_state.as_ref().unwrap();
+            assert_eq!(bs.column_index, 0);
+            assert_eq!(bs.board.columns[0].tasks.len(), 1);
+        }
+    }
+
+    #[test]
+    fn test_toggle_task_completion() {
+        let mut model = setup_test_state();
+        create_task(&mut model, "Task".to_string(), "".to_string(), vec![]);
+
+        toggle_task_completion(&mut model);
+        assert!(
+            model
+                .board_state
+                .as_ref()
+                .unwrap()
+                .board
+                .get_task(0, 0)
+                .unwrap()
+                .complete
+        );
+
+        toggle_task_completion(&mut model);
+        assert!(
+            !model
+                .board_state
+                .as_ref()
+                .unwrap()
+                .board
+                .get_task(0, 0)
+                .unwrap()
+                .complete
+        );
+    }
+}

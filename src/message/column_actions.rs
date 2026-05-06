@@ -102,3 +102,76 @@ pub fn move_column_right(model: &mut AppState) -> Option<Action> {
         None => None,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::board_state::Board;
+    use crate::view::board_view::BoardState;
+
+    fn setup_test_state() -> AppState {
+        let mut model = AppState::new();
+        let board = Board::new("Test Board".to_string());
+        model.board_state = Some(BoardState::new(board));
+        model
+    }
+
+    #[test]
+    fn test_create_column() {
+        let mut model = setup_test_state();
+        create_column(&mut model, "Todo".to_string());
+
+        let bs = model.board_state.as_ref().unwrap();
+        assert_eq!(bs.board.columns.len(), 1);
+        assert_eq!(bs.board.columns[0].title, "Todo");
+        assert_eq!(bs.column_scrolls.len(), 1);
+    }
+
+    #[test]
+    fn test_rename_column() {
+        let mut model = setup_test_state();
+        create_column(&mut model, "Old".to_string());
+        rename_column(&mut model, "New".to_string());
+
+        let bs = model.board_state.as_ref().unwrap();
+        assert_eq!(bs.board.columns[0].title, "New");
+    }
+
+    #[test]
+    fn test_delete_column() {
+        let mut model = setup_test_state();
+        create_column(&mut model, "C1".to_string());
+        create_column(&mut model, "C2".to_string());
+
+        model.board_state.as_mut().unwrap().column_index = 1;
+        delete_column(&mut model);
+
+        let bs = model.board_state.as_ref().unwrap();
+        assert_eq!(bs.board.columns.len(), 1);
+        assert_eq!(bs.column_index, 0);
+        assert_eq!(bs.column_scrolls.len(), 1);
+    }
+
+    #[test]
+    fn test_move_column_left_right() {
+        let mut model = setup_test_state();
+        create_column(&mut model, "C1".to_string());
+        create_column(&mut model, "C2".to_string());
+
+        // At C2 (index 1)
+        model.board_state.as_mut().unwrap().column_index = 1;
+        move_column_left(&mut model);
+        assert_eq!(model.board_state.as_ref().unwrap().column_index, 0);
+        assert_eq!(
+            model.board_state.as_ref().unwrap().board.columns[0].title,
+            "C2"
+        );
+
+        move_column_right(&mut model);
+        assert_eq!(model.board_state.as_ref().unwrap().column_index, 1);
+        assert_eq!(
+            model.board_state.as_ref().unwrap().board.columns[1].title,
+            "C2"
+        );
+    }
+}

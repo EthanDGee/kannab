@@ -17,3 +17,24 @@ pub fn quit_to_picker(model: &mut AppState) -> Option<Action> {
     model.pending_changes = false;
     None
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::board_state::Board;
+    use crate::view::board_view::BoardState;
+
+    #[test]
+    fn test_quit_to_picker() {
+        let mut model = AppState::new();
+        model.mode = AppMode::Board;
+        model.board_state = Some(BoardState::new(Board::new("T".to_string())));
+        model.pending_changes = true;
+
+        quit_to_picker(&mut model);
+
+        assert!(matches!(model.mode, AppMode::Picker));
+        assert!(model.board_state.is_none());
+        assert!(!model.pending_changes);
+    }
+}
