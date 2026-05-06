@@ -56,6 +56,8 @@ pub struct ModalData {
     pub task_description: String,
     /// Buffer for checklist item description input.
     pub item_description: String,
+    /// Working copy of checklist items for a task.
+    pub checklist: Vec<crate::model::board_state::Item>,
 }
 
 /// The complete state of an active modal dialog.
@@ -69,6 +71,10 @@ pub struct ModalState {
     pub cursor_position: CursorPosition,
     /// The currently focused input field.
     pub focus: InputField,
+    /// Index of the currently focused checklist item.
+    pub item_index: usize,
+    /// Scroll offset for the checklist items.
+    pub scroll_offset: usize,
 }
 
 impl ModalState {
@@ -86,6 +92,8 @@ impl ModalState {
             data: ModalData::default(),
             cursor_position: CursorPosition::default(),
             focus,
+            item_index: 0,
+            scroll_offset: 0,
         }
     }
 }

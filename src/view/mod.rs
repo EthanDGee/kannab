@@ -1,3 +1,5 @@
+//! View layer components for rendering the application.
+
 pub mod app_view;
 pub mod board_view;
 pub mod column_view;

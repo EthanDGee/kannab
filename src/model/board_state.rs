@@ -4,8 +4,10 @@ use crate::io::file_handling::to_snake_case;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+pub const VERSION_NUMBER: &str = "0.1.0";
+
 /// A single checklist item within a task.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub struct Item {
     /// Unique identifier for the item.
     id: Uuid,
@@ -24,6 +26,11 @@ impl Item {
             complete: false,
         }
     }
+
+    /// Toggles completion of the checklist item.
+    pub fn toggle_completion(&mut self) {
+        self.complete = !self.complete;
+    }
 }
 
 /// A task within a Kanban column, optionally containing a checklist.
@@ -38,7 +45,7 @@ pub struct Task {
     /// Whether the overall task is marked as complete.
     pub complete: bool,
     /// Optional list of smaller steps/items.
-    pub checklist: Option<Vec<Item>>,
+    pub checklist: Vec<Item>,
 }
 
 impl Task {
@@ -49,8 +56,13 @@ impl Task {
             title: String::new(),
             description: String::new(),
             complete: false,
-            checklist: None,
+            checklist: vec![],
         }
+    }
+
+    /// Toggles completion of the task.
+    pub fn toggle_completion(&mut self) {
+        self.complete = !self.complete;
     }
 }
 
@@ -79,6 +91,41 @@ impl Column {
     pub fn task_list_empty(&self) -> bool {
         self.tasks.is_empty()
     }
+
+    /// Provides an immutable reference to the task at the given index.
+    pub fn get_task(&self, index: usize) -> Option<&Task> {
+        self.tasks.get(index)
+    }
+
+    /// Provides a mutable reference to the task at the given index.
+    pub fn get_task_mut(&mut self, index: usize) -> Option<&mut Task> {
+        self.tasks.get_mut(index)
+    }
+
+    /// Removes and returns the task at the given index, if it exists.
+    pub fn remove_task(&mut self, index: usize) -> Option<Task> {
+        if index < self.tasks.len() {
+            Some(self.tasks.remove(index))
+        } else {
+            None
+        }
+    }
+
+    /// Inserts a task at the given index.
+    pub fn insert_task(&mut self, index: usize, task: Task) {
+        if index <= self.tasks.len() {
+            self.tasks.insert(index, task);
+        } else {
+            self.tasks.push(task);
+        }
+    }
+
+    /// Swaps the tasks at the two given indices.
+    pub fn swap_tasks(&mut self, i: usize, j: usize) {
+        if i < self.tasks.len() && j < self.tasks.len() {
+            self.tasks.swap(i, j);
+        }
+    }
 }
 
 /// A lightweight representation of a board used in lists and metadata.
@@ -102,6 +149,8 @@ impl BoardName {
 /// A complete Kanban board containing multiple columns of tasks.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Board {
+    /// Version number of the Board
+    pub version_number: String,
     /// The title of the board.
     pub title: String,
     /// The filename where this board is stored (without extension).
@@ -115,6 +164,7 @@ impl Board {
     pub fn new(title: String) -> Self {
         let file_name = to_snake_case(title.clone());
         Board {
+            version_number: VERSION_NUMBER.to_string(),
             title,
             file_name,
             columns: Vec::new(),
@@ -124,6 +174,42 @@ impl Board {
     /// Provides a mutable reference to the board's columns.
     pub fn get_columns(&mut self) -> &mut Vec<Column> {
         &mut self.columns
+    }
+
+    /// Provides an immutable reference to the column at the given index.
+    pub fn get_column(&self, index: usize) -> Option<&Column> {
+        self.columns.get(index)
+    }
+
+    /// Provides a mutable reference to the column at the given index.
+    pub fn get_column_mut(&mut self, index: usize) -> Option<&mut Column> {
+        self.columns.get_mut(index)
+    }
+
+    /// Removes and returns the column at the given index, if it exists.
+    pub fn remove_column(&mut self, index: usize) -> Option<Column> {
+        if index < self.columns.len() {
+            Some(self.columns.remove(index))
+        } else {
+            None
+        }
+    }
+
+    /// Swaps the columns at the two given indices.
+    pub fn swap_columns(&mut self, i: usize, j: usize) {
+        if i < self.columns.len() && j < self.columns.len() {
+            self.columns.swap(i, j);
+        }
+    }
+
+    /// Provides an immutable reference to the task in the column and at the index provided.
+    pub fn get_task(&self, col_index: usize, task_index: usize) -> Option<&Task> {
+        self.get_column(col_index)?.get_task(task_index)
+    }
+
+    /// Provides a mutable reference to the task in the column and at the index provided.
+    pub fn get_task_mut(&mut self, col_index: usize, task_index: usize) -> Option<&mut Task> {
+        self.get_column_mut(col_index)?.get_task_mut(task_index)
     }
 
     /// Returns true if the board contains no columns.

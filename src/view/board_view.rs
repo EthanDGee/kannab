@@ -1,6 +1,13 @@
+//! View components for rendering a full Kanban board.
+
 use crate::app::App;
+use crate::model::modal_state::ModalState;
 use crate::view::column_view::{self, COLUMN_WIDTH};
+use crate::widgets::floating_window::centered_rect;
+use crate::widgets::text_input::TextInput;
 use crate::{APP_NAME, model::board_state::Board};
+use ratatui::style::Modifier;
+use ratatui::widgets::{Block, Borders, Clear};
 use ratatui::{
     Frame,
     layout::{Constraint, Direction, Layout, Rect},
@@ -8,18 +15,23 @@ use ratatui::{
     widgets::Paragraph,
 };
 
-/// Handles associated view data for the Kanban data
+/// Handles associated view data for the Kanban board data.
 ///
-/// In addition to the selecting of tasks all scroll data for every column is stored independently to
-/// make sure the state of scrolling is stored when switching between columns.
+/// In addition to the cursor position for tasks and current column, all scroll data for every column is stored
+/// independently to ensure the scroll position is preserved when switching between columns.
 pub struct BoardState {
+    /// Index of the currently focused column.
     pub column_index: usize,
+    /// Index of the currently focused task within the active column.
     pub task_index: usize,
+    /// Persistent scroll positions for each column.
     pub column_scrolls: Vec<usize>,
+    /// The underlying board data model.
     pub board: Board,
 }
 
 impl BoardState {
+    /// Creates a new `BoardState` for the given board, initializing column scrolls to zero.
     pub fn new(board: Board) -> Self {
         let num_columns = board.columns.len();
         BoardState {
@@ -39,8 +51,44 @@ impl BoardState {
     pub fn task_list_empty(&self, column_index: usize) -> bool {
         self.board.task_list_empty(column_index)
     }
+
+    /// Returns an immutable reference to the currently selected column.
+    pub fn current_column(&self) -> Option<&crate::model::board_state::Column> {
+        self.board.get_column(self.column_index)
+    }
+
+    /// Returns an immutable reference to the currently selected task.
+    pub fn current_task(&self) -> Option<&crate::model::board_state::Task> {
+        self.current_column()?.get_task(self.task_index)
+    }
+
+    /// Switches the currently focused column to the given index, preserving scroll positions.
+    pub fn switch_column(&mut self, new_index: usize) {
+        if new_index < self.board.columns.len() {
+            // Save current task_index
+            if self.column_index < self.column_scrolls.len() {
+                self.column_scrolls[self.column_index] = self.task_index;
+            }
+
+            self.column_index = new_index;
+
+            // Restore new task_index
+            if self.column_index < self.column_scrolls.len() {
+                self.task_index = self.column_scrolls[self.column_index];
+            }
+
+            // Clamp task_index to new column's task count
+            let num_tasks = self.current_column().map_or(0, |c| c.tasks.len());
+            if num_tasks == 0 {
+                self.task_index = 0;
+            } else if self.task_index >= num_tasks {
+                self.task_index = num_tasks - 1;
+            }
+        }
+    }
 }
 
+/// Renders the active board view, including its header, columns, and footer.
 pub fn render(app: &App, frame: &mut Frame, area: Rect) {
     let board_state = app.model.board_state.as_ref().unwrap();
     let board = &board_state.board;
@@ -98,4 +146,53 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
     let footer = Paragraph::new(footer_text)
         .style(Style::default().fg(colors.body_text).bg(colors.background));
     frame.render_widget(footer, chunks[2]);
+}
+
+/// Renders a modal for creating or renaming a board.
+pub fn board_modal_view(
+    app: &App,
+    frame: &mut Frame,
+    modal: &ModalState,
+    area: Rect,
+    title: &str,
+    instruction_text: &str,
+) {
+    let colors = app.model.color_scheme;
+    let area = centered_rect(60, 15, area);
+
+    frame.render_widget(Clear, area); //this clears out the background
+
+    let block = Block::default()
+        .title(title)
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(colors.highlight))
+        .style(Style::default().bg(colors.background).fg(colors.body_text));
+
+    let inner_area = block.inner(area);
+    frame.render_widget(block, area);
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(1), // Title Label
+            Constraint::Length(3), // Input Field
+            Constraint::Length(1), // Instructions
+        ])
+        .split(inner_area);
+
+    let label = Paragraph::new("Board Name:").style(Style::default().add_modifier(Modifier::BOLD));
+    frame.render_widget(label, chunks[0]);
+
+    let input = TextInput::new(colors, &modal.data.board_title, modal.cursor_position)
+        .active(true)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(colors.inner_border)),
+        );
+    frame.render_widget(input, chunks[1]);
+
+    let instructions =
+        Paragraph::new(instruction_text).style(Style::default().fg(colors.inner_border));
+    frame.render_widget(instructions, chunks[2]);
 }

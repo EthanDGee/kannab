@@ -1,23 +1,34 @@
+//! Event handling and keyboard input processing.
+//!
+//! This module translates raw terminal events (primarily key presses) into
+//! application-level `Action`s, taking into account the current `AppMode`
+//! and active modals.
+
 use crate::message::action::{Action, InputField};
 use crate::model::app_state::AppMode;
 use crate::model::modal_state::{ConfirmDelete, ModalState};
 use crate::{app::App, model::modal_state::ModalType};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent};
 
+/// Top-level event type.
 pub enum Event {
+    /// A keyboard event.
     Key(KeyEvent),
+    /// A mouse event.
     Mouse(MouseEvent),
+    /// A periodic timer event.
     Tick,
 }
 
+/// Dispatches an event to the appropriate handler based on its type.
 pub fn handle_event(app: &App, event: Event) -> Option<Action> {
     match event {
         Event::Key(key) => handle_key_event(app, key),
-
         _ => None,
     }
 }
 
+/// Routes key events to either modal handlers or mode-specific handlers.
 fn handle_key_event(app: &App, key: KeyEvent) -> Option<Action> {
     if let Some(modal) = &app.model.modal_state {
         return handle_modal_key(modal, key);
@@ -31,6 +42,7 @@ fn handle_key_event(app: &App, key: KeyEvent) -> Option<Action> {
     }
 }
 
+/// Handles keyboard input when a modal overlay is active.
 fn handle_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
     if key.code == KeyCode::Esc {
         return Some(Action::CloseModal);
@@ -40,9 +52,11 @@ fn handle_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
         ModalType::CreateBoard | ModalType::EditBoard => {
             single_line_modal(key, InputField::BoardTitle, modal.data.board_title.clone())
         }
-        ModalType::CreateColumn | ModalType::RenameColumn => {
-            single_line_modal(key, InputField::ColumnTitle, modal.data.column_title.clone())
-        }
+        ModalType::CreateColumn | ModalType::RenameColumn => single_line_modal(
+            key,
+            InputField::ColumnTitle,
+            modal.data.column_title.clone(),
+        ),
         ModalType::CreateTask | ModalType::EditTask => handle_task_creation(modal, key),
         ModalType::ConfirmDelete(_) => confirmation(key),
         ModalType::Help => None,
@@ -56,6 +70,13 @@ fn handle_task_creation(modal: &ModalState, key: KeyEvent) -> Option<Action> {
         match key.code {
             // Save and Exit: Ctrl+S or Ctrl+Enter
             KeyCode::Char('s') | KeyCode::Enter => return Some(Action::Confirm),
+            // Delete Checklist Item: Ctrl+Backspace (often sends Backspace or Char('h'))
+            KeyCode::Backspace | KeyCode::Char('h') => {
+                if modal.focus == InputField::ItemDescription {
+                    return Some(Action::DeleteChecklistItem);
+                }
+                return None;
+            }
             _ => return None,
         }
     }
@@ -66,6 +87,8 @@ fn handle_task_creation(modal: &ModalState, key: KeyEvent) -> Option<Action> {
         KeyCode::Enter => {
             if modal.focus == InputField::TaskTitle {
                 Some(Action::Confirm)
+            } else if modal.focus == InputField::ItemDescription {
+                Some(Action::ToggleItemCompletion)
             } else {
                 // Insert newline in description
                 let mut current_text = modal.data.task_description.clone();
@@ -83,6 +106,14 @@ fn handle_task_creation(modal: &ModalState, key: KeyEvent) -> Option<Action> {
                     InputField::TaskDescription,
                     modal.data.task_description.clone(),
                 ),
+                InputField::ItemDescription => {
+                    let text = if modal.item_index < modal.data.checklist.len() {
+                        modal.data.checklist[modal.item_index].description.clone()
+                    } else {
+                        modal.data.item_description.clone()
+                    };
+                    (InputField::ItemDescription, text)
+                }
                 _ => (InputField::TaskTitle, modal.data.task_title.clone()),
             };
             update_text_field(key, field, current_text)
@@ -90,7 +121,7 @@ fn handle_task_creation(modal: &ModalState, key: KeyEvent) -> Option<Action> {
     }
 }
 
-/// Helper for handling single line text edit modals
+/// Helper for handling single line text edit modals.
 fn single_line_modal(key: KeyEvent, field: InputField, current_text: String) -> Option<Action> {
     if key.code == KeyCode::Enter {
         return Some(Action::Confirm);
@@ -113,6 +144,7 @@ fn update_text_field(key: KeyEvent, field: InputField, mut current_text: String)
     }
 }
 
+/// Processes input for confirmation modals.
 fn confirmation(key: KeyEvent) -> Option<Action> {
     if key.code == KeyCode::Enter {
         return Some(Action::Confirm);
@@ -120,6 +152,7 @@ fn confirmation(key: KeyEvent) -> Option<Action> {
     None
 }
 
+/// Processes keyboard input when in the board picker mode.
 fn handle_picker_keys(key: KeyEvent) -> Option<Action> {
     let shift = key.modifiers.contains(KeyModifiers::SHIFT);
     if shift {
@@ -160,6 +193,7 @@ fn handle_picker_keys(key: KeyEvent) -> Option<Action> {
     }
 }
 
+/// Processes keyboard input when viewing a specific board.
 fn handle_board_keys(key: KeyEvent) -> Option<Action> {
     let ctrl = key.modifiers.contains(KeyModifiers::CONTROL);
     let shift = key.modifiers.contains(KeyModifiers::SHIFT);
@@ -225,7 +259,7 @@ fn handle_board_keys(key: KeyEvent) -> Option<Action> {
             ))),
 
             // Toggle Completion
-            KeyCode::Tab => Some(Action::ToggleCompletion),
+            KeyCode::Tab => Some(Action::ToggleTaskCompletion),
 
             // Help
             KeyCode::Char('?') => Some(Action::OpenModal(ModalType::Help)),

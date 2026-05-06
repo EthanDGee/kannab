@@ -5,15 +5,6 @@ use crate::message::io_actions::mark_dirty;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
 use crate::model::{app_state::AppState, board_state::Column};
 
-/// Returns a mutable reference to the currently selected column, if a board is active.
-pub fn get_current_column_mut(model: &mut AppState) -> Option<&mut Column> {
-    // Extract the column index immutably first to avoid overlapping borrows
-    let column_index = model.board_state.as_ref()?.column_index;
-    // Now borrow mutably
-    let board_state = model.board_state.as_mut()?;
-    board_state.board.columns.get_mut(column_index)
-}
-
 // TODO: create_column should insert column after the current column index
 
 /// Appends a new column with the specified title to the current board.
@@ -31,11 +22,12 @@ pub fn create_column(model: &mut AppState, title: String) -> Option<Action> {
 
 /// Updates the title of the currently selected column.
 pub fn rename_column(model: &mut AppState, new_name: String) -> Option<Action> {
-    let board_state = model.board_state.as_ref()?;
+    let board_state = model.board_state.as_mut()?;
     if board_state.column_list_empty() {
         return None;
     }
-    let column = get_current_column_mut(model)?;
+    let column_index = board_state.column_index;
+    let column = board_state.board.get_column_mut(column_index)?;
     column.title = new_name;
     mark_dirty(model)
 }
@@ -44,13 +36,12 @@ pub fn rename_column(model: &mut AppState, new_name: String) -> Option<Action> {
 pub fn delete_column(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
     let column_index = board_state.column_index;
-    let num_columns = board_state.board.columns.len();
 
-    if column_index >= num_columns || board_state.column_list_empty() {
+    if board_state.column_list_empty() {
         return None;
     }
 
-    board_state.board.columns.remove(column_index);
+    board_state.board.remove_column(column_index);
 
     // Keep column_scrolls in sync with columns
     if column_index < board_state.column_scrolls.len() {
@@ -74,6 +65,7 @@ pub fn delete_column(model: &mut AppState) -> Option<Action> {
 
     mark_dirty(model)
 }
+
 /// Swaps the current column with the one to its left (lower index).
 pub fn move_column_left(model: &mut AppState) -> Option<Action> {
     let board_state = model.board_state.as_mut()?;
@@ -81,12 +73,10 @@ pub fn move_column_left(model: &mut AppState) -> Option<Action> {
         return None;
     }
     let column_index = board_state.column_index;
-    let columns_ref = board_state.board.get_columns();
-    let columns = columns_ref;
 
     match decrement_no_wrap(column_index) {
         Some(new_index) => {
-            columns.swap(column_index, new_index);
+            board_state.board.swap_columns(column_index, new_index);
             board_state.column_index = new_index;
             mark_dirty(model)
         }
@@ -101,14 +91,15 @@ pub fn move_column_right(model: &mut AppState) -> Option<Action> {
         return None;
     }
     let column_index = board_state.column_index;
-    let columns = board_state.board.get_columns();
+    let num_columns = board_state.board.columns.len();
 
-    match increment_no_wrap(column_index, columns.len()) {
+    match increment_no_wrap(column_index, num_columns) {
         Some(new_index) => {
-            columns.swap(column_index, new_index);
+            board_state.board.swap_columns(column_index, new_index);
             board_state.column_index = new_index;
             mark_dirty(model)
         }
         None => None,
     }
 }
+

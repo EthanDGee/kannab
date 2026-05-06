@@ -41,16 +41,20 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::MoveColumnRight => column_actions::move_column_right(model),
 
         // Task Handling
-        Action::CreateTask(title, description) => {
-            task_actions::create_task(model, title, description)
+        Action::CreateTask(title, description, checklist) => {
+            task_actions::create_task(model, title, description, checklist)
         }
-        Action::EditTask(input_field, edit) => task_actions::edit_task(model, input_field, edit),
+        Action::EditTask(title, description, checklist) => {
+            task_actions::edit_task(model, title, description, checklist)
+        }
         Action::DeleteTask => task_actions::delete_task(model),
         Action::MoveTaskUp => task_actions::move_task_up(model),
         Action::MoveTaskDown => task_actions::move_task_down(model),
         Action::MoveTaskToNextColumn => task_actions::move_task_to_next_column(model),
         Action::MoveTaskToPrevColumn => task_actions::move_task_to_prev_column(model),
-        Action::ToggleCompletion => task_actions::toggle_completion(model),
+        Action::ToggleTaskCompletion => task_actions::toggle_task_completion(model),
+        Action::ToggleItemCompletion => task_actions::toggle_item_completion(model),
+        Action::DeleteChecklistItem => modal_actions::delete_checklist_item(model),
 
         // Modal Actions
         Action::OpenModal(modal_type) => modal_actions::open_modal(model, modal_type),
