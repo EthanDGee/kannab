@@ -11,12 +11,15 @@ use crate::{app::App, model::modal_state::ModalType};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent};
 
 /// Top-level event type.
+#[allow(dead_code)]
 pub enum Event {
     /// A keyboard event.
     Key(KeyEvent),
     /// A mouse event.
+    #[allow(dead_code)]
     Mouse(MouseEvent),
     /// A periodic timer event.
+    #[allow(dead_code)]
     Tick,
 }
 

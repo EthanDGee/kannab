@@ -79,6 +79,7 @@ pub enum Action {
     /// Confirm the current modal operation (e.g., Save).
     Confirm,
     /// Discard the current modal operation.
+    #[allow(dead_code)]
     Cancel,
 
     // IO operations

@@ -172,19 +172,19 @@ pub fn update_field(model: &mut AppState, field: InputField, value: String) -> O
 
 /// Removes the currently selected checklist item.
 pub fn delete_checklist_item(model: &mut AppState) -> Option<Action> {
-    if let Some(modal) = &mut model.modal_state {
-        if modal.focus == InputField::ItemDescription {
-            if modal.item_index < modal.data.checklist.len() {
-                modal.data.checklist.remove(modal.item_index);
-                // Adjust index if we deleted the last item and it wasn't the only one
-                if modal.item_index >= modal.data.checklist.len() && modal.item_index > 0 {
-                    modal.item_index -= 1;
-                }
-                return Some(Action::MarkDirty);
-            } else {
-                // We are on the "new item" field, just clear it
-                modal.data.item_description.clear();
+    if let Some(modal) = &mut model.modal_state
+        && modal.focus == InputField::ItemDescription
+    {
+        if modal.item_index < modal.data.checklist.len() {
+            modal.data.checklist.remove(modal.item_index);
+            // Adjust index if we deleted the last item and it wasn't the only one
+            if modal.item_index >= modal.data.checklist.len() && modal.item_index > 0 {
+                modal.item_index -= 1;
             }
+            return Some(Action::MarkDirty);
+        } else {
+            // We are on the "new item" field, just clear it
+            modal.data.item_description.clear();
         }
     }
     None

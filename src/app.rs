@@ -12,6 +12,7 @@ use crossterm::event::{self};
 use std::time::{Duration, Instant};
 
 /// Interval for checking input events (10 milliseconds).
+#[allow(dead_code)]
 const EVENT_TICK_RATE: Duration = Duration::new(0, 10);
 
 /// Interval for auto-saving (5 seconds).

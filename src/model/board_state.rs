@@ -172,6 +172,7 @@ impl Board {
     }
 
     /// Provides a mutable reference to the board's columns.
+    #[allow(dead_code)]
     pub fn get_columns(&mut self) -> &mut Vec<Column> {
         &mut self.columns
     }
@@ -203,6 +204,7 @@ impl Board {
     }
 
     /// Provides an immutable reference to the task in the column and at the index provided.
+    #[allow(dead_code)]
     pub fn get_task(&self, col_index: usize, task_index: usize) -> Option<&Task> {
         self.get_column(col_index)?.get_task(task_index)
     }

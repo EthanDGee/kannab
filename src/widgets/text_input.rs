@@ -62,12 +62,14 @@ impl<'a> TextInput<'a> {
     }
 
     /// Sets the base style for the text in the input.
+    #[allow(dead_code)]
     pub fn style(mut self, style: Style) -> Self {
         self.style = style;
         self
     }
 
     /// Sets whether long lines should wrap.
+    #[allow(dead_code)]
     pub fn wrap(mut self, wrap: bool) -> Self {
         self.wrap = wrap;
         self

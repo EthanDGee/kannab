@@ -102,7 +102,7 @@ fn theme_path() -> Option<PathBuf> {
 
 /// Checks if the theme configuration file exists.
 fn theme_exists() -> bool {
-    theme_path().map_or(false, |path| path.exists())
+    theme_path().is_some_and(|path| path.exists())
 }
 
 /// Saves the provided `ColorScheme` to disk as TOML.

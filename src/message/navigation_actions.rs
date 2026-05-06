@@ -56,11 +56,11 @@ pub fn move_up(model: &mut AppState) -> Option<Action> {
             model.picker_state.index = decrement_wrap(model.picker_state.index, len);
         }
         AppMode::Board => {
-            if let Some(board_state) = &mut model.board_state {
-                if let Some(column) = board_state.current_column() {
-                    let len = column.tasks.len();
-                    board_state.task_index = decrement_wrap(board_state.task_index, len);
-                }
+            if let Some(board_state) = &mut model.board_state
+                && let Some(column) = board_state.current_column()
+            {
+                let len = column.tasks.len();
+                board_state.task_index = decrement_wrap(board_state.task_index, len);
             }
         }
     }
