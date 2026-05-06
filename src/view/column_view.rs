@@ -1,11 +1,11 @@
 //! View components for rendering individual columns within a board.
 
+use crate::app::App;
 use crate::model::board_state::Column;
 use crate::model::modal_state::ModalState;
 use crate::view::task_view;
 use crate::widgets::floating_window::centered_rect;
 use crate::widgets::text_input::TextInput;
-use crate::app::App;
 use ratatui::layout::{Constraint, Direction, Layout};
 use ratatui::widgets::{Clear, Paragraph};
 use ratatui::{

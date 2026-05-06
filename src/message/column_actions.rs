@@ -102,4 +102,3 @@ pub fn move_column_right(model: &mut AppState) -> Option<Action> {
         None => None,
     }
 }
-

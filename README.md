@@ -2,15 +2,21 @@
 
 A keyboard-driven Kanban board manager for the terminal, built with Rust and Ratatui.
 
-`kannab` is designed for developers and power users who want a fast, vim-inspired workflow for managing tasks without leaving the command line. It features a responsive TUI, global persistent storage, and intuitive keybindings for seamless board management.
+`kannab` is designed for developers and power users who want a fast, vim-inspired
+workflow for managing tasks without leaving the command line. It features a
+responsive TUI, global persistent storage, and intuitive keybindings for seamless
+board management.
 
 ## Features
 
 - **Board Picker**: Manage multiple boards from a centralized launcher.
-- **Customizable Columns**: Create, rename, delete, and reorder columns to fit your workflow.
+- **Customizable Columns**: Create, rename, delete, and reorder columns to fit
+your workflow.
 - **Vim-Style Navigation**: Support for both arrow keys and standard `hjkl` navigation.
-- **Global Persistence**: Boards are stored globally on your filesystem with automatic saving.
-- **Responsive UI**: A fullscreen terminal interface that adapts to your window size with clear visual highlighting.
+- **Global Persistence**: Boards are stored globally on your filesystem with
+automatic saving.
+- **Responsive UI**: A fullscreen terminal interface that adapts to your
+window size with clear visual highlighting.
 
 ## Getting Started
 
@@ -40,7 +46,7 @@ kannab
 ### Board Picker (Main Menu)
 
 | Key | Action |
-|-----|--------|
+| ----- | -------- |
 | `↑` / `k` | Previous board |
 | `↓` / `j` | Next board |
 | `Enter` | Open selected board |
@@ -53,7 +59,7 @@ kannab
 ### Board View (Task Navigation)
 
 | Key | Action |
-|-----|--------|
+| ----- | -------- |
 | `←` / `h` | Previous column |
 | `→` / `l` | Next column |
 | `↑` / `k` | Previous task |
@@ -93,4 +99,5 @@ cargo test
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE)
+file for details.

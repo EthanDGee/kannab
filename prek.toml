@@ -1,0 +1,74 @@
+minimum_prek_version = "0.3.0"
+default_install_hook_types = ["pre-commit", "pre-push"]
+fail_fast = true
+
+[[repos]]
+repo = "builtin"
+
+[[repos.hooks]]
+id = "trailing-whitespace"
+
+[[repos.hooks]]
+id = "end-of-file-fixer"
+
+[[repos.hooks]]
+id = "check-toml"
+
+[[repos.hooks]]
+id = "check-yaml"
+
+[[repos.hooks]]
+id = "check-added-large-files"
+
+[[repos]]
+repo = "https://github.com/crate-ci/typos"
+rev = "v1.44.0"
+
+[[repos.hooks]]
+id = "typos"
+args = ["--force-exclude"]
+
+[[repos]]
+repo = "https://github.com/igorshubovych/markdownlint-cli"
+rev = "v0.48.0"
+
+[[repos.hooks]]
+id = "markdownlint-fix"
+
+[[repos]]
+repo = "local"
+
+[[repos.hooks]]
+id = "cargo-fmt"
+name = "cargo fmt"
+entry = "cargo fmt --"
+language = "system"
+types = ["rust"]
+pass_filenames = false
+
+[[repos.hooks]]
+id = "cargo-clippy"
+name = "cargo clippy"
+entry = "cargo clippy --all-targets --all-features -- -D warnings"
+language = "system"
+types = ["rust"]
+pass_filenames = false
+
+[[repos.hooks]]
+id = "cargo-audit"
+name = "cargo audit"
+entry = "cargo audit"
+language = "system"
+types = ["file"]
+files = "Cargo\\.(toml|lock)"
+pass_filenames = false
+stages = ["pre-push"]
+
+[[repos.hooks]]
+id = "cargo-test"
+name = "cargo test"
+entry = "cargo test"
+language = "system"
+types = ["rust"]
+pass_filenames = false
+stages = ["pre-push"]

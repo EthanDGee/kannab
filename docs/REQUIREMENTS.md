@@ -2,10 +2,12 @@
 
 ## 1. Project Overview
 
-**Project Name:** kannab  
-**Type:** Terminal User Interface (TUI) CLI Application  
-**Core Functionality:** A keyboard-driven kanban board manager with vim-style navigation that stores boards globally on the filesystem.  
-**Target Users:** Developers, power users, and productivity enthusiasts who prefer terminal-based workflows.
+**Project Name:** kannab
+**Type:** Terminal User Interface (TUI) CLI Application
+**Core Functionality:** A keyboard-driven kanban board manager with vim-style
+navigation that stores boards globally on the filesystem.
+**Target Users:** Developers, power users, and productivity enthusiasts who
+prefer terminal-based workflows.
 
 ---
 
@@ -14,7 +16,7 @@
 ### Board Management
 
 | Story | Priority |
-|-------|----------|
+| ------- | ---------- |
 | Board picker on launch | Must |
 | Create new boards | Must |
 | List all boards in picker | Must |
@@ -26,7 +28,7 @@
 ### Column Management
 
 | Story | Priority |
-|-------|----------|
+| ------- | ---------- |
 | Create columns | Must |
 | Rename columns | Must |
 | Delete columns | Must |
@@ -35,7 +37,7 @@
 ### Task Management
 
 | Story | Priority |
-|-------|----------|
+| ------- | ---------- |
 | Create tasks with titles | Must |
 | Add descriptions to tasks | Must |
 | Edit existing tasks | Must |
@@ -45,7 +47,7 @@
 ### Navigation
 
 | Story | Priority |
-|-------|----------|
+| ------- | ---------- |
 | Navigate with arrow keys | Must |
 | Navigate with `hjkl` | Should |
 | Search with `/` | Could |
@@ -53,7 +55,7 @@
 ### Persistence
 
 | Story | Priority |
-|-------|----------|
+| ------- | ---------- |
 | Global storage across sessions | Must |
 | Auto-save | Must |
 
@@ -78,7 +80,7 @@
 #### Main Menu (Board Picker)
 
 | Key | Action | Priority |
-|-----|--------|----------|
+| ----- | -------- | ---------- |
 | `↑` / `k` | Previous board | Must |
 | `↓` / `j` | Next board | Must |
 | `Home` / `g` | First board | Could |
@@ -95,7 +97,7 @@
 #### Board View (Column/Task Navigation)
 
 | Key | Action | Priority |
-|-----|--------|----------|
+| ----- | -------- | ---------- |
 | `←` / `h` | Previous column | Must |
 | `→` / `l` | Next column | Must |
 | `↑` / `k` | Previous task | Must |
@@ -121,7 +123,7 @@
 #### Task Edit Mode
 
 | Key | Action | Priority |
-|-----|--------|----------|
+| ----- | -------- | ---------- |
 | `←` / `→` | Move cursor left / right | Must |
 | `↑` / `↓` | Move cursor up / down | Should |
 | `Home` / `End` | Line start / end | Should |
@@ -142,7 +144,7 @@
 #### Visual Highlighting
 
 | Element | Default | Selected |
-|---------|---------|----------|
+| --------- | --------- | ---------- |
 | Board (picker) | Normal text | **Bold** + `▶` prefix indicator |
 | Column header | Normal | **Inverted colors** (bg/fg swap) |
 | Task card | Normal + border | **Inverted colors** + bold text |
@@ -151,7 +153,7 @@
 #### Color Scheme (Terminal Attributes)
 
 | Element | Style |
-|---------|-------|
+| --------- | ------- |
 | Background | Terminal default |
 | Selected item | Inverted) |
 | Column borders | Dim/gray |
@@ -162,7 +164,7 @@
 #### Interaction Feedback
 
 | Action | Visual Feedback |
-|--------|-----------------|
+| -------- | ----------------- |
 | Select board/task | Immediate invert |
 | Delete | Confirmation dialog appears |
 | Save | Status message |
@@ -170,13 +172,13 @@
 #### Responsive Behavior
 
 | Terminal Width | Behavior |
-|----------------|----------|
+| ---------------- | ---------- |
 | Wide (>120 cols) | All columns visible |
 | Medium (80-120 cols) | Horizontal scroll columns |
 | Narrow (<80 cols) | Horizontal scroll, narrower columns |
 
 | Terminal Height | Behavior |
-|-----------------|---------|
+| ----------------- | --------- |
 | Normal | All columns same height |
 | Short (<10 rows) | Compact mode, minimal padding |
 | Per-column overflow | Each column scrolls vertically |
@@ -194,7 +196,7 @@
 - Story Points
 - Time tracking
 
-### Navigation
+### Extended Navigation
 
 - Jump to column by number (`1`, `2`, `3`)
 - Jump to first/last task (`g`, `G`)
@@ -216,7 +218,7 @@
 
 ### Storage Structure
 
-```
+```text
 ~/.local/share/kannab/
 ├── boards/
 │   ├── work.json
@@ -258,14 +260,14 @@
 ## 7. Non-Functional Requirements
 
 | Requirement | Target |
-|-------------|--------|
+| ------------- | -------- |
 | Startup time | < 200ms |
 | Cross-platform | Linux, macOS, Windows, freeBSD |
 
 ### Path Conventions
 
 | Platform | Data Path |
-|----------|-----------|
+| ---------- | ----------- |
 | Linux | `$XDG_DATA_HOME/kannab/` (default: `~/.local/share/kannab/`) |
 | macOS | `~/Library/Application Support/kannab/` |
 | Windows | `%APPDATA%/kannab/` |

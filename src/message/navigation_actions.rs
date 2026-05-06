@@ -38,11 +38,7 @@ pub fn decrement_wrap(index: usize, len: usize) -> usize {
 
 /// Decrements an index without wrapping: returns `None` if at the first element.
 pub fn decrement_no_wrap(index: usize) -> Option<usize> {
-    if index == 0 {
-        None
-    } else {
-        Some(index - 1)
-    }
+    if index == 0 { None } else { Some(index - 1) }
 }
 
 // ---------------------------
