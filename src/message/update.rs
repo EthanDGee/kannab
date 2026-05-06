@@ -54,6 +54,7 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::MoveTaskToPrevColumn => task_actions::move_task_to_prev_column(model),
         Action::ToggleTaskCompletion => task_actions::toggle_task_completion(model),
         Action::ToggleItemCompletion => task_actions::toggle_item_completion(model),
+        Action::DeleteChecklistItem => modal_actions::delete_checklist_item(model),
 
         // Modal Actions
         Action::OpenModal(modal_type) => modal_actions::open_modal(model, modal_type),

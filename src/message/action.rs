@@ -54,6 +54,8 @@ pub enum Action {
     ToggleTaskCompletion,
     /// Toggle the completion status of the currently selected checklist item
     ToggleItemCompletion,
+    /// Delete the currently selected checklist item.
+    DeleteChecklistItem,
     /// Move the current task up within its column.
     MoveTaskUp,
     /// Move the current task down within its column.

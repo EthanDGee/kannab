@@ -70,6 +70,13 @@ fn handle_task_creation(modal: &ModalState, key: KeyEvent) -> Option<Action> {
         match key.code {
             // Save and Exit: Ctrl+S or Ctrl+Enter
             KeyCode::Char('s') | KeyCode::Enter => return Some(Action::Confirm),
+            // Delete Checklist Item: Ctrl+Backspace (often sends Backspace or Char('h'))
+            KeyCode::Backspace | KeyCode::Char('h') => {
+                if modal.focus == InputField::ItemDescription {
+                    return Some(Action::DeleteChecklistItem);
+                }
+                return None;
+            }
             _ => return None,
         }
     }

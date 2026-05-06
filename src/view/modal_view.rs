@@ -56,7 +56,7 @@ pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
             modal,
             area,
             " Create New Task ",
-            "Tab: Switch fields | Enter: Create | Esc: Cancel",
+            "Tab: Switch fields | Enter: Create | Ctrl+Bksp: Del Item | Esc: Cancel",
         ),
         ModalType::EditTask => task_view::task_modal(
             app,
@@ -64,11 +64,11 @@ pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
             modal,
             area,
             " Edit Task ",
-            "Tab: Switch fields | Enter: Save | Esc: Cancel",
+            "Tab: Switch fields | Enter: Save | Ctrl+Bksp: Del Item | Esc: Cancel",
         ),
         ModalType::ConfirmDelete(_) => confirm_delete(app, frame, modal, area),
         ModalType::Help => {
-            todo!("Finish implementing the  Modal ")
+            todo!("Finish implementing the Modal ")
         }
     }
 }
