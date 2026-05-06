@@ -97,3 +97,16 @@ impl ModalState {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_modal_state_new() {
+        let ms = ModalState::new(ModalType::CreateTask);
+        assert!(matches!(ms.modal_type, ModalType::CreateTask));
+        assert_eq!(ms.focus, InputField::TaskTitle);
+        assert_eq!(ms.item_index, 0);
+    }
+}

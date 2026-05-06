@@ -375,4 +375,26 @@ mod tests {
                 .complete
         );
     }
+
+    #[test]
+    fn test_toggle_item_completion() {
+        let mut model = AppState::new();
+        let mut modal = crate::model::modal_state::ModalState::new(
+            crate::model::modal_state::ModalType::EditTask,
+        );
+
+        let mut item = Item::new();
+        item.complete = false;
+        modal.data.checklist.push(item);
+        modal.focus = InputField::ItemDescription;
+        modal.item_index = 0;
+
+        model.modal_state = Some(modal);
+
+        toggle_item_completion(&mut model);
+        assert!(model.modal_state.as_ref().unwrap().data.checklist[0].complete);
+
+        toggle_item_completion(&mut model);
+        assert!(!model.modal_state.as_ref().unwrap().data.checklist[0].complete);
+    }
 }

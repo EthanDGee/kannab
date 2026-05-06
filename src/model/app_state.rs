@@ -55,3 +55,27 @@ impl AppState {
         self.board_list.is_empty()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_app_state_new() {
+        let state = AppState::new();
+        assert!(matches!(state.mode, AppMode::Picker));
+        assert!(state.board_list.is_empty());
+        assert!(state.board_state.is_none());
+        assert!(state.modal_state.is_none());
+        assert!(!state.pending_changes);
+        assert!(!state.should_quit);
+    }
+
+    #[test]
+    fn test_board_list_empty() {
+        let mut state = AppState::new();
+        assert!(state.board_list_empty());
+        state.board_list.push(BoardName::new("Test".to_string()));
+        assert!(!state.board_list_empty());
+    }
+}

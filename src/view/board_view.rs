@@ -196,3 +196,63 @@ pub fn board_modal_view(
         Paragraph::new(instruction_text).style(Style::default().fg(colors.inner_border));
     frame.render_widget(instructions, chunks[2]);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::board_state::{Board, Column, Task};
+
+    #[test]
+    fn test_board_state_new() {
+        let mut board = Board::new("T".to_string());
+        board.columns.push(Column::new());
+        let bs = BoardState::new(board);
+        assert_eq!(bs.column_index, 0);
+        assert_eq!(bs.task_index, 0);
+        assert_eq!(bs.column_scrolls.len(), 1);
+    }
+
+    #[test]
+    fn test_switch_column_preserves_scroll() {
+        let mut board = Board::new("T".to_string());
+
+        let mut c1 = Column::new();
+        c1.tasks.push(Task::new());
+        c1.tasks.push(Task::new());
+
+        let mut c2 = Column::new();
+        c2.tasks.push(Task::new());
+
+        board.columns.push(c1);
+        board.columns.push(c2);
+
+        let mut bs = BoardState::new(board);
+
+        // At C1, move to Task index 1
+        bs.task_index = 1;
+
+        // Switch to C2
+        bs.switch_column(1);
+        assert_eq!(bs.column_index, 1);
+        assert_eq!(bs.task_index, 0); // Restored from scroll (0)
+        assert_eq!(bs.column_scrolls[0], 1); // Saved from C1
+
+        // Switch back to C1
+        bs.switch_column(0);
+        assert_eq!(bs.column_index, 0);
+        assert_eq!(bs.task_index, 1); // Restored from saved scroll
+    }
+
+    #[test]
+    fn test_switch_column_clamping() {
+        let mut board = Board::new("T".to_string());
+        board.columns.push(Column::new()); // Empty
+        board.columns.push(Column::new()); // Empty
+
+        let mut bs = BoardState::new(board);
+        bs.column_scrolls[1] = 99; // Manually set a high scroll
+
+        bs.switch_column(1);
+        assert_eq!(bs.task_index, 0); // Clamped to 0 since column is empty
+    }
+}

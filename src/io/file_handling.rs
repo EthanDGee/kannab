@@ -133,3 +133,20 @@ pub fn initialize_theme() -> ColorScheme {
     save_theme(&theme);
     theme
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_to_snake_case() {
+        assert_eq!(to_snake_case("Hello World".to_string()), "hello_world");
+        assert_eq!(
+            to_snake_case("Multiple   Spaces".to_string()),
+            "multiple_spaces"
+        );
+        assert_eq!(to_snake_case("Lowercase".to_string()), "lowercase");
+        assert_eq!(to_snake_case("UPPERCASE".to_string()), "uppercase");
+        assert_eq!(to_snake_case("".to_string()), "");
+    }
+}

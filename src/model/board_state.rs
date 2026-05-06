@@ -352,4 +352,29 @@ mod tests {
         }
         assert_eq!(board.get_task(0, 0).unwrap().title, "Updated");
     }
+
+    #[test]
+    fn test_board_serialization() {
+        let mut board = Board::new("Full Board".to_string());
+        let mut col = Column::new();
+        col.title = "Col".to_string();
+        let mut task = crate::model::board_state::Task::new();
+        task.title = "Task".to_string();
+        let mut item = crate::model::board_state::Item::new();
+        item.description = "Item".to_string();
+        task.checklist.push(item);
+        col.tasks.push(task);
+        board.columns.push(col);
+
+        let json = serde_json::to_string(&board).unwrap();
+        let deserialized: Board = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(deserialized.title, board.title);
+        assert_eq!(deserialized.columns.len(), 1);
+        assert_eq!(deserialized.columns[0].tasks[0].title, "Task");
+        assert_eq!(
+            deserialized.columns[0].tasks[0].checklist[0].description,
+            "Item"
+        );
+    }
 }

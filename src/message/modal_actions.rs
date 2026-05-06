@@ -380,4 +380,42 @@ mod tests {
         assert!(matches!(action, Some(Action::CreateBoard(name)) if name == "New Board"));
         assert!(model.modal_state.is_none());
     }
+
+    #[test]
+    fn test_finalize_task_data() {
+        let mut modal = ModalState::new(ModalType::CreateTask);
+        modal.data.task_title = "T".to_string();
+        modal.data.task_description = "D".to_string();
+
+        let mut item = Item::new();
+        item.description = "Item 1".to_string();
+        modal.data.checklist.push(item);
+        modal.data.item_description = "New Item".to_string();
+
+        let (title, desc, checklist) = finalize_task_data(&modal);
+        assert_eq!(title, "T");
+        assert_eq!(desc, "D");
+        assert_eq!(checklist.len(), 2);
+        assert_eq!(checklist[1].description, "New Item");
+    }
+
+    #[test]
+    fn test_switch_input_field_auto_append() {
+        let mut model = AppState::new();
+        let mut modal = ModalState::new(ModalType::CreateTask);
+        modal.focus = InputField::ItemDescription;
+        modal.item_index = 0;
+        modal.data.item_description = "Auto Append".to_string();
+        model.modal_state = Some(modal);
+
+        // Switch should append "Auto Append" to checklist and move to next item slot
+        switch_input_field(&mut model);
+
+        let modal = model.modal_state.as_ref().unwrap();
+        assert_eq!(modal.data.checklist.len(), 1);
+        assert_eq!(modal.data.checklist[0].description, "Auto Append");
+        assert_eq!(modal.data.item_description, "");
+        assert_eq!(modal.item_index, 1);
+        assert_eq!(modal.focus, InputField::ItemDescription);
+    }
 }
