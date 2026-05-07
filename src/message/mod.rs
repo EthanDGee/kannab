@@ -7,6 +7,7 @@
 pub mod action;
 mod board_actions;
 mod column_actions;
+mod help_actions;
 mod io_actions;
 mod modal_actions;
 mod navigation_actions;

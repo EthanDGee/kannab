@@ -2,8 +2,8 @@
 
 use crate::message::action::Action;
 use crate::message::{
-    board_actions, column_actions, io_actions, modal_actions, navigation_actions, picker_actions,
-    task_actions,
+    board_actions, column_actions, help_actions, io_actions, modal_actions, navigation_actions,
+    picker_actions, task_actions,
 };
 use crate::model::app_state::AppState;
 
@@ -71,6 +71,9 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
             None
         }
         Action::Confirm => modal_actions::confirm(model),
+
+        // Help Actions
+        Action::OpenHelpWindow => help_actions::open_help_modal(model),
 
         // I/O Operations
         Action::Save => io_actions::save(model),

@@ -80,6 +80,10 @@ pub enum Action {
     /// Confirm the current modal operation (e.g., Save).
     Confirm,
 
+    // Help Action
+    #[allow(dead_code)]
+    OpenHelpWindow,
+
     // IO operations
     /// Mark the state as containing unsaved changes.
     MarkDirty,
