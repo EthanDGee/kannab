@@ -60,7 +60,16 @@ fn handle_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
         | ModalType::CreateTask
         | ModalType::EditTask => handle_text_modal_key(modal, key),
         ModalType::ConfirmDelete(_) => confirmation(key),
-        ModalType::Help => None,
+        ModalType::Help => handle_help_keys(key),
+    }
+}
+
+/// Processes input for the help modal.
+fn handle_help_keys(key: KeyEvent) -> Option<Action> {
+    match key.code {
+        KeyCode::Char('j') | KeyCode::Down => Some(Action::MoveDown),
+        KeyCode::Char('k') | KeyCode::Up => Some(Action::MoveUp),
+        _ => None,
     }
 }
 

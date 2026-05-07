@@ -50,6 +50,11 @@ pub fn decrement_no_wrap(index: usize) -> Option<usize> {
 /// In Picker mode, selects the previous board.
 /// In Board mode, selects the previous task in the current column.
 pub fn move_up(model: &mut AppState) -> Option<Action> {
+    if let Some(modal) = &mut model.modal_state {
+        modal.scroll_offset = modal.scroll_offset.saturating_sub(1);
+        return None;
+    }
+
     match model.mode {
         AppMode::Picker => {
             let len = model.board_list.len();
@@ -72,6 +77,11 @@ pub fn move_up(model: &mut AppState) -> Option<Action> {
 /// In Picker mode, selects the next board.
 /// In Board mode, selects the next task in the current column.
 pub fn move_down(model: &mut AppState) -> Option<Action> {
+    if let Some(modal) = &mut model.modal_state {
+        modal.scroll_offset = modal.scroll_offset.saturating_add(1);
+        return None;
+    }
+
     match model.mode {
         AppMode::Picker => {
             let len = model.board_list.len();

@@ -5,6 +5,7 @@ use crate::model::modal_state::ModalType;
 use crate::model::modal_state::{ConfirmDelete, ModalState};
 use crate::view::board_view::board_modal_view;
 use crate::view::column_view::column_modal_view;
+use crate::view::help_view;
 use crate::view::task_view;
 use crate::widgets::floating_window::centered_rect_minimum_size;
 use ratatui::Frame;
@@ -66,9 +67,7 @@ pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
             "Tab: Switch fields | Enter: Save | Ctrl+Bksp: Del Item | Esc: Cancel",
         ),
         ModalType::ConfirmDelete(_) => confirm_delete(app, frame, modal, area),
-        ModalType::Help => {
-            todo!("Finish implementing the Modal ")
-        }
+        ModalType::Help => help_view::render(app, frame, area),
     }
 }
 
