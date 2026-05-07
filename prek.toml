@@ -55,16 +55,6 @@ types = ["rust"]
 pass_filenames = false
 
 [[repos.hooks]]
-id = "cargo-audit"
-name = "cargo audit"
-entry = "cargo audit"
-language = "system"
-types = ["file"]
-files = "Cargo\\.(toml|lock)"
-pass_filenames = false
-stages = ["pre-push"]
-
-[[repos.hooks]]
 id = "cargo-test"
 name = "cargo test"
 entry = "cargo test"

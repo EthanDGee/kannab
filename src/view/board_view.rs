@@ -4,7 +4,6 @@ use crate::app::App;
 use crate::model::modal_state::ModalState;
 use crate::view::column_view::{self, COLUMN_WIDTH};
 use crate::widgets::floating_window::centered_rect;
-use crate::widgets::text_input::TextInput;
 use crate::{APP_NAME, model::board_state::Board};
 use ratatui::style::Modifier;
 use ratatui::widgets::{Block, Borders, Clear};
@@ -183,14 +182,15 @@ pub fn board_modal_view(
     let label = Paragraph::new("Board Name:").style(Style::default().add_modifier(Modifier::BOLD));
     frame.render_widget(label, chunks[0]);
 
-    let input = TextInput::new(colors, &modal.data.board_title, modal.cursor_position)
-        .active(true)
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .border_style(Style::default().fg(colors.inner_border)),
-        );
-    frame.render_widget(input, chunks[1]);
+    // Use TextArea for input
+    let mut textarea = modal.active_textarea.clone();
+    textarea.set_block(
+        Block::default()
+            .borders(Borders::ALL)
+            .border_style(Style::default().fg(colors.inner_border)),
+    );
+    textarea.set_cursor_style(Style::default().fg(colors.background).bg(colors.highlight));
+    frame.render_widget(&textarea, chunks[1]);
 
     let instructions =
         Paragraph::new(instruction_text).style(Style::default().fg(colors.inner_border));

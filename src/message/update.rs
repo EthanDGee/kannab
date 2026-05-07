@@ -60,8 +60,14 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         Action::OpenModal(modal_type) => modal_actions::open_modal(model, modal_type),
         Action::CloseModal => modal_actions::close_modal(model),
         Action::SwitchInputField => modal_actions::switch_input_field(model),
-        Action::UpdateField(field, value) => modal_actions::update_field(model, field, value),
-        Action::MoveCursor(x, y) => modal_actions::move_cursor(model, x, y),
+        Action::ModalInput(key) => {
+            if let Some(modal) = &mut model.modal_state
+                && modal.active_textarea.input(key)
+            {
+                return Some(Action::MarkDirty);
+            }
+            None
+        }
         Action::Confirm => modal_actions::confirm(model),
         Action::Cancel => modal_actions::cancel(model),
 

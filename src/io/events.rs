@@ -52,98 +52,61 @@ fn handle_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
     }
 
     match modal.modal_type {
-        ModalType::CreateBoard | ModalType::EditBoard => {
-            single_line_modal(key, InputField::BoardTitle, modal.data.board_title.clone())
-        }
-        ModalType::CreateColumn | ModalType::RenameColumn => single_line_modal(
-            key,
-            InputField::ColumnTitle,
-            modal.data.column_title.clone(),
-        ),
-        ModalType::CreateTask | ModalType::EditTask => handle_task_creation(modal, key),
+        ModalType::CreateBoard
+        | ModalType::EditBoard
+        | ModalType::CreateColumn
+        | ModalType::RenameColumn
+        | ModalType::CreateTask
+        | ModalType::EditTask => handle_text_modal_key(modal, key),
         ModalType::ConfirmDelete(_) => confirmation(key),
         ModalType::Help => None,
     }
 }
 
-/// Helper for handling task-related text input (title and description).
-fn handle_task_creation(modal: &ModalState, key: KeyEvent) -> Option<Action> {
-    // Handle hot keys
+/// Helper for handling text input modals (Board, Column, Task).
+fn handle_text_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
+    // Handle Global Modal Hotkeys
     if key.modifiers.contains(KeyModifiers::CONTROL) {
         match key.code {
             // Save and Exit: Ctrl+S or Ctrl+Enter
             KeyCode::Char('s') | KeyCode::Enter => return Some(Action::Confirm),
-            // Delete Checklist Item: Ctrl+Backspace (often sends Backspace or Char('h'))
-            KeyCode::Backspace | KeyCode::Char('h') => {
-                if modal.focus == InputField::ItemDescription {
-                    return Some(Action::DeleteChecklistItem);
-                }
-                return None;
+            // Delete Checklist Item: Ctrl+Backspace or Ctrl+H (only in ItemDescription)
+            KeyCode::Backspace | KeyCode::Char('h')
+                if modal.focus == InputField::ItemDescription =>
+            {
+                return Some(Action::DeleteChecklistItem);
             }
-            _ => return None,
+            _ => {}
         }
     }
 
+    // Handle Structural/Navigation Keys
     match key.code {
         KeyCode::Tab => Some(Action::SwitchInputField),
-        // Submit the task / Newline support
         KeyCode::Enter => {
-            if modal.focus == InputField::TaskTitle {
-                Some(Action::Confirm)
-            } else if modal.focus == InputField::ItemDescription {
-                Some(Action::ToggleItemCompletion)
-            } else {
-                // Insert newline in description
-                let mut current_text = modal.data.task_description.clone();
-                current_text.push('\n');
-                Some(Action::UpdateField(
-                    InputField::TaskDescription,
-                    current_text,
-                ))
-            }
-        }
-        _ => {
-            let (field, current_text) = match modal.focus {
-                InputField::TaskTitle => (InputField::TaskTitle, modal.data.task_title.clone()),
-                InputField::TaskDescription => (
-                    InputField::TaskDescription,
-                    modal.data.task_description.clone(),
-                ),
-                InputField::ItemDescription => {
-                    let text = if modal.item_index < modal.data.checklist.len() {
-                        modal.data.checklist[modal.item_index].description.clone()
-                    } else {
-                        modal.data.item_description.clone()
-                    };
-                    (InputField::ItemDescription, text)
+            // Context-sensitive Enter behavior
+            match modal.modal_type {
+                ModalType::CreateTask | ModalType::EditTask => {
+                    if modal.focus == InputField::TaskTitle {
+                        // Confirm on Title field
+                        return Some(Action::Confirm);
+                    }
+                    if modal.focus == InputField::ItemDescription {
+                        // Toggle completion on Checklist Items
+                        return Some(Action::ToggleItemCompletion);
+                    }
+                    // For TaskDescription, let TextArea handle the newline
                 }
-                _ => (InputField::TaskTitle, modal.data.task_title.clone()),
-            };
-            update_text_field(key, field, current_text)
+                _ => {
+                    // For other modals (Board/Column), Enter confirms
+                    return Some(Action::Confirm);
+                }
+            }
+            // If we didn't return, pass it to the TextArea (e.g., for newlines in description)
+            Some(Action::ModalInput(key))
         }
-    }
-}
-
-/// Helper for handling single line text edit modals.
-fn single_line_modal(key: KeyEvent, field: InputField, current_text: String) -> Option<Action> {
-    if key.code == KeyCode::Enter {
-        return Some(Action::Confirm);
-    }
-    update_text_field(key, field, current_text)
-}
-
-/// Helper for handling text input fields within modals.
-fn update_text_field(key: KeyEvent, field: InputField, mut current_text: String) -> Option<Action> {
-    match key.code {
-        KeyCode::Char(c) => {
-            current_text.push(c);
-            Some(Action::UpdateField(field, current_text))
-        }
-        KeyCode::Backspace => {
-            current_text.pop();
-            Some(Action::UpdateField(field, current_text))
-        }
-        _ => None,
+        // Pass all other keys (Arrows, Backspace, Home/End, etc.) to the TextArea
+        _ => Some(Action::ModalInput(key)),
     }
 }
 

@@ -1,6 +1,7 @@
 //! Definitions for all available application actions and input fields.
 
 use crate::model::modal_state::ModalType;
+use crossterm::event::KeyEvent;
 
 /// All possible actions that can trigger a state update.
 /// This enum is the core of the Elm-like update loop.
@@ -72,10 +73,8 @@ pub enum Action {
     CloseModal,
     /// Switch to the next available input field in the modal.
     SwitchInputField,
-    /// Update the text value of a field in an active modal.
-    UpdateField(InputField, String),
-    /// Update the cursor position within a modal field.
-    MoveCursor(usize, usize),
+    /// Pass a key event to the active modal's focused text area.
+    ModalInput(KeyEvent),
     /// Confirm the current modal operation (e.g., Save).
     Confirm,
     /// Discard the current modal operation.

@@ -5,6 +5,7 @@ use crate::model::{
     app_state::AppState,
     modal_state::{ModalState, ModalType},
 };
+use ratatui_textarea::{CursorMove, TextArea, WrapMode};
 
 /// Initializes and opens a modal of the specified type.
 pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action> {
@@ -16,15 +17,11 @@ pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action>
                 && let Some(column) = board_state.current_column()
             {
                 modal_state.data.column_title = column.title.clone();
-                modal_state.cursor_position.char_index =
-                    modal_state.data.column_title.chars().count();
             }
         }
         ModalType::EditBoard => {
             if let Some(board) = model.board_list.get(model.picker_state.index) {
                 modal_state.data.board_title = board.title.clone();
-                modal_state.cursor_position.char_index =
-                    modal_state.data.board_title.chars().count();
             }
         }
         ModalType::CreateTask => {
@@ -69,13 +66,12 @@ pub fn open_modal(model: &mut AppState, modal_type: ModalType) -> Option<Action>
                 modal_state.data.task_title = task.title.clone();
                 modal_state.data.task_description = task.description.clone();
                 modal_state.data.checklist = task.checklist.clone();
-                modal_state.cursor_position.char_index =
-                    modal_state.data.task_title.chars().count();
             }
         }
         _ => {}
     }
 
+    load_active_textarea(&mut modal_state);
     model.modal_state = Some(modal_state);
     None
 }
@@ -89,6 +85,8 @@ pub fn close_modal(model: &mut AppState) -> Option<Action> {
 /// Toggles focus between title and description fields in a task-related modal.
 pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
     if let Some(modal) = &mut model.modal_state {
+        sync_active_textarea(modal);
+
         modal.focus = match modal.focus {
             InputField::TaskTitle => InputField::TaskDescription,
             InputField::TaskDescription => {
@@ -119,55 +117,49 @@ pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
             _ => InputField::TaskTitle,
         };
 
-        // Reset cursor position to end of the new field's content
-        let char_count = match modal.focus {
-            InputField::TaskTitle => modal.data.task_title.chars().count(),
-            InputField::TaskDescription => modal.data.task_description.chars().count(),
-            InputField::ItemDescription => {
-                if modal.item_index < modal.data.checklist.len() {
-                    modal.data.checklist[modal.item_index]
-                        .description
-                        .chars()
-                        .count()
-                } else {
-                    modal.data.item_description.chars().count()
-                }
-            }
-            _ => 0,
-        };
-
-        modal.cursor_position.char_index = char_count;
-        modal.cursor_position.line_index = 0; // Simple for now
+        load_active_textarea(modal);
     }
     None
 }
 
-/// Updates the transient value of a specific input field within the active modal.
-pub fn update_field(model: &mut AppState, field: InputField, value: String) -> Option<Action> {
-    let mut new_cursor_pos = None;
-    if let Some(modal) = &mut model.modal_state {
-        // Calculate cursor position based on the end of the text
-        let lines: Vec<&str> = value.split('\n').collect();
-        let line_index = lines.len().saturating_sub(1);
-        let char_index = lines.last().map_or(0, |l| l.chars().count());
-        new_cursor_pos = Some((char_index, line_index));
-
-        match field {
-            InputField::BoardTitle => modal.data.board_title = value,
-            InputField::ColumnTitle => modal.data.column_title = value,
-            InputField::TaskTitle => modal.data.task_title = value,
-            InputField::TaskDescription => modal.data.task_description = value,
-            InputField::ItemDescription => {
-                if modal.item_index < modal.data.checklist.len() {
-                    modal.data.checklist[modal.item_index].description = value;
-                } else {
-                    modal.data.item_description = value;
-                }
+/// Helper to sync the content of the active TextArea back to the ModalData.
+fn sync_active_textarea(modal: &mut ModalState) {
+    let text = modal.active_textarea.lines().join("\n");
+    match modal.focus {
+        InputField::BoardTitle => modal.data.board_title = text,
+        InputField::ColumnTitle => modal.data.column_title = text,
+        InputField::TaskTitle => modal.data.task_title = text,
+        InputField::TaskDescription => modal.data.task_description = text,
+        InputField::ItemDescription => {
+            if modal.item_index < modal.data.checklist.len() {
+                modal.data.checklist[modal.item_index].description = text;
+            } else {
+                modal.data.item_description = text;
             }
         }
     }
+}
 
-    new_cursor_pos.map(|(x, y)| Action::MoveCursor(x, y))
+/// Helper to load the current field's content from ModalData into the active TextArea.
+fn load_active_textarea(modal: &mut ModalState) {
+    let text = match modal.focus {
+        InputField::BoardTitle => &modal.data.board_title,
+        InputField::ColumnTitle => &modal.data.column_title,
+        InputField::TaskTitle => &modal.data.task_title,
+        InputField::TaskDescription => &modal.data.task_description,
+        InputField::ItemDescription => {
+            if modal.item_index < modal.data.checklist.len() {
+                &modal.data.checklist[modal.item_index].description
+            } else {
+                &modal.data.item_description
+            }
+        }
+    };
+    modal.active_textarea = TextArea::from(text.lines());
+    if modal.focus == InputField::TaskDescription {
+        modal.active_textarea.set_wrap_mode(WrapMode::Word);
+    }
+    modal.active_textarea.move_cursor(CursorMove::End);
 }
 
 /// Removes the currently selected checklist item.
@@ -181,20 +173,13 @@ pub fn delete_checklist_item(model: &mut AppState) -> Option<Action> {
             if modal.item_index >= modal.data.checklist.len() && modal.item_index > 0 {
                 modal.item_index -= 1;
             }
+            load_active_textarea(modal);
             return Some(Action::MarkDirty);
         } else {
             // We are on the "new item" field, just clear it
             modal.data.item_description.clear();
+            load_active_textarea(modal);
         }
-    }
-    None
-}
-
-/// Updates the cursor's character and line position in the active modal.
-pub fn move_cursor(model: &mut AppState, x: usize, y: usize) -> Option<Action> {
-    if let Some(modal) = &mut model.modal_state {
-        modal.cursor_position.char_index = x;
-        modal.cursor_position.line_index = y;
     }
     None
 }
@@ -203,6 +188,10 @@ pub fn move_cursor(model: &mut AppState, x: usize, y: usize) -> Option<Action> {
 ///
 /// For example, confirming a `CreateBoard` modal returns a `CreateBoard(name)` action.
 pub fn confirm(model: &mut AppState) -> Option<Action> {
+    if let Some(modal) = &mut model.modal_state {
+        sync_active_textarea(modal);
+    }
+
     let modal = model.modal_state.as_ref()?;
     let action = match &modal.modal_type {
         ModalType::CreateBoard => {
@@ -355,24 +344,10 @@ mod tests {
     }
 
     #[test]
-    fn test_update_field() {
-        let mut model = AppState::new();
-        model.modal_state = Some(ModalState::new(ModalType::CreateBoard));
-
-        let action = update_field(&mut model, InputField::BoardTitle, "My Board".to_string());
-
-        assert!(matches!(action, Some(Action::MoveCursor(8, 0))));
-        assert_eq!(
-            model.modal_state.as_ref().unwrap().data.board_title,
-            "My Board"
-        );
-    }
-
-    #[test]
     fn test_confirm_create_board() {
         let mut model = AppState::new();
         let mut modal = ModalState::new(ModalType::CreateBoard);
-        modal.data.board_title = "New Board".to_string();
+        modal.active_textarea = TextArea::from(["New Board"]);
         model.modal_state = Some(modal);
 
         let action = confirm(&mut model);
@@ -406,6 +381,7 @@ mod tests {
         modal.focus = InputField::ItemDescription;
         modal.item_index = 0;
         modal.data.item_description = "Auto Append".to_string();
+        load_active_textarea(&mut modal); // Load into active_textarea so sync works
         model.modal_state = Some(modal);
 
         // Switch should append "Auto Append" to checklist and move to next item slot

@@ -6,12 +6,11 @@ use crate::model::board_state::Task;
 use crate::model::modal_state::ModalState;
 use crate::view::theme::ColorScheme;
 use crate::widgets::floating_window::centered_rect;
-use crate::widgets::text_input::TextInput;
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Modifier, Style, Stylize};
 use ratatui::text::Line;
-use ratatui::widgets::{Block, Borders, Clear, ListItem, Paragraph};
+use ratatui::widgets::{Block, Borders, Clear, ListItem, Paragraph, Wrap};
 
 /// Returns the checkbox symbol based on completion
 pub fn checkbox_symbol(completed: bool) -> &'static str {
@@ -121,18 +120,23 @@ pub fn task_modal(
     frame.render_widget(title_label, main_chunks[0]);
 
     let title_active = modal.focus == InputField::TaskTitle;
-    let title_input = TextInput::new(colors, &modal.data.task_title, modal.cursor_position)
-        .active(title_active)
-        .block(
+    if title_active {
+        let mut textarea = modal.active_textarea.clone();
+        textarea.set_block(
             Block::default()
                 .borders(Borders::ALL)
-                .border_style(Style::default().fg(if title_active {
-                    colors.highlight
-                } else {
-                    colors.inner_border
-                })),
+                .border_style(Style::default().fg(colors.highlight)),
         );
-    frame.render_widget(title_input, main_chunks[1]);
+        textarea.set_cursor_style(Style::default().fg(colors.background).bg(colors.highlight));
+        frame.render_widget(&textarea, main_chunks[1]);
+    } else {
+        let title_input = Paragraph::new(modal.data.task_title.as_str()).block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(colors.inner_border)),
+        );
+        frame.render_widget(title_input, main_chunks[1]);
+    }
 
     // Description Field
     let desc_label =
@@ -140,19 +144,25 @@ pub fn task_modal(
     frame.render_widget(desc_label, main_chunks[2]);
 
     let desc_active = modal.focus == InputField::TaskDescription;
-    let desc_input = TextInput::new(colors, &modal.data.task_description, modal.cursor_position)
-        .active(desc_active)
-        .multiline()
-        .block(
+    if desc_active {
+        let mut textarea = modal.active_textarea.clone();
+        textarea.set_block(
             Block::default()
                 .borders(Borders::ALL)
-                .border_style(Style::default().fg(if desc_active {
-                    colors.highlight
-                } else {
-                    colors.inner_border
-                })),
+                .border_style(Style::default().fg(colors.highlight)),
         );
-    frame.render_widget(desc_input, main_chunks[3]);
+        textarea.set_cursor_style(Style::default().fg(colors.background).bg(colors.highlight));
+        frame.render_widget(&textarea, main_chunks[3]);
+    } else {
+        let desc_input = Paragraph::new(modal.data.task_description.as_str())
+            .wrap(Wrap { trim: false })
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(colors.inner_border)),
+            );
+        frame.render_widget(desc_input, main_chunks[3]);
+    }
 
     // Checklist Label
     let checklist_label =
@@ -249,16 +259,21 @@ pub fn render_check_list_item(
         .style(Style::default().fg(colors.body_text));
     frame.render_widget(checkbox, checkbox_area);
 
-    let item_input = TextInput::new(*colors, content, modal.cursor_position)
-        .active(item_active)
-        .block(
+    if item_active {
+        let mut textarea = modal.active_textarea.clone();
+        textarea.set_block(
             Block::default()
                 .borders(Borders::ALL)
-                .border_style(Style::default().fg(if item_active {
-                    colors.highlight
-                } else {
-                    colors.inner_border
-                })),
+                .border_style(Style::default().fg(colors.highlight)),
         );
-    frame.render_widget(item_input, item_chunks[1]);
+        textarea.set_cursor_style(Style::default().fg(colors.background).bg(colors.highlight));
+        frame.render_widget(&textarea, item_chunks[1]);
+    } else {
+        let item_input = Paragraph::new(content).block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(colors.inner_border)),
+        );
+        frame.render_widget(item_input, item_chunks[1]);
+    }
 }
