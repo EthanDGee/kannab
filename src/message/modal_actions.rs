@@ -81,7 +81,7 @@ pub fn close_modal(model: &mut AppState) -> Option<Action> {
 }
 
 /// Toggles focus between title and description fields in a task-related modal.
-pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
+pub fn next_input_field(model: &mut AppState) -> Option<Action> {
     if let Some(modal) = &mut model.modal_state {
         sync_active_textarea(modal);
 
@@ -112,6 +112,34 @@ pub fn switch_input_field(model: &mut AppState) -> Option<Action> {
                 }
             }
 
+            _ => InputField::TaskTitle,
+        };
+
+        load_active_textarea(modal);
+    }
+    None
+}
+
+/// Toggles focus between title and description fields in a task-related modal backwards.
+pub fn prev_input_field(model: &mut AppState) -> Option<Action> {
+    if let Some(modal) = &mut model.modal_state {
+        sync_active_textarea(modal);
+
+        modal.focus = match modal.focus {
+            InputField::TaskTitle => {
+                let item_count = modal.data.checklist.len();
+                modal.item_index = item_count;
+                InputField::ItemDescription
+            }
+            InputField::TaskDescription => InputField::TaskTitle,
+            InputField::ItemDescription => {
+                if modal.item_index == 0 {
+                    InputField::TaskDescription
+                } else {
+                    modal.item_index -= 1;
+                    InputField::ItemDescription
+                }
+            }
             _ => InputField::TaskTitle,
         };
 
@@ -316,22 +344,48 @@ mod tests {
     }
 
     #[test]
-    fn test_switch_input_field_task() {
+    fn test_next_input_field_task() {
         let mut model = AppState::new();
         let mut modal = ModalState::new(ModalType::CreateTask);
         modal.focus = InputField::TaskTitle;
         model.modal_state = Some(modal);
 
-        switch_input_field(&mut model);
+        next_input_field(&mut model);
         assert_eq!(
             model.modal_state.as_ref().unwrap().focus,
             InputField::TaskDescription
         );
 
-        switch_input_field(&mut model);
+        next_input_field(&mut model);
         assert_eq!(
             model.modal_state.as_ref().unwrap().focus,
             InputField::ItemDescription
+        );
+    }
+
+    #[test]
+    fn test_prev_input_field_task() {
+        let mut model = AppState::new();
+        let mut modal = ModalState::new(ModalType::CreateTask);
+        modal.focus = InputField::TaskTitle;
+        model.modal_state = Some(modal);
+
+        prev_input_field(&mut model);
+        assert_eq!(
+            model.modal_state.as_ref().unwrap().focus,
+            InputField::ItemDescription
+        );
+
+        prev_input_field(&mut model);
+        assert_eq!(
+            model.modal_state.as_ref().unwrap().focus,
+            InputField::TaskDescription
+        );
+
+        prev_input_field(&mut model);
+        assert_eq!(
+            model.modal_state.as_ref().unwrap().focus,
+            InputField::TaskTitle
         );
     }
 
@@ -367,7 +421,7 @@ mod tests {
     }
 
     #[test]
-    fn test_switch_input_field_auto_append() {
+    fn test_next_input_field_auto_append_checklist() {
         let mut model = AppState::new();
         let mut modal = ModalState::new(ModalType::CreateTask);
         modal.focus = InputField::ItemDescription;
@@ -377,7 +431,7 @@ mod tests {
         model.modal_state = Some(modal);
 
         // Switch should append "Auto Append" to checklist and move to next item slot
-        switch_input_field(&mut model);
+        next_input_field(&mut model);
 
         let modal = model.modal_state.as_ref().unwrap();
         assert_eq!(modal.data.checklist.len(), 1);

@@ -83,7 +83,14 @@ fn handle_text_modal_key(modal: &ModalState, key: KeyEvent) -> Option<Action> {
 
     // Handle Structural/Navigation Keys
     match key.code {
-        KeyCode::Tab => Some(Action::SwitchInputField),
+        KeyCode::BackTab => Some(Action::PrevInputField),
+        KeyCode::Tab => {
+            if key.modifiers.contains(KeyModifiers::SHIFT) {
+                Some(Action::PrevInputField)
+            } else {
+                Some(Action::NextInputField)
+            }
+        }
         KeyCode::Enter => {
             // Context-sensitive Enter behavior
             match modal.modal_type {
@@ -126,13 +133,16 @@ fn handle_picker_keys(key: KeyEvent) -> Option<Action> {
         match key.code {
             // Board Rearrangement
             KeyCode::Up | KeyCode::Char('K') => Some(Action::MoveBoardUp),
-            KeyCode::Down | KeyCode::Char('J') | KeyCode::Tab => Some(Action::MoveBoardDown),
+            KeyCode::Down | KeyCode::Char('J') => Some(Action::MoveBoardDown),
+
+            // Backtab Navigation
+            KeyCode::BackTab => Some(Action::MoveUp),
             _ => None,
         }
     } else {
         match key.code {
             // Navigation
-            KeyCode::Up | KeyCode::Char('k') => Some(Action::MoveUp),
+            KeyCode::Up | KeyCode::Char('k') | KeyCode::BackTab => Some(Action::MoveUp),
             KeyCode::Down | KeyCode::Char('j') | KeyCode::Tab => Some(Action::MoveDown),
 
             // Actions

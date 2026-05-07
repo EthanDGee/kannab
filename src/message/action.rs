@@ -72,7 +72,9 @@ pub enum Action {
     /// Close any currently open modal and discard its modal state.
     CloseModal,
     /// Switch to the next available input field in the modal.
-    SwitchInputField,
+    NextInputField,
+    /// Switch to the previous available input field in the modal.
+    PrevInputField,
     /// Pass a key event to the active modal's focused text area.
     ModalInput(KeyEvent),
     /// Confirm the current modal operation (e.g., Save).

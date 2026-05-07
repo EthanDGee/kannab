@@ -60,7 +60,8 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
         // Modal Actions
         Action::OpenModal(modal_type) => modal_actions::open_modal(model, modal_type),
         Action::CloseModal => modal_actions::close_modal(model),
-        Action::SwitchInputField => modal_actions::switch_input_field(model),
+        Action::NextInputField => modal_actions::next_input_field(model),
+        Action::PrevInputField => modal_actions::prev_input_field(model),
         Action::ModalInput(key) => {
             if let Some(modal) = &mut model.modal_state
                 && modal.active_textarea.input(key)
