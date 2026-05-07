@@ -4,7 +4,7 @@ use crate::app::App;
 use crate::model::board_state::Column;
 use crate::model::modal_state::ModalState;
 use crate::view::task_view;
-use crate::widgets::floating_window::centered_rect;
+use crate::widgets::floating_window::centered_rect_minimum_size;
 use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::layout::{Constraint, Direction, Layout};
@@ -86,7 +86,7 @@ pub fn column_modal_view(
     instruction_text: &str,
 ) {
     let colors = app.model.color_scheme;
-    let area = centered_rect(60, 15, area);
+    let area = centered_rect_minimum_size(60, 15, 25, 7, area);
 
     frame.render_widget(Clear, area);
 

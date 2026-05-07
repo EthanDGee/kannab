@@ -5,7 +5,7 @@ use crate::message::action::InputField;
 use crate::model::board_state::Task;
 use crate::model::modal_state::ModalState;
 use crate::view::theme::ColorScheme;
-use crate::widgets::floating_window::centered_rect;
+use crate::widgets::floating_window::centered_rect_minimum_size;
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Modifier, Style, Stylize};
@@ -88,7 +88,7 @@ pub fn task_modal(
     instruction_text: &str,
 ) {
     let colors = app.model.color_scheme;
-    let area = centered_rect(70, 60, area);
+    let area = centered_rect_minimum_size(70, 60, 30, 20, area);
 
     frame.render_widget(Clear, area);
 

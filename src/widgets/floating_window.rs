@@ -31,6 +31,7 @@ pub fn centered_rect_minimum_size(
 }
 
 /// Helper function to create a centered rectangle using up to a certain percentage of the available area.
+#[allow(dead_code)]
 pub fn centered_rect(percent_x: u16, percent_y: u16, rectangle: Rect) -> Rect {
     centered_rect_minimum_size(percent_x, percent_y, 0, 0, rectangle)
 }

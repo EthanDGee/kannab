@@ -5,7 +5,7 @@ use crate::app::App;
 use crate::model::board_state::Board;
 use crate::model::modal_state::ModalState;
 use crate::view::column_view::{self, COLUMN_WIDTH};
-use crate::widgets::floating_window::centered_rect;
+use crate::widgets::floating_window::centered_rect_minimum_size;
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::Modifier;
@@ -156,7 +156,7 @@ pub fn board_modal_view(
     instruction_text: &str,
 ) {
     let colors = app.model.color_scheme;
-    let area = centered_rect(60, 15, area);
+    let area = centered_rect_minimum_size(60, 15, 25, 7, area);
 
     frame.render_widget(Clear, area); //this clears out the background
 

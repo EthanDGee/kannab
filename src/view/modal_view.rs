@@ -6,7 +6,7 @@ use crate::model::modal_state::{ConfirmDelete, ModalState};
 use crate::view::board_view::board_modal_view;
 use crate::view::column_view::column_modal_view;
 use crate::view::task_view;
-use crate::widgets::floating_window::centered_rect;
+use crate::widgets::floating_window::centered_rect_minimum_size;
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Modifier, Style};
@@ -76,7 +76,7 @@ pub fn render(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
 fn confirm_delete(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) {
     // --- Setup: Get colors and calculate centered area ---
     let colors = &app.model.color_scheme;
-    let area = centered_rect(35, 10, area);
+    let area = centered_rect_minimum_size(35, 10, 40, 6, area);
     frame.render_widget(Clear, area);
 
     // --- Extract target from modal ---
