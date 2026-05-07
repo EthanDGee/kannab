@@ -10,7 +10,7 @@
     - [Board Picker (Main Menu)](#board-picker-main-menu)
     - [Board View (Task Navigation)](#board-view-task-navigation)
     - [Task Modal (Create / Edit Task)](#task-modal-create--edit-task)
-    - [Other Modals (Board / Column)](#other-modals-board--column)
+    - [Other Modals (Board / Column)](#other-modals-board--column--help)
     - [Confirmation Dialog](#confirmation-dialog)
   - [Storage](#storage)
   - [Configuration](#configuration)
@@ -43,6 +43,8 @@ with a Tokyo Night default.
 - **Delete Confirmation**: All destructive actions prompt a confirmation dialog.
 - **Responsive UI**: A fullscreen terminal interface with horizontal scrolling
 when content exceeds the window size.
+- **Comprehensive Help Window**: A comprehensive help window that covers all
+functionality of kannab.
 
 ## Getting Started
 
@@ -131,10 +133,11 @@ The task modal has three input fields cycled via `Tab` / `Shift`+`Tab`:
 New checklist items are created automatically when you type in the last
 empty item slot and navigate away.
 
-### Other Modals (Board / Column)
+### Other Modals (Board / Column / Help)
 
 | Key | Action |
 | ----- | -------- |
+| `?` / `shift + /` | Opens the help window` |
 | `Esc` | Close modal (discard changes) |
 | `Enter` | Confirm |
 
