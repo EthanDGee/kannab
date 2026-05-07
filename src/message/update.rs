@@ -1,8 +1,9 @@
 //! The central update function that routes actions to their specific handlers.
 
+use crate::message::action::Action;
 use crate::message::{
-    action::Action, board_actions, column_actions, io_actions, modal_actions, navigation_actions,
-    picker_actions, task_actions,
+    board_actions, column_actions, io_actions, modal_actions, navigation_actions, picker_actions,
+    task_actions,
 };
 use crate::model::app_state::AppState;
 
@@ -69,7 +70,6 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
             None
         }
         Action::Confirm => modal_actions::confirm(model),
-        Action::Cancel => modal_actions::cancel(model),
 
         // I/O Operations
         Action::Save => io_actions::save(model),
@@ -80,7 +80,7 @@ pub fn update(model: &mut AppState, action: Action) -> Option<Action> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::message::update::*;
     use crate::model::app_state::AppMode;
 
     #[test]

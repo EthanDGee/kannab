@@ -1,17 +1,16 @@
 //! View components for rendering modal dialogs and overlays.
 
+use crate::app::App;
+use crate::model::modal_state::ModalType;
 use crate::model::modal_state::{ConfirmDelete, ModalState};
 use crate::view::board_view::board_modal_view;
 use crate::view::column_view::column_modal_view;
 use crate::view::task_view;
 use crate::widgets::floating_window::centered_rect;
-use crate::{app::App, model::modal_state::ModalType};
-use ratatui::{
-    Frame,
-    layout::{Constraint, Direction, Layout, Rect},
-    style::{Modifier, Style},
-    widgets::{Block, Borders, Clear, Paragraph},
-};
+use ratatui::Frame;
+use ratatui::layout::{Constraint, Direction, Layout, Rect};
+use ratatui::style::{Modifier, Style};
+use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 
 /// The primary render function for modals.
 ///

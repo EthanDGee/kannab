@@ -4,10 +4,11 @@
 //! ensuring that the terminal state is correctly restored even in case of panics.
 
 use color_eyre::Result;
-use crossterm::{
-    cursor, execute,
-    terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
+use crossterm::terminal::{
+    EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
 };
+use crossterm::{cursor, execute};
+
 use ratatui::{Terminal, prelude::CrosstermBackend};
 use std::io::{Stdout, stdout};
 

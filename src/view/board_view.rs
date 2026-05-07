@@ -1,18 +1,17 @@
 //! View components for rendering a full Kanban board.
 
+use crate::APP_NAME;
 use crate::app::App;
+use crate::model::board_state::Board;
 use crate::model::modal_state::ModalState;
 use crate::view::column_view::{self, COLUMN_WIDTH};
 use crate::widgets::floating_window::centered_rect;
-use crate::{APP_NAME, model::board_state::Board};
+use ratatui::Frame;
+use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::Modifier;
+use ratatui::style::Style;
+use ratatui::widgets::Paragraph;
 use ratatui::widgets::{Block, Borders, Clear};
-use ratatui::{
-    Frame,
-    layout::{Constraint, Direction, Layout, Rect},
-    style::Style,
-    widgets::Paragraph,
-};
 
 /// Handles associated view data for the Kanban board data.
 ///
@@ -199,8 +198,8 @@ pub fn board_modal_view(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::model::board_state::{Board, Column, Task};
+    use crate::view::board_view::*;
 
     #[test]
     fn test_board_state_new() {

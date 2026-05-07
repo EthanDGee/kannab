@@ -77,9 +77,6 @@ pub enum Action {
     ModalInput(KeyEvent),
     /// Confirm the current modal operation (e.g., Save).
     Confirm,
-    /// Discard the current modal operation.
-    #[allow(dead_code)]
-    Cancel,
 
     // IO operations
     /// Mark the state as containing unsaved changes.

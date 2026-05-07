@@ -103,7 +103,7 @@ impl ModalState {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::model::modal_state::*;
 
     #[test]
     fn test_modal_state_new() {

@@ -230,7 +230,7 @@ impl Board {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::model::board_state::*;
 
     #[test]
     fn test_item_new() {

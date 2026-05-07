@@ -20,7 +20,7 @@ pub fn quit_to_picker(model: &mut AppState) -> Option<Action> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::message::picker_actions::*;
     use crate::model::board_state::Board;
     use crate::view::board_view::BoardState;
 

@@ -58,7 +58,7 @@ impl AppState {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::model::app_state::{AppMode, AppState, BoardName};
 
     #[test]
     fn test_app_state_new() {

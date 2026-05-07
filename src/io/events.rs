@@ -4,10 +4,11 @@
 //! application-level `Action`s, taking into account the current `AppMode`
 //! and active modals.
 
+use crate::app::App;
 use crate::message::action::{Action, InputField};
 use crate::model::app_state::AppMode;
+use crate::model::modal_state::ModalType;
 use crate::model::modal_state::{ConfirmDelete, ModalState};
-use crate::{app::App, model::modal_state::ModalType};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseEvent};
 
 /// Top-level event type.

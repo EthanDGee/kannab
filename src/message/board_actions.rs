@@ -130,7 +130,7 @@ pub fn move_board_down(model: &mut AppState) -> Option<Action> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::message::board_actions::*;
     use crate::model::app_state::{AppMode, AppState};
     use crate::model::board_state::BoardName;
 

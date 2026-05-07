@@ -3,7 +3,8 @@
 use crate::message::action::Action;
 use crate::message::io_actions::mark_dirty;
 use crate::message::navigation_actions::{decrement_no_wrap, increment_no_wrap};
-use crate::model::{app_state::AppState, board_state::Column};
+use crate::model::app_state::AppState;
+use crate::model::board_state::Column;
 
 // TODO: create_column should insert column after the current column index
 
@@ -105,7 +106,8 @@ pub fn move_column_right(model: &mut AppState) -> Option<Action> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::message::column_actions::*;
+    use crate::model::app_state::AppState;
     use crate::model::board_state::Board;
     use crate::view::board_view::BoardState;
 

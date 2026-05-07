@@ -1,6 +1,8 @@
 //! Handlers for I/O and system-level actions.
 
-use crate::{io::file_handling, message::action::Action, model::app_state::AppState};
+use crate::io::file_handling;
+use crate::message::action::Action;
+use crate::model::app_state::AppState;
 
 /// Marks the application state as having unsaved changes, triggering future auto-saves.
 pub fn mark_dirty(model: &mut AppState) -> Option<Action> {
@@ -35,7 +37,7 @@ pub fn quit(model: &mut AppState) -> Option<Action> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::message::io_actions::*;
 
     #[test]
     fn test_mark_dirty() {

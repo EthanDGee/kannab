@@ -142,7 +142,8 @@ pub fn move_right(model: &mut AppState) -> Option<Action> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::message::navigation_actions::*;
+    use crate::model::app_state::{AppMode, AppState};
     use crate::model::board_state::{Board, Column, Task};
     use crate::view::board_view::BoardState;
 

@@ -136,7 +136,7 @@ pub fn initialize_theme() -> ColorScheme {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::io::file_handling::*;
 
     #[test]
     fn test_to_snake_case() {

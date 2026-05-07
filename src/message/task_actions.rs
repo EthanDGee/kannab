@@ -215,7 +215,7 @@ pub fn toggle_item_completion(model: &mut AppState) -> Option<Action> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::message::task_actions::*;
     use crate::model::board_state::{Board, Column};
     use crate::view::board_view::BoardState;
 

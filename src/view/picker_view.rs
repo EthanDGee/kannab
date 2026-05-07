@@ -1,12 +1,10 @@
 //! View components for rendering the board picker screen.
 
 use crate::{APP_NAME, app::App};
-use ratatui::{
-    Frame,
-    layout::{Constraint, Layout, Rect},
-    style::Style,
-    widgets::{Block, List, ListItem, Paragraph},
-};
+use ratatui::Frame;
+use ratatui::layout::{Constraint, Layout, Rect};
+use ratatui::style::Style;
+use ratatui::widgets::{Block, List, ListItem, Paragraph};
 
 /// Transient UI state for the board picker.
 #[derive(Clone, Default)]

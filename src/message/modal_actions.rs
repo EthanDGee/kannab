@@ -1,10 +1,8 @@
 //! Handlers for modal-related actions and user input.
 
 use crate::message::action::{Action, InputField};
-use crate::model::{
-    app_state::AppState,
-    modal_state::{ModalState, ModalType},
-};
+use crate::model::app_state::AppState;
+use crate::model::modal_state::{ModalState, ModalType};
 use ratatui_textarea::{CursorMove, TextArea, WrapMode};
 
 /// Initializes and opens a modal of the specified type.
@@ -230,12 +228,6 @@ pub fn confirm(model: &mut AppState) -> Option<Action> {
     action
 }
 
-/// Cancels the current modal operation, discards any data, and closes it.
-pub fn cancel(model: &mut AppState) -> Option<Action> {
-    model.modal_state = None;
-    None
-}
-
 /// Extracts and prepares task data from the modal state, including appending any new checklist item.
 fn finalize_task_data(
     modal: &ModalState,
@@ -255,8 +247,8 @@ fn finalize_task_data(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::message::action::InputField;
+    use crate::message::modal_actions::*;
     use crate::model::app_state::AppState;
     use crate::model::board_state::Item;
     use crate::model::modal_state::{ModalState, ModalType};

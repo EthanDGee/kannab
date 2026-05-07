@@ -5,14 +5,12 @@ use crate::model::board_state::Column;
 use crate::model::modal_state::ModalState;
 use crate::view::task_view;
 use crate::widgets::floating_window::centered_rect;
+use ratatui::Frame;
+use ratatui::layout::Rect;
 use ratatui::layout::{Constraint, Direction, Layout};
+use ratatui::style::{Modifier, Style};
+use ratatui::widgets::{Block, Borders, List, ListState};
 use ratatui::widgets::{Clear, Paragraph};
-use ratatui::{
-    Frame,
-    layout::Rect,
-    style::{Modifier, Style},
-    widgets::{Block, Borders, List, ListState},
-};
 
 /// The fixed width used for all Kanban columns.
 pub const COLUMN_WIDTH: u16 = 40;
