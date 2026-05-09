@@ -2,7 +2,7 @@
 description = "A kanban TUI built around vim navigation and a polished user experience."
 name = "kannab"
 repository = "https://github.com/EthanDGee/kannab"
-version = "0.3.3"
+version = "0.3.5"
 edition = "2024"
 license = "MIT"
 
