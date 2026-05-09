@@ -33,8 +33,12 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
         .split(area);
 
     // Header
-    let title = Paragraph::new(format!("{} - Select Board", APP_NAME))
-        .style(Style::default().fg(colors.body_text).bg(colors.background));
+    let mut title_style = Style::default().fg(colors.body_text);
+
+    if !colors.transparent {
+        title_style = title_style.bg(colors.background);
+    }
+    let title = Paragraph::new(format!("{} - Select Board", APP_NAME)).style(title_style);
     frame.render_widget(title, chunks[0]);
 
     // Board list (custom scrollable list widget)
@@ -50,24 +54,35 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
                 Style::default()
                     .fg(colors.highlight_text)
                     .bg(colors.highlight)
+            } else if colors.transparent {
+                Style::default().fg(colors.body_text)
             } else {
                 Style::default().fg(colors.body_text).bg(colors.background)
             })
         })
         .collect();
 
+    let mut list_style = Style::default().fg(colors.body_text);
+
+    if !colors.transparent {
+        list_style = list_style.bg(colors.background);
+    }
+
     let list = List::new(items).block(
         Block::default()
             .title("Boards")
             .border_style(Style::default().fg(colors.outer_border))
-            .style(Style::default().fg(colors.body_text).bg(colors.background)),
+            .style(list_style),
     );
     frame.render_widget(list, chunks[1]);
 
     // Status bar
-    let status = format!("[NORMAL] [?] Help  ({} boards)", app.model.board_list.len());
-    frame.render_widget(
-        Paragraph::new(status).style(Style::default().fg(colors.body_text).bg(colors.background)),
-        chunks[2],
-    );
+    let mut status_style = Style::default().fg(colors.body_text);
+
+    if !colors.transparent {
+        status_style = status_style.bg(colors.background);
+    }
+
+    let status = format!("Help [?] ({} boards)", app.model.board_list.len());
+    frame.render_widget(Paragraph::new(status).style(status_style), chunks[2]);
 }

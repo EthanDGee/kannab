@@ -19,6 +19,8 @@ pub struct ColorScheme {
     pub highlight_text: Color,
     /// Standard color for general body text.
     pub body_text: Color,
+    /// Toggle to determine whether or not backgrounds are transparent.
+    pub transparent: bool,
 }
 
 impl Default for ColorScheme {
@@ -31,6 +33,7 @@ impl Default for ColorScheme {
             highlight: Rgb(122, 162, 247),      // tokyo night blue
             highlight_text: Rgb(205, 214, 244), // tokyo night fg
             body_text: Rgb(205, 214, 244),      // tokyo night fg
+            transparent: true,
         }
     }
 }
