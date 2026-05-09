@@ -27,13 +27,17 @@ pub fn render(
     let colors = &app.model.color_scheme;
     let board_state = app.model.board_state.as_ref().expect("BoardState missing");
 
-    let block_style = if selected {
+    let mut block_style = if selected {
         Style::new()
             .fg(colors.highlight)
             .add_modifier(Modifier::BOLD)
     } else {
         Style::new().fg(colors.body_text)
     };
+
+    if !colors.transparent {
+        block_style = block_style.bg(colors.background);
+    }
 
     let border_style = if selected {
         Style::new().fg(colors.highlight)
@@ -64,6 +68,11 @@ pub fn render(
 
     let list = List::new(task_items).block(Block::default());
 
+    let mut list_style = Style::default().fg(colors.body_text);
+    if !colors.transparent {
+        list_style = list_style.bg(colors.background);
+    }
+
     let mut list_state = ListState::default();
     if selected {
         list_state.select(Some(board_state.task_index));
@@ -73,7 +82,7 @@ pub fn render(
         list_state.select(scroll_index);
     }
 
-    frame.render_stateful_widget(list, inner, &mut list_state);
+    frame.render_stateful_widget(list.style(list_style), inner, &mut list_state);
 }
 
 /// Renders a modal for creating or renaming a column.
@@ -90,11 +99,16 @@ pub fn column_modal_view(
 
     frame.render_widget(Clear, area);
 
+    let mut block_style = Style::default().fg(colors.body_text);
+    if !colors.transparent {
+        block_style = block_style.bg(colors.background);
+    }
+
     let block = Block::default()
         .title(title)
         .borders(Borders::ALL)
         .border_style(Style::default().fg(colors.highlight))
-        .style(Style::default().bg(colors.background).fg(colors.body_text));
+        .style(block_style);
 
     let inner_area = block.inner(area);
     frame.render_widget(block, area);

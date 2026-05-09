@@ -118,12 +118,17 @@ fn confirm_delete(app: &App, frame: &mut Frame, modal: &ModalState, area: Rect) 
         }
     };
 
+    let mut block_style = Style::default().fg(colors.body_text);
+    if !colors.transparent {
+        block_style = block_style.bg(colors.background);
+    }
+
     // boarded with the label based on the delete_type
     let block = Block::default()
         .title(format!(" Delete {} ", delete_type))
         .borders(Borders::ALL)
         .border_style(Style::default().fg(colors.highlight))
-        .style(Style::default().bg(colors.background).fg(colors.body_text));
+        .style(block_style);
 
     let inner_area = block.inner(area);
     frame.render_widget(block, area);

@@ -91,12 +91,17 @@ pub fn task_modal(
     let area = centered_rect_minimum_size(70, 60, 30, 20, area);
 
     frame.render_widget(Clear, area);
+    let mut block_style = Style::default().fg(colors.body_text);
+
+    if !colors.transparent {
+        block_style = block_style.bg(colors.background);
+    }
 
     let block = Block::default()
         .title(title)
         .borders(Borders::ALL)
         .border_style(Style::default().fg(colors.highlight))
-        .style(Style::default().bg(colors.background).fg(colors.body_text));
+        .style(block_style);
 
     let inner_area = block.inner(area);
     frame.render_widget(block, area);

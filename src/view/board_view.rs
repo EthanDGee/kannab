@@ -103,9 +103,22 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
 
     // Header
     let header_title = format!("{} - {}", APP_NAME, board.title);
-    let title = Paragraph::new(header_title)
-        .style(Style::default().fg(colors.body_text).bg(colors.background));
+
+    let mut title_style = Style::default().fg(colors.body_text);
+    if !colors.transparent {
+        title_style = title_style.bg(colors.background);
+    }
+
+    let title = Paragraph::new(header_title).style(title_style);
     frame.render_widget(title, chunks[0]);
+
+    // Fill background for the Kanban area if not transparent
+    if !colors.transparent {
+        frame.render_widget(
+            Block::default().style(Style::default().bg(colors.background)),
+            chunks[1],
+        );
+    }
 
     // Horizontal layout for columns with fixed width and scrolling
     let available_width = chunks[1].width;
@@ -141,8 +154,13 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
 
     // Footer
     let footer_text = format!("{}  [?] Help", board.title);
-    let footer = Paragraph::new(footer_text)
-        .style(Style::default().fg(colors.body_text).bg(colors.background));
+    let mut footer_style = Style::default().fg(colors.body_text);
+
+    if !colors.transparent {
+        footer_style = footer_style.bg(colors.background);
+    }
+
+    let footer = Paragraph::new(footer_text).style(footer_style);
     frame.render_widget(footer, chunks[2]);
 }
 
@@ -160,11 +178,16 @@ pub fn board_modal_view(
 
     frame.render_widget(Clear, area); //this clears out the background
 
+    let mut block_style = Style::default().fg(colors.body_text);
+    if !colors.transparent {
+        block_style = block_style.bg(colors.background);
+    }
+
     let block = Block::default()
         .title(title)
         .borders(Borders::ALL)
         .border_style(Style::default().fg(colors.highlight))
-        .style(Style::default().bg(colors.background).fg(colors.body_text));
+        .style(block_style);
 
     let inner_area = block.inner(area);
     frame.render_widget(block, area);

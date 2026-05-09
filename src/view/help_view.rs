@@ -42,11 +42,16 @@ pub fn render(app: &App, frame: &mut Frame, area: Rect) {
     let help_area = centered_rect(80, 80, area);
     frame.render_widget(Clear, help_area);
 
+    let mut block_style = Style::default().fg(colors.body_text);
+    if !colors.transparent {
+        block_style = block_style.bg(colors.background);
+    }
+
     let block = Block::default()
         .title(" Help ")
         .borders(Borders::ALL)
         .border_style(Style::default().fg(colors.highlight))
-        .style(Style::default().bg(colors.background));
+        .style(block_style);
     frame.render_widget(block, help_area);
 
     let inner_area = Rect::new(

@@ -2,7 +2,7 @@
 name = "kannab"
 description = "A kanban CLI tool."
 repository = "https://github.com/EthanDGee/kannab"
-version = "0.3.3"
+version = "0.3.4"
 edition = "2024"
 license = "MIT"
 

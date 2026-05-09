@@ -33,7 +33,7 @@ impl Default for ColorScheme {
             highlight: Rgb(122, 162, 247),      // tokyo night blue
             highlight_text: Rgb(205, 214, 244), // tokyo night fg
             body_text: Rgb(205, 214, 244),      // tokyo night fg
-            transparent: true,
+            transparent: false,
         }
     }
 }
