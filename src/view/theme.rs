@@ -21,6 +21,8 @@ pub struct ColorScheme {
     pub body_text: Color,
     /// Toggle to determine whether or not backgrounds are transparent.
     pub transparent: bool,
+    /// Toggles code icons
+    pub code_icons: bool,
 }
 
 impl Default for ColorScheme {
@@ -34,6 +36,7 @@ impl Default for ColorScheme {
             highlight_text: Rgb(205, 214, 244), // tokyo night fg
             body_text: Rgb(205, 214, 244),      // tokyo night fg
             transparent: false,
+            code_icons: false,
         }
     }
 }

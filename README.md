@@ -39,7 +39,7 @@ with `Shift`+arrows.
 - **Global Persistence**: Boards stored globally on your file system with
 automatic saving every 5 seconds.
 - **Custom Themes**: Configurable color scheme via `~/.config/kannab/theme.toml`
-with a Tokyo Night default.
+with support for transparent backgrounds and nerd fonts (default `Tokyo Night`)
 - **Delete Confirmation**: All destructive actions prompt a confirmation dialog.
 - **Responsive UI**: A fullscreen terminal interface with horizontal scrolling
 when content exceeds the window size.
@@ -168,6 +168,8 @@ inner_border = "#434C5E"
 highlight = "#7AA2F7"
 highlight_text = "#CDD6F4"
 body_text = "#CDD6F4"
+transparent = false // turn this to true to enable transparent backgrounds
+code_icons = false // changing this to true enables nerd fonts support
 ```
 
 To see theme changes you must close and restart the program. If the config

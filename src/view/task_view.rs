@@ -13,8 +13,12 @@ use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Clear, ListItem, Paragraph, Wrap};
 
 /// Returns the checkbox symbol based on completion
-pub fn checkbox_symbol(completed: bool) -> &'static str {
-    if completed { "" } else { "" }
+pub fn checkbox_symbol(completed: bool, code_icons: bool) -> &'static str {
+    if code_icons {
+        if completed { "" } else { "" }
+    } else {
+        if completed { "[x]" } else { "[ ]" }
+    }
 }
 
 /// Renders a single task as a `ListItem` of its column.
@@ -32,7 +36,7 @@ pub fn render<'a>(task: &Task, colors: &ColorScheme, selected: bool, width: u16)
 
     let top = Line::from(format!("┌{}┐", "─".repeat(inner_width)).fg(border_color));
 
-    let checkmark = checkbox_symbol(task.complete);
+    let checkmark = checkbox_symbol(task.complete, colors.code_icons);
     let formatted_title = format!("{} {}", checkmark, task.title.clone());
 
     let header = if task.title.len() > inner_width {
@@ -241,11 +245,14 @@ pub fn render_check_list_item(
     completed: bool,
 ) {
     let item_active = modal.focus == InputField::ItemDescription && modal.item_index == item_index;
+
+    let checkbox_sizes = if colors.code_icons { 3 } else { 5 };
+
     let item_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
-            Constraint::Length(3), // Checkbox
-            Constraint::Min(0),    // Item Description
+            Constraint::Length(checkbox_sizes), // Checkbox
+            Constraint::Min(0),                 // Item Description
         ])
         .split(area);
 
@@ -260,8 +267,11 @@ pub fn render_check_list_item(
         .split(item_chunks[0])[1];
 
     // Render checkbox
-    let checkbox = Paragraph::new(format!(" {} ", checkbox_symbol(completed)))
-        .style(Style::default().fg(colors.body_text));
+    let checkbox = Paragraph::new(format!(
+        " {} ",
+        checkbox_symbol(completed, colors.code_icons)
+    ))
+    .style(Style::default().fg(colors.body_text));
     frame.render_widget(checkbox, checkbox_area);
 
     if item_active {
